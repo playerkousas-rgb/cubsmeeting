@@ -1,0 +1,12 @@
+{
+  "name": "cub-meeting-helper",
+  "version": "1.0.0",
+  "description": "幼童軍團集會助手 Cub Hub — 靜態PWA，無build step",
+  "type": "module",
+  "scripts": {
+    "test": "node tests/smoke.mjs && node tests/ui.mjs && node tests/audit.mjs && node tests/runtime.mjs",
+    "test:smoke": "node tests/smoke.mjs",
+    "test:ui": "node tests/ui.mjs",
+    "test:audit": "node tests/audit.mjs"
+  }
+}
