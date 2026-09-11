@@ -1,0 +1,6 @@
+# Local tooling, browser binaries, screenshots and temporary PDFs
+node_modules/
+.cache/
+playwright-report/
+test-results/
+*.log

@@ -19,8 +19,11 @@ const flowCode = read("js/flow.js");
   const top = (html.match(/<nav id="topnav"[\s\S]*?<\/nav>/) || [""])[0];
   const bot = (html.match(/<nav id="tabbar"[\s\S]*?<\/nav>/) || [""])[0];
   const tn = (top.match(/<a /g) || []).length, bn = (bot.match(/<a /g) || []).length;
-  ok(tn <= 4 && tn >= 3, `上面入口列 ${tn} 粒（≤4）`);
-  ok(bn <= 4 && bn >= 3, `下面工具箱 ${bn} 粒（≤4）`);
+  ok(tn === 5, `上面入口列 ${tn} 粒（5）`);
+  ok(bot.includes('href="#jungle"') && bot.includes('森林故事'), '下方有森林故事直接入口');
+  ok(!bot.includes('href="#teams"'), '小隊不再佔下方入口');
+  ok(read('js/jungle.js').includes("a.getAttribute('href')==='#jungle'"), '森林故事頁高亮自己的入口');
+  ok(bn === 5, `下面工具箱 ${bn} 粒（5）`);
   ok(!/一二三四|步驟一|Step 1/.test(top + bot), "導覽掣無標一二三四扮流程");
 }
 /* 2. 嚮導每步四要素齊（做咩n／點解why／動作掣btn／go） */

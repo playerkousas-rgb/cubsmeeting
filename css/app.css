@@ -131,3 +131,92 @@ body.offline .extcard{opacity:.55}
   @page{size:A4;margin:12mm}
   body{background:#fff}
 }
+
+/* v2: preparation above, field tools below; quiet purple and warm paper. */
+:root{--bg:#f5f4f0;--line:#e7e3ed;--mut:#70687b;--ink:#30283c;--brand:#604487;--gr:#38634d}
+#topbar{background:#30283c;padding:16px 22px}.brand{font-size:18px}
+#stickytop{box-shadow:0 2px 12px #30283c08}#topnav,#tabbar{padding:8px 16px;background:#fff}
+.navcap{font-size:11px;letter-spacing:.06em;margin-bottom:5px}.navrow{gap:6px}.navrow a{min-width:0;font-size:12px;border:1px solid transparent;border-radius:10px;padding:7px 2px}.navrow a.cur{background:#ede7f5;border-color:#ded3ea}.navrow a span{font-size:20px}
+#view{max-width:1080px;padding:24px 24px 140px}.hero{background:#eae3f2;color:#30283c;padding:36px;border-radius:22px;position:relative}.hero h1{font-size:40px;line-height:1.25;letter-spacing:-.04em;margin:14px 0}.hero p{max-width:570px;font-size:14px;color:#625570}.hero .btn.ghost{color:var(--ink);border-color:#c5b7d5}.troop,.eyebrow{font-size:11px;letter-spacing:.1em;color:#756187}.eyebrow{display:block}.stats{border-top:1px solid #d7cce2;padding-top:14px;margin-top:22px;font-size:12px}.stats b{font-size:22px}.card{border-width:1px;border-radius:18px;padding:24px;margin:18px 0}.card h2{font-size:20px}.btn{border-width:1px;border-radius:10px;min-height:42px}.btn.gr{background:var(--gr)}
+.current-meeting,.section-heading{display:flex;align-items:center;justify-content:space-between;gap:14px}.current-meeting h2{margin:4px 0}.catalog-row{display:flex;align-items:center;gap:12px;border-top:1px solid var(--line)}.catalog-row>a{display:flex;align-items:center;gap:16px;padding:20px 0;text-decoration:none;color:var(--ink);flex:1;min-width:0}.catalog-row small{display:block;color:var(--mut);font-size:12px;margin-top:3px}.catalog-row .go{margin-left:auto}.mno{background:#eee8f4;color:var(--brand);font-size:13px;padding:8px;border-radius:10px}.status-chip{background:#f6f4f8;color:#70687b;border:1px solid #e2dcea;border-radius:20px;padding:5px 9px;cursor:pointer;white-space:nowrap}.template-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin-top:20px}.template-card,.activity-card{border:1px solid var(--line);padding:22px;border-radius:14px;text-decoration:none;color:var(--ink);background:#fcfbfd}.template-card:hover{border-color:var(--brand);background:#f4effa}.template-card p{font-size:13px;color:var(--mut)}.template-card>b{font-size:13px;color:var(--brand)}.activity-card .adia{max-height:130px}.activity-card svg{max-height:130px;width:100%}.activity-card h3{font-size:16px}.prep-step{display:flex;gap:18px;padding:22px;border:1px solid var(--line);border-radius:14px;margin:12px 0}.prep-step h3{margin:0}.prep-step p{font-size:14px;color:var(--mut)}.prep-step.active{background:#f0f5ef;border:2px solid #76947b}.prep-step.complete{padding:14px 22px;background:#fafbf8}.prep-step.complete .btn{margin-left:15px;font-size:12px;min-height:32px}.step-number{background:#eee8f4;border-radius:50%;width:32px;height:32px;display:grid;place-items:center;flex-shrink:0}.sheet-entry{padding:16px 0;border-top:1px solid var(--line)}summary{cursor:pointer}.tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:24px 0}.tool-grid .btn{padding:25px}.tool-clock{font-size:64px;font-variant-numeric:tabular-nums;margin:20px 0}.external-link.off{opacity:.45;cursor:not-allowed}a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid #b07c25;outline-offset:3px}
+@media(min-width:760px){#topnav .navrow,#topnav .navcap,#tabbar .navrow,#tabbar .navcap{max-width:1032px;margin-left:auto;margin-right:auto}.navrow a{font-size:14px}#tabbar{box-shadow:0 -3px 18px #30283c09}}
+@media(max-width:520px){#view{padding:14px 12px 140px}.hero{padding:24px}.hero h1{font-size:32px}.card{padding:17px}.navrow a{font-size:10px}.navrow{gap:2px}#topnav,#tabbar{padding:7px 6px}.brand{font-size:15px}.current-meeting{align-items:flex-start;flex-direction:column}.catalog-row>a{gap:10px}.catalog-row b{font-size:14px}.status-chip{font-size:11px}.section-heading{align-items:flex-start;flex-direction:column;gap:0}.prep-step{padding:16px;gap:12px}}
+@media print{#view{padding:0}.hero,.current-meeting,#topnav,#tabbar,#flowbar{display:none!important}.card{border:0;box-shadow:none}.prep-step{break-inside:avoid}}
+/* Text-first curriculum and real A4 writing sheets. */
+.learning-card details{margin-top:12px}.learning-card h4{margin-bottom:4px}.learning-card details p{font-size:14px;margin-top:4px}
+.writing-prompt{margin:14px 0}.writing-space{height:42mm;border:1px solid #bbb;margin-top:7px;border-radius:4px}.worksheet h2{font-size:19px}.leader-sheet{font-size:13px}.leader-sheet li{margin:10px 0}.worksheet{font-size:14px}
+@media print{.psheet{width:auto;min-height:0;max-width:100%;break-after:page;break-inside:avoid;padding:8mm}.psheet:last-child{break-after:auto}.worksheet .writing-space{height:42mm}.psheet h2{font-size:18px}.leader-sheet{font-size:11px;line-height:1.5}.leader-sheet li{margin:7px 0}.leader-sheet p{margin:7px 0}#printarea .divider{display:block!important}}
+@media print{
+  body.print-pack #app,body.print-pack #netbar{display:none!important}
+  body.print-pack #modal{position:static!important;inset:auto!important;overflow:visible!important;padding:0!important;background:#fff!important}
+  body.print-pack .mbox{max-width:none;width:100%;margin:0;padding:0;border-radius:0;overflow:visible}
+  body.print-pack .mbox>:not(#printarea){display:none!important}
+  body.print-pack .psheet{margin:0;border:0;border-radius:0}
+}
+.character-card{text-align:left;padding:20px;white-space:normal}.character-card b{display:block;font-size:20px}.character-card span{display:block;font-size:13px;color:var(--mut);margin-top:6px}.story-text{font-size:22px;line-height:1.9}.story-reader .quick{margin-top:20px}.story-reader button:disabled{opacity:.4;cursor:default}
+@media(max-width:520px){.story-text{font-size:19px}}
+/* Field-ready lesson support: reveal details only when needed. */
+.field-summary{border-left:4px solid var(--gr)}.field-summary .say{font-size:16px}.field-question h2{font-size:26px;line-height:1.6;margin:22px 0}.field-answer{background:#edf5ec;border-radius:12px;padding:18px;margin:15px 0}.field-question button:disabled{opacity:.4;cursor:default}.field-deck{display:grid;gap:12px;margin:20px 0}.field-deck details{border:1px solid var(--line);border-radius:12px;padding:16px}.field-brief{line-height:1.9}.field-label{display:block;margin:16px 0}.field-label input,.field-label textarea{display:block;width:100%;max-width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;font:inherit;color:var(--ink)}.followup-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-top:1px solid var(--line)}.followup-row small{display:block;color:var(--mut)}.print-card-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8mm}.print-card-grid article{border:1px dashed #555;padding:5mm;min-height:52mm;break-inside:avoid}.print-card-grid h3{font-size:17px}.print-card-grid p{font-size:13px}.field-print p{margin:10px 0}
+@media(max-width:520px){.field-question h2{font-size:22px}.followup-row{align-items:flex-start;flex-direction:column}.print-card-grid{grid-template-columns:1fr}}
+@media print{.print-card-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:5mm}.print-card-grid article{min-height:54mm}.field-print p{margin:7px 0}.field-print{font-size:11px;line-height:1.55}}
+.leadcard .safe{color:#42321f}.leadcard .btn.ghost{color:#fff;border-color:#8799a4}
+
+.site-footer{text-align:center;padding:12px 16px 24px;color:var(--mut);font-size:12px}
+@media print{.site-footer{display:none!important}}
+/* Source-grounded teaching diagrams and independent ceremony cue reader. */
+.uniform-map,.scarf-map{display:block;width:100%;max-width:640px;height:auto;margin:18px auto}.uniform-map text,.scarf-map text{font-family:inherit;fill:#30283c}.uniform-pairs{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}.ceremony-call{font-size:26px;font-weight:700;line-height:1.5;padding:18px;background:#edf5ec;border-radius:12px;overflow-wrap:anywhere}.ceremony-sheet article{border-bottom:1px solid #ccc;padding:8px 0}.uniform-task{font-size:14px}.ceremony-reader .btn:disabled,.uniform-question .btn:disabled{opacity:.45}
+@media(max-width:520px){.ceremony-call{font-size:22px}.uniform-pairs{grid-template-columns:1fr}}
+@media print{.uniform-map{max-height:88mm;width:100%;margin:3mm auto}.scarf-map{max-height:42mm;width:100%;margin:3mm auto}.uniform-pairs{grid-template-columns:1fr 1fr}.ceremony-sheet article{padding:2mm 0}.uniform-task{font-size:12px}}
+
+/* Local official clothing references; original floor-plan teaching aids. */
+.uniform-reference-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0}
+.uniform-reference-grid figure{margin:0;text-align:center;background:#fff;border:1px solid #ded8e4;border-radius:12px;padding:12px;color:#30283c}
+.uniform-reference-grid img{display:block;width:100%;height:480px;object-fit:contain;margin:0 auto 10px}
+.uniform-reference-grid img[hidden],.uniform-reference-grid p[hidden]{display:none}
+.uniform-reference-grid figcaption{font-weight:700;font-size:15px}
+.reference-credit{font-size:12px;line-height:1.6;color:#5c5366;overflow-wrap:anywhere}
+.formation-map{display:block;width:100%;max-width:600px;height:auto;margin:16px auto;font-family:inherit}
+.role-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0}
+.role-card-grid article{border:2px dashed #777;border-radius:8px;padding:24px;min-height:160px}
+.role-card-grid h3{font-size:24px}.ceremony-source-note{font-size:13px;padding:10px;border-left:3px solid #8d799e;background:#f6f2f8;line-height:1.6}
+@media(max-width:480px){.uniform-reference-grid{gap:8px}.uniform-reference-grid figure{padding:6px}.uniform-reference-grid img{height:350px}.uniform-reference-grid figcaption{font-size:13px}.role-card-grid{grid-template-columns:1fr}}
+@media print{.uniform-reference-grid{grid-template-columns:1fr 1fr;gap:5mm;margin:3mm 0}.uniform-reference-grid figure{padding:3mm}.uniform-reference-grid img{height:155mm;width:100%;margin:0 auto 2mm}.uniform-reference-sheet{font-size:12px}.reference-credit{font-size:10px}.formation-map{max-height:115mm;margin:3mm auto}.role-card-grid{grid-template-columns:1fr 1fr;gap:5mm}.role-card-grid article{min-height:60mm;padding:7mm}.role-card-grid h3{font-size:22px}}
+.uniform-reference-zoom{display:block;width:100%;max-width:473px;height:auto;margin:16px auto;background:white}
+
+/* Salute illustration stays explicitly separate from official reference art. */
+.salute-teaching{display:grid;grid-template-columns:minmax(140px,1fr) 2fr;gap:18px;align-items:start}
+.salute-hand{margin:12px 0;text-align:center;background:white;color:#30283c;border:1px solid #ddd;border-radius:12px;padding:12px}
+.salute-hand img{display:block;max-width:100%;height:330px;object-fit:contain;margin:auto}
+.salute-hand img[hidden],.salute-hand p[hidden]{display:none}
+.salute-hand figcaption{font-size:13px;font-weight:700;margin-top:8px}
+.salute-teaching li{margin-bottom:12px}.salute-question .btn:disabled{opacity:.45}
+.salute-task article{border-bottom:1px solid #ddd;padding:8px 0}.salute-writing{height:15mm}
+.salute-answers article{margin:18px 0}
+@media(max-width:480px){.salute-teaching{grid-template-columns:1fr}.salute-hand img{height:300px}}
+@media print{.salute-teaching{grid-template-columns:1fr 2fr;gap:5mm}.salute-hand img{height:90mm}.salute-hand{padding:2mm;margin:3mm 0}.salute-task{font-size:12px}.salute-task h3{font-size:14px}.salute-writing{height:13mm}.salute-teaching li{margin-bottom:3mm}}
+.salute-zoom .salute-hand img{width:100%;max-width:290px;height:auto}
+
+.salute-position-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}
+.salute-position-grid figure{margin:0;min-width:0}.salute-position-grid figcaption{font-size:13px;margin-top:8px}
+.salute-position-map{display:block;width:100%;height:auto;font-family:inherit}
+@media(max-width:480px){.salute-position-grid{grid-template-columns:1fr}.salute-position-map{max-width:320px;margin:auto}}
+@media print{.salute-position-grid{grid-template-columns:1fr 1fr;gap:4mm;margin:3mm 0}.salute-position-map{max-height:112mm}.salute-position-grid figcaption{font-size:10px}}
+
+.tracking-key-grid,.tracking-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}
+.tracking-key-grid article{min-width:0;border:1px solid #ddd;border-radius:10px;padding:12px}
+.tracking-symbol{display:block;width:100%;height:120px;margin:auto;font-family:inherit}
+.tracking-question .tracking-symbol{height:220px;max-width:300px;margin:16px auto}
+.tracking-card-grid article{border:2px dashed #777;padding:10px;break-inside:avoid}
+.tracking-question .btn:disabled{opacity:.45}
+@media(max-width:480px){.tracking-key-grid{grid-template-columns:1fr}.tracking-key-grid .tracking-symbol{height:140px}}
+@media print{.tracking-key-grid,.tracking-card-grid{grid-template-columns:1fr 1fr;gap:3mm;margin:3mm 0}.tracking-guide .tracking-symbol{height:18mm}.tracking-guide .tracking-key-grid article{padding:2mm}.tracking-guide .tracking-key-grid p{margin:1mm 0}.tracking-cards,.tracking-worksheet{font-size:12px}.tracking-card-grid article{padding:3mm}.tracking-card-grid .tracking-symbol{height:38mm}.tracking-worksheet .tracking-card-grid article{min-height:57mm}}
+
+.material-options{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}
+.material-options article{border:1px solid #ddd;border-radius:10px;padding:14px;min-width:0}
+.material-options label{display:flex;align-items:flex-start;gap:8px;cursor:pointer}.material-options input{margin-top:6px;flex-shrink:0}
+.material-options p{font-size:13px;line-height:1.6}.material-summary{border-collapse:collapse;width:100%}.material-summary th,.material-summary td{border:1px solid #aaa;text-align:left;padding:7px}
+@media(max-width:480px){.material-options{grid-template-columns:1fr}}
+@media print{.material-cover .material-summary{font-size:10px}.material-cover th,.material-cover td{padding:2mm}.material-cover p{margin:2mm 0}}
+
+.worksheet-response{padding:12px 0;border-bottom:1px solid #ded8e4}.worksheet-response h3{font-size:17px}.worksheet-response p{margin:10px 0}.sheet-entry>.btn{margin:4px}
+@media print{.worksheet-guide .worksheet-response{padding:2mm 0}.worksheet-guide .worksheet-response h3{font-size:13px;margin:2mm 0}.worksheet-guide .worksheet-response p{margin:2mm 0}.worksheet-guide .say{font-size:11px;padding:2mm;line-height:1.5}.worksheet-guide>.mut{font-size:10px}}

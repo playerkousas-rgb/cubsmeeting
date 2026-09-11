@@ -20,7 +20,7 @@ const sb = {
 };
 sb.window = sb; sb.globalThis = sb;
 vm.createContext(sb);
-for (const f of ["js/data.js", "js/guide.js", "js/flow.js", "js/app.js"]) {
+for (const f of ["js/data.js", "js/jungle-data.js", "js/practical-data.js", "js/guide.js", "js/flow.js", "js/app.js", "js/redesign.js", "js/content.js", "js/jungle.js", "js/practical.js", "js/uniform-ceremony.js", "js/field-visuals.js", "js/salute-lab.js", "js/salute-positions.js", "js/tracking-kit.js", "js/material-desk.js", "js/plain-content.js", "js/worksheet-guides.js"]) {
   vm.runInContext(fs.readFileSync(path.join(root, f), "utf8"), sb, { filename: f });
 }
 const Q = (s) => vm.runInContext(s, sb);
@@ -29,10 +29,10 @@ ok(Q("DATA.meetings.length") >= 22, "載入 22 場集會");
 Q("Store.set('tid','c07'); try{localStorage.setItem('cub_tid','c07')}catch(e){}");
 
 const pages = [
-  ["vPlan", "App.vPlan()", ["年度行事曆", "睇最新通告同活動", "帶我由頭做到尾", "獎章路線圖"]],
-  ["vMeetList", "App.vMeetList()", ["集會範本庫"]],
+  ["vPlan", "App.vPlan()", ["集會目錄", "睇最新通告同活動", "今場集會", "據幼童軍訓練綱要設計"]],
+  ["vMeetList", "App.vMeetList()", ["揀個範本", "準備呢場"]],
   ["vMeetDetail", "App.vMeetDetail(curMeet())", ["照讀一句", "自動加總", "家長通知", "複製去WhatsApp"]],
-  ["vPack", "App.vPack()", ["一撳印齊", "只印三樣", "預設印"]],
+  ["vPack", "App.vPack()", ["完整出隊包", "精簡列印", "預設印"]],
   ["vLead", "App.vLead()", ["投影帶領", "全螢幕帶領", "抽籤點名"]],
   ["vTrack", "App.vTrack()", ["開進度追蹤APP記獎章", "記出席"]],
   ["vPlay", "App.vPlay()", ["活動庫", "有口令", "有安全"]],
@@ -80,5 +80,26 @@ for (const [name, expr, needles] of pages) {
   const a = Q("App.matList(12)"), b = Q("App.matList(36)");
   ok(a !== b, "改人數，物資數量會變");
 }
+/* Redesign routes, storage compatibility and preparation isolation. */
+Q("App.prepare('c07')");
+ok(Q("curTid()") === 'c07', '選擇集會保留正確ID（相容既有純文字儲存）');
+ok(Q("Flow.cur().k") === 'print', '選集會直接開始印教材步驟');
+Q("Flow.mark('print',true)");
+ok(Q("Flow.cur().k") === 'bag', '完成一步推進下一步');
+Q("App.prepare('c08')");
+ok(!Q("Flow.isDone('print')"), '換集會清除上一場嚮導完成狀態');
+Q("App.init()");
+ok(Q("curTid()") === 'c08', '重新初始化不會重設為第一場');
+for (const route of ['prep','sheets','play','skills','teams','tools']) {
+  Q("location.hash='#" + route + "'; App.route()");
+  ok(Q("App.tab") === route, '新路由可開啟：' + route);
+}
+for (const expr of ['App.vPrep()', 'App.vSheets()', 'App.vLibrary(true)', 'App.vLibrary(false)', 'App.vTools(true)', 'App.vTools(false)']) {
+  ok(Q(expr).length > 100, '新頁面有內容：' + expr);
+}
+Q("App.activity('c01',0)");
+ok(Q("curTid()") === 'c08', '即用活動不會改動今場集會');
+Q("Tools.reset()");
+ok(Q("Tools.time()") === '05:00', '倒數預設五分鐘');
 console.log(fail === 0 ? "\nRUNTIME PASS" : `\nRUNTIME FAIL (${fail})`);
 process.exit(fail === 0 ? 0 : 1);

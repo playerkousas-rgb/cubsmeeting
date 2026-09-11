@@ -24,7 +24,7 @@ function extBtn(url, big, title, desc) {
 function handleOffline() {
   var off = (typeof navigator !== "undefined" && navigator.onLine === false);
   try { if (document.body && document.body.classList) document.body.classList.toggle("offline", !!off); } catch (e) {}
-  document.querySelectorAll("a.extcard").forEach(function (a) {
+  document.querySelectorAll("a.extcard, a.external-link, a.pill").forEach(function (a) {
     if (off) { a.classList.add("off"); a.setAttribute("aria-disabled", "true"); a.onclick = function () { toast("📴 而家離線，要上網先用得"); return false; }; }
     else { a.classList.remove("off"); a.removeAttribute("aria-disabled"); a.onclick = null; }
   });
@@ -37,23 +37,24 @@ if (typeof window !== "undefined") {
 }
 
 /* 目前揀咗邊場 */
-function curTid() { return Store.get("tid", "c01"); }
+function curTid() { try { var v = localStorage.getItem("cub_tid"); return v ? (v.charAt(0) === '"' ? JSON.parse(v) : v) : "c01"; } catch (e) { return "c01"; } }
 function curMeet() {
   var t = curTid(), ms = (typeof DATA !== "undefined") ? DATA.meetings : [];
   for (var i = 0; i < ms.length; i++) if (ms[i].tid === t) return ms[i];
   return ms[0];
 }
 function setTid(tid) {
+  var previous = curTid();
   Store.set("tid", tid);
   try { localStorage.setItem("cub_tid", tid); } catch (e) {}
-  if (typeof Flow !== "undefined") { var s = Flow.st(); if (s.on) { s.tid = tid; if (!s.done) s.done = {}; s.done.pick = 1; Flow.save(s); } }
+  if (typeof Flow !== "undefined") { var s = Flow.st(); if (s.on) { s.tid = tid; if (previous !== tid || !s.done) s.done = {}; s.done.pick = 1; Flow.save(s); } }
 }
 
 var App = {
   tab: "plan",
   go: function (h) { location.hash = h; },
   init: function () {
-    if (!Store.get("tid", null)) { Store.set("tid", "c01"); try { localStorage.setItem("cub_tid", "c01"); } catch (e) {} }
+    if (!localStorage.getItem("cub_tid")) { Store.set("tid", "c01"); try { localStorage.setItem("cub_tid", "c01"); } catch (e) {} }
     if (!Store.get("headcount", null)) Store.set("headcount", 24);
     window.addEventListener("hashchange", App.route);
     App.route();
@@ -114,9 +115,9 @@ var App = {
     });
     h += '</div><button class="btn ghost" onclick="if(confirm(\'真係記低成季做晒？\'))App.finishAll()">記低呢季完成晒</button></section>';
     /* 獎章路線圖 */
-    h += '<section class="card"><h2>🐺 獎章路線圖</h2><p class="mut">會員章 → 幼童軍獎章 → 歷奇章 → 高級歷奇章 → 金紫荊獎章 → 專科章</p><div class="badges">' +
+    h += '<section class="card"><h2>🐺 獎章路線圖</h2><p class="mut">會員章 → 幼童軍體驗章 → 幼童軍歷奇章 → 幼童軍高級歷奇章 → 金紫荊獎章；活動徽章另按範疇選擇</p><div class="badges">' +
       DATA.badges.map(function (b) { return '<div class="badge"><span>' + b.ic + "</span><b>" + esc(b.n) + "</b><small>" + esc(b.d) + "</small></div>"; }).join("") + "</div>" +
-      '<div class="tipcard">⚠️ 分工要清：呢個套包負責帶集會＋記當日出席；長期獎章進度（會員章至金紫荊）、服務／活動／訓練班履歷、金紫荊 PT/68 申請表，一律去進度追蹤APP，唔好喺套包再起一套獎章資料庫。</div></div></section>';
+      '<div class="tipcard">⚠️ 分工要清：呢個套包負責帶集會＋記當日出席；長期獎章進度（會員章至金紫荊）、服務／活動／訓練班履歷、金紫荊現行申請表，一律去進度追蹤APP，唔好喺套包再起一套獎章資料庫。</div></div></section>';
     return h;
   },
   quickStart: function () { App.go("#meet?tid=" + curTid()); },
@@ -220,7 +221,7 @@ var App = {
     var att = Store.get("att_" + curTid(), {});
     var h = '<section class="card"><h2>📝 記錄／進度</h2>';
     /* 大卡：外部APP入口（第1位） */
-    h += extBtn(badgeUrl, true, "🏅 開進度追蹤APP記獎章", "呢個套包只記今日出席；長期獎章（會員章→金紫荊）、服務／活動／訓練班履歷、金紫荊PT/68表，全部交畀嗰邊，唔好喺套包再起一套獎章資料庫。") + "</section>";
+    h += extBtn(badgeUrl, true, "🏅 開進度追蹤APP記獎章", "呢個套包只記今日出席；長期獎章（會員章→金紫荊）、服務／活動／訓練班履歷、金紫荊現行申請表，全部交畀嗰邊，唔好喺套包再起一套獎章資料庫。") + "</section>";
     h += '<section class="card"><h3>✅ 完場記出席（今場：' + esc(curMeet().n) + "）</h3>" +
       '<p class="mut">剔邊個到咗 → 撳儲存。儲完嚮導會自動跳去「同步落進度追蹤APP」。</p><div id="attlist">' +
       roster.map(function (n, i) { return "<label class='att'><input type='checkbox' data-i='" + i + "' " + (att[i] ? "checked" : "") + "> " + esc(n) + "</label>"; }).join("") +
