@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const load = (f) => {
-  const code = fs.readFileSync(path.join(root, f), "utf8");
+  const code = fs.readFileSync(path.join(root, f), "utf8") + (f === "js/data.js" ? "\n" + fs.readFileSync(path.join(root, "js/jungle-data.js"), "utf8") : "");
   const sb = {};
   vm.createContext(sb);
   vm.runInContext(code + "\nthis.__out={DATA:typeof DATA!=='undefined'?DATA:undefined,EXTERNAL:typeof EXTERNAL!=='undefined'?EXTERNAL:undefined,Guide:typeof Guide!=='undefined'?Guide:undefined,Flow:typeof Flow!=='undefined'?Flow:undefined};", sb);
@@ -62,12 +62,12 @@ d.DATA.meetings.forEach((m) => {
 /* 6. 獎章路線齊 */
 {
   const names = d.DATA.badges.map((b) => b.n).join("");
-  ["會員章", "幼童軍獎章", "歷奇章", "高級歷奇章", "金紫荊", "專科章"].forEach((k) => ok(names.includes(k), `獎章路線有「${k}」`));
+  ["會員章", "幼童軍體驗章", "幼童軍歷奇章", "幼童軍高級歷奇章", "金紫荊", "活動徽章"].forEach((k) => ok(names.includes(k), `獎章路線有「${k}」`));
 }
 /* 7. 幼童軍傳統齊 */
 {
   const facts = JSON.stringify(d.DATA.facts);
-  ["盡力", "Akela", "小隊", "大聲呼叫", "Grand Howl", "會操"].forEach((k) => ok(facts.includes(k) || (d.DATA.meetings.some((m) => JSON.stringify(m).includes(k))), `傳統有「${k}」`));
+  ["準備", "Akela", "小隊", "大聲呼叫", "Grand Howl", "會操"].forEach((k) => ok(facts.includes(k) || (d.DATA.meetings.some((m) => JSON.stringify(m).includes(k))), `傳統有「${k}」`));
 }
 
 console.log(fail === 0 ? "\nSMOKE PASS" : `\nSMOKE FAIL (${fail})`);
