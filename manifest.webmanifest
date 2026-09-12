@@ -7,8 +7,8 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#FAF6FF",
-  "theme_color": "#6A1B9A",
+  "background_color": "#FFF8F0",
+  "theme_color": "#FF6F00",
   "shortcuts": [
     {"name": "✂️ 圖紙（印教材）", "short_name": "圖紙", "url": "./index.html#pack"},
     {"name": "🖨️ 印齊今場", "short_name": "印齊今場", "url": "./index.html#pack"},
