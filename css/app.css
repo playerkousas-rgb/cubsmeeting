@@ -1,10 +1,10 @@
-/* 🐺 幼童軍團集會助手 — Cub Hub（紫＋金） */
+/* 🐺 幼童軍團集會助手 — Cub Hub（橙色代表 v8） */
 *{box-sizing:border-box}
-:root{--bg:#FAF6FF;--card:#fff;--line:#E6DCF5;--ink:#2B2140;--mut:#7A6FA0;--brand:#6A1B9A;--brand2:#9C27B0;--gold:#FFB300;--gr:#2E7D32;--red:#C62828}
+:root{--bg:#FFF8F0;--card:#fff;--line:#FFE0B2;--ink:#3E2723;--mut:#8D6E63;--brand:#FF6F00;--brand2:#FF8F00;--gold:#FFB300;--gr:#2E7D32;--red:#C62828}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang HK","Noto Sans TC","Microsoft JhengHei",sans-serif;line-height:1.7;font-size:16px}
 #netbar{background:#333;color:#fff;text-align:center;font-size:13px;padding:6px}
 #stickytop{position:sticky;top:0;z-index:20;background:var(--bg)}
-#topbar{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:linear-gradient(135deg,#6A1B9A,#9C27B0);color:#fff}
+#topbar{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:linear-gradient(135deg,#FF6F00,#FF8F00);color:#000}
 .brand{font-weight:800;font-size:17px;cursor:pointer}
 .iconbtn{background:rgba(255,255,255,.2);border:0;color:#fff;font-size:18px;border-radius:10px;padding:4px 10px;margin-left:6px;cursor:pointer}
 #topnav,#tabbar{background:var(--bg);padding:6px 10px}
@@ -220,3 +220,14 @@ body.offline .extcard{opacity:.55}
 
 .worksheet-response{padding:12px 0;border-bottom:1px solid #ded8e4}.worksheet-response h3{font-size:17px}.worksheet-response p{margin:10px 0}.sheet-entry>.btn{margin:4px}
 @media print{.worksheet-guide .worksheet-response{padding:2mm 0}.worksheet-guide .worksheet-response h3{font-size:13px;margin:2mm 0}.worksheet-guide .worksheet-response p{margin:2mm 0}.worksheet-guide .say{font-size:11px;padding:2mm;line-height:1.5}.worksheet-guide>.mut{font-size:10px}}
+
+/* v8 上5下5手冊定位 - 橙色代表 */
+.manual-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin:8px 0}
+.manual-card{display:block;border-radius:12px;padding:10px;text-decoration:none;color:var(--ink);background:#fff;transition:.2s;text-align:center}
+.manual-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.manual-card b{display:block;font-size:14px;margin:4px 0}
+.manual-card small{display:block}
+.subtabs{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.subtab{background:#fff;border:2px solid var(--line);border-radius:999px;padding:6px 14px;font-size:13px;cursor:pointer}
+.subtab.cur{background:var(--brand);color:#fff;border-color:var(--brand)}
+.info-section{border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0;background:#fff}
