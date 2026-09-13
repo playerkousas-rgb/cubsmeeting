@@ -223,6 +223,21 @@ for (const [name, expr, needles] of pages) {
   /* 烹飪章 note 要包齊官方三條注意事項 */
   ok(Q("App.officialBadges['烹飪章'].note").includes("使用爐具安全指引"), "烹飪章 note 含「使用爐具安全指引」");
 
+  /* 露營章／探險章／愛護動物章（官方頁27–29）：已逐字核對過原文。
+     呢三個係核心範疇章，進度性獎章 4.1.3／4.1.4／4.2.5 直接引用，改錯影響大，釘死佢。 */
+  const P27_29 = {
+    "露營章": { page:27, n:8, first:"進行不少於一晚的戶外露營", last:"協助清理露營後的場地" },
+    "探險章": { page:28, n:6, first:"明瞭地圖或街道圖上的主要圖例", last:"策劃及參加一次不少於六公里之幼童軍遠足活動" },
+    "愛護動物章": { page:29, n:3, first:"向領袖講述動物的需要", last:"認識一種寵物的生命週期" },
+  };
+  for (const [name, exp] of Object.entries(P27_29)) {
+    const b = Q(`App.officialBadges[${JSON.stringify(name)}]`);
+    ok(!!b && b.page === exp.page, `「${name}」頁 ${b && b.page}（官方 ${exp.page}）`);
+    ok(b.items.length === exp.n, `「${name}」${b.items.length} 項（官方 ${exp.n}）`);
+    ok(b.items[0].startsWith(exp.first), `「${name}」首項同官方原文一致`);
+    ok(b.items[exp.n - 1].startsWith(exp.last), `「${name}」末項同官方原文一致`);
+  }
+
   /* rule 欄要真係 render 到，唔可以淨係存喺 data 度 */
   Q("Modal.open = function(h){ globalThis.__m = h; }");
   Q("App.openBadge('宗教章')");
