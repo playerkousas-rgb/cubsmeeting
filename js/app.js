@@ -73,7 +73,6 @@ var App = {
     else if (App.tab === "meet") v.innerHTML = q.tid ? App.vMeetDetail(curMeet()) : App.vMeetList();
     else if (App.tab === "pack") v.innerHTML = App.vPack();
     else if (App.tab === "lead") v.innerHTML = App.vLead();
-    else if (App.tab === "track") v.innerHTML = App.vTrack();
     else if (App.tab === "play") v.innerHTML = App.vPlay();
     else if (App.tab === "book") v.innerHTML = App.vBook();
     else v.innerHTML = App.vPlan();
@@ -167,7 +166,6 @@ var App = {
     h += '<section class="card"><h3>📨 家長通知（一撳複製）</h3><p class="notice">' + esc(m.notice) + "</p>" +
       '<div class="quick"><button class="btn sm" onclick="App.copyNotice()">📋 複製去WhatsApp</button>' +
       '<a class="btn sm ghost" id="waLink" href="https://wa.me/?text=" target="_blank" rel="noopener">↗ 開WhatsApp貼上</a></div></section>';
-    h += '<section class="card"><h3>🏅 記出席＋獎章分工</h3><p>呢度只記今日邊個到。獎章進度唔喺呢度打，撳下面去進度APP。</p><div class="quick"><button class="btn sm gr" onclick="App.go(\'#track\')">📝 去記出席</button></div></section>';
     return h;
   },
   copyNotice: function () {
@@ -190,7 +188,8 @@ var App = {
       '<div class="quick"><button class="btn gr" onclick="PackPrint.open(\'all\')">🖨️ 一撳印齊（教案＋分隔頁＋圖紙）</button>' +
       '<button class="btn" onclick="PackPrint.open(\'leader\')">只印領袖一頁流程</button>' +
       '<button class="btn ghost" onclick="Bag.open()">🧺 執袋（唔使印）</button>' +
-      '<button class="btn ghost" onclick="Venue.open()">📍 設場（唔使印）</button></div>' +
+      '<button class="btn ghost" onclick="Venue.open()">📍 設場（唔使印）</button>' +
+      '<button class="btn ghost" onclick="App.editRoster()">✏️ 改名單（而家 ' + roster.length + ' 人）</button></div>' +
       '<p class="mut">一疊過張數 ＝ 教案 1 ＋ 分隔頁 1 ＋ 圖紙 ' + m.sheets.length + " ＝ " + (2 + m.sheets.length) + " 款（圖紙再×份數）。</p></section>";
     h += '<section class="card"><h3>📄 打印預覽（撳入去剔）</h3><div class="printlist">' +
       "<label><input type='checkbox' checked disabled> 領袖教案（程序＋口令＋時間）</label>" +
@@ -214,33 +213,7 @@ var App = {
       '<p class="mut">跟綠色領袖卡做：每段有圖、有口令、有節奏、有安全。做完一段撳「✓ 做完」，自動跳下一段。</p></section>';
   },
 
-  /* ---------- 記錄／進度 ---------- */
-  vTrack: function () {
-    var badgeUrl = (typeof EXTERNAL !== "undefined") ? EXTERNAL.badge : "https://cubsbadge.vercel.app/";
-    var roster = Store.get("roster", ["陳小狼", "李小虎", "黃小豹"]);
-    var att = Store.get("att_" + curTid(), {});
-    var h = '<section class="card"><h2>📝 記錄／進度</h2>';
-    /* 大卡：外部APP入口（第1位） */
-    h += extBtn(badgeUrl, true, "🏅 開進度追蹤APP記獎章", "呢個套包只記今日出席；長期獎章（會員章→金紫荊）、服務／活動／訓練班履歷、金紫荊現行申請表，全部交畀嗰邊，唔好喺套包再起一套獎章資料庫。") + "</section>";
-    h += '<section class="card"><h3>✅ 完場記出席（今場：' + esc(curMeet().n) + "）</h3>" +
-      '<p class="mut">剔邊個到咗 → 撳儲存。長期獎章進度請去右上角 🏅 進度追蹤APP，呢度唔做獎章紀錄。</p><div id="attlist">' +
-      roster.map(function (n, i) { return "<label class='att'><input type='checkbox' data-i='" + i + "' " + (att[i] ? "checked" : "") + "> " + esc(n) + "</label>"; }).join("") +
-      '</div><div class="quick"><button class="btn sm gr" onclick="App.saveAtt()">💾 儲存出席</button>' +
-      '<button class="btn sm ghost" onclick="App.editRoster()">✏️ 改名單</button>' +
-      '<button class="btn sm ghost" onclick="App.go(\'#book\')">👥 改人數（而家' + esc(String(Store.get("headcount", 24))) + '人）</button></div>' +
-      '<div id="syncHint"></div></section>';
-    return h;
-  },
-  saveAtt: function () {
-    var o = {};
-    document.querySelectorAll("#attlist input").forEach(function (c) { if (c.checked) o[c.getAttribute("data-i")] = 1; });
-    Store.set("att_" + curTid(), o);
-    var n = Object.keys(o).length;
-    toast("✓ 記低 " + n + " 人出席");
-    var badgeUrl = (typeof EXTERNAL !== "undefined") ? EXTERNAL.badge : "https://cubsbadge.vercel.app/";
-    var el = document.getElementById("syncHint");
-    if (el) el.innerHTML = '<div class="tipcard">下一步：去進度APP同步獎章進度（套包唔做獎章DB）。<br><a class="btn sm gr" href="' + badgeUrl + '" target="_blank" rel="noopener">🏅 同步落進度追蹤APP ↗</a></div>';
-  },
+  /* ---------- 名單（只為打印份數及抽籤點名，唔做出席紀錄） ---------- */
   editRoster: function () {
     var r = Store.get("roster", ["陳小狼", "李小虎", "黃小豹"]);
     Modal.open("<h3>✏️ 改名單（一行一個名）</h3><textarea id='ros' rows='8'>" + esc(r.join("\n")) + "</textarea><div class='quick'><button class='btn gr' onclick='App.saveRoster()'>💾 儲存</button></div>");
@@ -289,7 +262,7 @@ var App = {
     h += '<section class="card"><h3>🧰 物資庫（跟人數自動換算）</h3><p class="mut">而家人數：' + hc + ' 人（改下面滑桿，數量即刻計）。算法：24人做基準，每多人按比例加。</p>' +
       '<label>👥 團員人數：<input type="range" min="6" max="48" value="' + hc + '" oninput="App.setHC(this.value)"> <b id="hcN">' + hc + "</b>人</label><ul id='matlist'>" + App.matList(hc) + "</ul></section>";
     h += '<section class="card"><h3>🔗 相關APP（網上服務・要上網先用得）</h3>' +
-      extBtn(badgeUrl, true, "🏅 幼童軍進度追蹤系統", "記每個團員獎章進度（會員章至金紫荊）、活動履歷（服務／活動／訓練班，家長申報領袖審批）、金紫荊申請表。分工：套包帶集會＋記出席，長期進度交畀佢。") +
+      extBtn(badgeUrl, true, "🏅 幼童軍進度追蹤系統", "記每個團員獎章進度（會員章至金紫荊）、活動履歷（服務／活動／訓練班，家長申報領袖審批）、金紫荊申請表。分工：套包只帶集會；出席同長期獎章進度交畀佢。") +
       extBtn(circUrl, false, "📨 童軍通告圖書館", "搵總會／地區／區通告同活動報名資料。入去揀層級＋時間（今天／七天／三十天）；搵唔到就放寬時間或者轉全港搜尋。") + "</section>";
     h += '<section class="card"><h3>⚙️ 設定</h3><div class="quick"><button class="btn sm ghost" onclick="if(confirm(\'清晒所有記錄？\')){localStorage.clear();location.reload()}">🗑 清除本機記錄</button></div>' +
       '<p class="mut">離線PWA：無網都帶到集會；兩個相關APP係網上服務，離線會變灰。</p></section>';
@@ -426,7 +399,7 @@ var Lead = {
   render: function () {
     var st = document.getElementById("leadstage"); if (!st) return;
     var m = curMeet(), s = m.segs[Lead.idx];
-    if (!s) { st.innerHTML = "<div class='picked'>🎉 今場帶完！去記出席啦。<br><button class='btn gr' onclick=\"App.go('#track')\">📝 去記出席</button></div>"; return; }
+    if (!s) { st.innerHTML = "<div class='picked'>🎉 今場帶完！已自動喺集會目錄剔低「✓ 做咗」。<br><button class='btn gr' onclick=\"App.go('#plan')\">📅 返集會目錄</button></div>"; return; }
     st.innerHTML = "<div class='leadcard'><div class='lhead'>第" + (Lead.idx + 1) + "/" + m.segs.length + "段・" + esc(s.n) + "・" + s.m + "分鐘</div>" +
       "<div class='ldia'>" + (s.svg || "") + "</div>" +
       "<div class='lsay'>📢 " + esc(s.script || "") + "</div>" +
@@ -445,7 +418,14 @@ var Lead = {
     }, 1000);
   },
   stopTimer: function () { if (Lead.timer) clearInterval(Lead.timer); Lead.timer = null; },
-  next: function () { Lead.stopTimer(); Lead.beep(880, 0.2); Lead.idx++; Lead.render(); if (Lead.idx >= curMeet().segs.length && typeof Flow !== "undefined") Flow.mark("lead"); },
+  next: function () {
+    Lead.stopTimer(); Lead.beep(880, 0.2); Lead.idx++; Lead.render();
+    if (Lead.idx >= curMeet().segs.length) {
+      /* 呢個套包唯一要記嘅嘢：今場集會用過咗。剔落集會目錄，唔做出席／獎章紀錄。 */
+      var d = Store.get("done", {}); d[curTid()] = 1; Store.set("done", d);
+      if (typeof Flow !== "undefined") Flow.mark("lead");
+    }
+  },
   prev: function () { Lead.stopTimer(); Lead.idx = Math.max(0, Lead.idx - 1); Lead.render(); }
 };
 /* ESC always closes the active dialog; useful on desktop and prevents modal dead ends. */

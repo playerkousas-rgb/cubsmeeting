@@ -65,7 +65,19 @@ for (const legacy of ["#song", "#songs", "#craft"]) {
   ok(view.innerHTML.includes("工作紙＋歌曲"), `舊 ${legacy} → 渲染到合併頁，冇孤兒版`);
 }
 
-/* 3. 合併頁兩個小分頁真係切換到（真 App.showMiniTab） */
+/* 3. 拆咗記錄頁之後，#track 唔可以變死胡同；改名單要有新入口 */
+{
+  ok(Q("typeof App.vTrack") === "undefined", "App.vTrack 已移除（套包唔做記錄）");
+  Q("location.hash='#track'; App.route()");
+  ok(view.innerHTML.includes("集會目錄"), "舊 #track 書籤落入集會目錄，唔會死胡同");
+  /* 一定要行路由睇實際渲染：App.vPack 被 content.js 覆寫過，
+     但 #pack 路由用嘅係 redesign.js 載入時捕獲嘅 app.js 版本 */
+  Q("location.hash='#pack'; App.route()");
+  ok(view.innerHTML.includes("App.editRoster()"), "出隊包頁（#pack 路由實際渲染）有「改名單」入口");
+  ok(!/App\.editRoster|App\.saveAtt/.test(Q("App.vMeetDetail(curMeet())")), "詳細教案頁唔再有記出席卡");
+}
+
+/* 4. 合併頁兩個小分頁真係切換到（真 App.showMiniTab） */
 {
   const mkPane = (startHidden) => {
     const pane = { hidden: startHidden, classList: {} };

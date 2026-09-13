@@ -73,7 +73,10 @@ const flowCode = read("js/flow.js");
   ok(/要上網先用得/.test(app + html), "離線掣變灰＋顯示「要上網先用得」");
   ok(/navigator\.onLine|online.*offline|offline/.test(app), "有handle離線（online/offline監聽）");
   /* 三個位＋兩個位 */
-  ok(/記獎章|開進度追蹤APP記獎章/.test(app), "記錄頁頂有大卡「開進度追蹤APP記獎章」");
+  /* 定位：套包只幫帶集會，唔做記錄。內部冇記錄頁，只留引流去外部進度追蹤APP。 */
+  ok(!/vTrack/.test(app), "冇內部記錄頁（App.vTrack 已移除）");
+  ok(!/att_/.test(app), "冇出席剔格儲存（att_ 已移除）");
+  ok(/幼童軍進度追蹤系統/.test(app), "手冊有引流大卡去外部進度追蹤系統");
   ok(!/同步落進度追蹤APP/.test(flowCode), "嚮導唔再有「同步落進度追蹤APP」步驟");
   ok(/相關APP|相關APP/.test(app), "手冊有「相關APP」區");
   ok(/睇最新通告同活動/.test(app), "年度計劃頁有細卡「睇最新通告同活動」");

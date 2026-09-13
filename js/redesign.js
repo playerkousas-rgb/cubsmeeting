@@ -6,7 +6,6 @@
   var oldPlan = App.vPlan;
   var oldPack = App.vPack;
   var oldLead = App.vLead;
-  var oldTrack = App.vTrack;
   var oldPlay = App.vPlay;
 
   /* 準備流程：跟 ghmeeting 同一套 Flow */
@@ -313,7 +312,6 @@
       teams: function(){return App.vTools(true);},
       tools: function(){return App.vTools(false);},
       pack: function(){ return (typeof oldPack==='function') ? oldPack() : App.vPrint(); },
-      track: function(){ return (typeof oldTrack==='function') ? oldTrack() : '<section class="card"><h2>記錄</h2></section>'; }
     };
 
     var fn = render[tab];

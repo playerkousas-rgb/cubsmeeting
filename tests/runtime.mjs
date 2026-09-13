@@ -34,7 +34,6 @@ const pages = [
   ["vMeetDetail", "App.vMeetDetail(curMeet())", ["照讀一句", "自動加總", "家長通知", "複製去WhatsApp"]],
   ["vPack", "App.vPack()", ["完整出隊包", "精簡列印", "預設印"]],
   ["vLead", "App.vLead()", ["投影帶領", "全螢幕帶領", "抽籤點名"]],
-  ["vTrack", "App.vTrack()", ["開進度追蹤APP記獎章", "記出席"]],
   ["vPlay", "App.vPlay()", ["活動庫", "有口令", "有安全"]],
   ["vBook", "App.vBook()", ["手冊", "相關APP", "物資庫", "大聲呼叫"]],
 ];
@@ -46,7 +45,8 @@ for (const [name, expr, needles] of pages) {
 }
 /* 外部連結：新分頁＋noopener */
 {
-  const html = Q("App.vTrack()") + Q("App.vBook()") + Q("App.vPlan()");
+  /* 定位：套包唔做記錄，所以外部APP引流連結更加要齊（手冊／目錄／制服頁） */
+  const html = Q("App.vBook()") + Q("App.vPlan()") + Q("App.vUniform()");
   const links = [...html.matchAll(/<a[^>]*href="(https:[^"]+)"[^>]*>/g)];
   const ext = links.filter((m) => m[1].includes("vercel.app"));
   ok(ext.length >= 4, "外部APP連結 ≥4 個（找到 " + ext.length + "）");
@@ -91,6 +91,17 @@ for (const [name, expr, needles] of pages) {
   ok(!/記出席|同步獎章/.test(invite), "邀請卡唔再提記出席／同步獎章");
   /* 還原狀態：上面把 5 步全部標完成，會令後面「選集會直接開始印教材步驟」搵唔到 cur() */
   Q("localStorage.removeItem('cub_flow')");
+}
+/* 唯一要記嘅嘢：帶完今場 → 集會目錄自動剔「✓ 做咗」 */
+{
+  Q("Store.set('done',{})");
+  Q("Store.set('tid','c07'); try{localStorage.setItem('cub_tid','c07')}catch(e){}");
+  ok(!Q("Store.get('done',{})['c07']"), "未帶之前，c07 未剔");
+  Q("Lead.idx = curMeet().segs.length - 1");
+  Q("Lead.next()");
+  ok(Q("Store.get('done',{})['c07']") === 1, "帶完最後一段，c07 自動剔「做咗」");
+  ok(Q("App.vPlan()").includes("c07") , "集會目錄列到 c07");
+  Q("Lead.idx = 0");
 }
 /* PackPrint 張數 */
 {

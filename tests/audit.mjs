@@ -64,7 +64,8 @@ const ok = (c, msg) => { console.log((c ? "✓ " : "✗ FAIL ") + msg); if (!c) 
   const app = read("js/app.js");
   ok(/複製去WhatsApp|clipboard/.test(app), "家長通知一撳複製");
   ok(/wa\.me/.test(app), "有WhatsApp直貼連結");
-  ok(/記出席|att_/.test(app), "完場記出席＋進度");
+  ok(!/記出席|att_/.test(app), "套包唔做出席記錄（記錄交外部進度追蹤APP）");
+  ok(/Store\.set\("done"|Store\.get\("done"/.test(app), "唯一記錄：集會目錄剔「呢場用過咗」");
 }
 /* 7. manifest */
 {

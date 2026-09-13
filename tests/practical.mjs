@@ -34,7 +34,7 @@ assert(Followup.save('c24'));assert.equal(Followup.read('c24').due,'2026-09-18')
 Followup.open('c24');assert(html.includes('&lt;script&gt;'));assert(!html.includes('<script>alert'));
 assert.equal(ctx.curTid(),'c07');assert.equal(mem.cub_flow,storedBefore);
 const set=ctx.localStorage.setItem;ctx.localStorage.setItem=()=>{throw new Error('quota');};assert.equal(Followup.save('c24'),false);assert.equal(Practical.saveTroop(),false);ctx.localStorage.setItem=set;
-assert(App.vTrack().includes('實踐後回顧'));assert(App.vBook().includes('文字材料'));
+assert(typeof App.vTrack==='undefined');assert(App.vBook().includes('文字材料'));
 console.log('PRACTICAL PASS: 25 field packs, 50 Q&As, deck answers, escaped local data, follow-up dates, storage errors and no progress side effects');
 
 const {SessionPack}=ctx;
