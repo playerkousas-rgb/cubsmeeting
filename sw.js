@@ -1,5 +1,5 @@
 /* 🐺 幼童軍團集會助手 — Service Worker (offline first，cache齊) */
-var CACHE = "cubhub-v9-nav-sync-20260913";
+var CACHE = "cubhub-v9-badge2026-20260913";
 var ASSETS = [
   "./", "./index.html", "./manifest.webmanifest", "./css/app.css",
   "./js/data.js", "./js/guide.js", "./js/flow.js", "./js/app.js", "./js/redesign.js", "./js/content.js", "./js/jungle-data.js", "./js/jungle.js", "./js/practical-data.js", "./js/practical.js", "./js/uniform-ceremony.js", "./js/field-visuals.js", "./js/salute-lab.js", "./js/salute-positions.js", "./js/tracking-kit.js", "./js/material-desk.js", "./js/plain-content.js", "./js/worksheet-guides.js",

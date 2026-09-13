@@ -120,7 +120,9 @@ for (const [name, expr, needles] of pages) {
     公園定向章: 60, 寵物章: 61, 體適能章: 62, 風帆章: 63, 水手章: 64, 運動章: 65,
     游泳章: 66, 世界友誼章: 67, 宗教章: 68, 童軍先修章: 70,
   };
-  const PENDING = ["手藝章","資訊科技章","媒體製作章","地球部落計劃 – 走塑達人章、自然守護者章、日光善用者章","公園定向章（三級制度）","體適能章（三級制度）","風帆章","水手章","宗教章","童軍先修章"];
+  /* 47 個章全部已按官方 2026 第十版原文補齊；呢個陣列留空做棘輪：
+     如果日後有章被清空，呢度會即刻爆。 */
+  const PENDING = [];
   /* 舊制章：2026 第十版目錄已經冇呢 4 個章，所以唔入組別（撳唔到係正確行為） */
   const LEGACY = ["勞作章","讀圖章","電腦章","體操章"];
 
@@ -159,7 +161,74 @@ for (const [name, expr, needles] of pages) {
   /* 水上安全章：官方2026 係第34頁（舊制先係65頁） */
   const w = Q("App.officialBadges['水上安全章']");
   ok(w.page === 34, `水上安全章官方綱要頁 ${w.page}（34，2026第十版）`);
-  ok(w.items.length === 2, `水上安全章 ${w.items.length} 項要求（2，2026版；舊制4項版已撤）`);
+  ok(w.items.length === 3, `水上安全章 ${w.items.length} 項要求（官方原文3項）`);
+  ok(w.purpose.startsWith("提升幼童軍的安全意識"), "水上安全章目的用官方原文（唔係舊版改寫）");
+  ok(w.items[2].includes("手援") && w.items[2].includes("拋物") && w.items[2].includes("6 米"),
+     "水上安全章第3項保留手援／拋物及 6 米距離");
+
+  /* 新補嘅 10 個章：逐個核實質內容，唔係淨係核「有冇 key」 */
+  const FILLED = {
+    "手藝章":            { page:39, n:4, must:["鎚子","砂紙打磨"] },
+    "資訊科技章":        { page:41, n:7, must:["人工智能","知識產權"] },
+    "媒體製作章":        { page:43, n:6, must:["電子書","動畫短片"], rule:"其中兩項" },
+    "地球部落計劃 – 走塑達人章、自然守護者章、日光善用者章": { page:52, n:3, must:["走塑達人章","日光善用者章"], note:"地球部落" },
+    "公園定向章":        { page:60, n:3, must:["初級","拇指輔行法","等高線"], rule:"依次序", note:"同一事工" },
+    "體適能章":          { page:62, n:5, must:["皮摺量度","坐地前伸"], note:"學校體適能獎勵計劃" },
+    "風帆章":            { page:63, n:2, must:["游泳測試","滑浪風帆"], note:"最新課程" },
+    "水手章":            { page:64, n:9, must:["訊號旗","8 字結","稱人結"] },
+    "宗教章":            { page:68, n:6, must:["基督教課程","道教課程","五戒文"], rule:"其中一項課程" },
+    "童軍先修章":        { page:70, n:3, must:["認知","參與","新體驗"], rule:"十歲半", note:"4.4.1" },
+  };
+  for (const [name, exp] of Object.entries(FILLED)) {
+    const b = Q(`App.officialBadges[${JSON.stringify(name)}]`);
+    ok(!!b, `「${name}」已有內容`);
+    if (!b) continue;
+    ok(b.page === exp.page, `「${name}」頁碼 ${b.page}（官方 ${exp.page}）`);
+    ok(b.items.length === exp.n, `「${name}」${b.items.length} 項（官方 ${exp.n}）`);
+    const all = b.purpose + b.items.join("") + (b.rule || "") + (b.note || "");
+    exp.must.forEach((m) => ok(all.includes(m), `「${name}」內容含「${m}」`));
+    if (exp.rule) ok((b.rule || "").includes(exp.rule), `「${name}」rule 含「${exp.rule}」`);
+    if (exp.note) ok((b.note || "").includes(exp.note), `「${name}」note 含「${exp.note}」`);
+  }
+
+  /* 以下章 previously 係舊制改寫內容，已按官方 2026 原文重寫。
+     釘住關鍵字眼，防止有人再用舊版內容覆蓋返。 */
+  const REWRITTEN = {
+    "共融章":      { n:4,  must:["多元共融","特能童軍"], notMust:["弱智"] },
+    "家務章":      { n:8,  must:["清潔及整理一個房間"] },
+    "道路安全章":  { n:8,  must:["過馬路守則","十種","海報"] },
+    "香港歷史章":  { n:4,  must:["法定古蹟","博物館","命名背景和典故"] },
+    "藝術章":      { n:8,  must:["賀卡","黏土","展示板"], rule:"其中三項", notMust:["數碼藝術"] },
+    "娛樂章":      { n:10, must:["皮影戲","土風舞","五分鐘"], rule:"其中三項", notMust:["甲組"] },
+    "語言章":      { n:5,  must:["公眾免費上網地點"] },
+    "音樂章":      { n:3,  must:["ABRSM","獨奏","合奏"], notMust:["五線譜"] },
+    "攝影章":      { n:4,  must:["記憶咭","變焦","保養相機","12 張"], notMust:["3分鐘"] },
+    "寫作章":      { n:9,  must:["六行的詩","筆友"], note:"50 字" },
+    "閱讀章":      { n:4,  must:["電子書","網上目錄"] },
+    "田徑章":      { n:4,  must:["跳遠","跳高","擲豆袋","50米急跑","0.96米"], rule:"22 分", notMust:["仍待從官方"] },
+    "運動章":      { n:5,  must:["基本規則","體育精神"] },
+    "世界友誼章":  { n:4,  must:["四個月的時間","旗幟"] },
+  };
+  for (const [name, exp] of Object.entries(REWRITTEN)) {
+    const b = Q(`App.officialBadges[${JSON.stringify(name)}]`);
+    ok(!!b, `「${name}」有內容`);
+    if (!b) continue;
+    const all = b.purpose + b.items.join("") + (b.rule || "") + (b.note || "");
+    ok(b.items.length === exp.n, `「${name}」${b.items.length} 項（官方2026 ${exp.n}）`);
+    exp.must.forEach((m) => ok(all.includes(m), `「${name}」用官方2026字眼「${m}」`));
+    (exp.notMust || []).forEach((m) => ok(!all.includes(m), `「${name}」已冇舊制字眼「${m}」`));
+    if (exp.rule) ok((b.rule || "").includes(exp.rule), `「${name}」rule 含「${exp.rule}」`);
+    if (exp.note) ok((b.note || "").includes(exp.note), `「${name}」note 含「${exp.note}」`);
+  }
+  /* 烹飪章 note 要包齊官方三條注意事項 */
+  ok(Q("App.officialBadges['烹飪章'].note").includes("使用爐具安全指引"), "烹飪章 note 含「使用爐具安全指引」");
+
+  /* rule 欄要真係 render 到，唔可以淨係存喺 data 度 */
+  Q("Modal.open = function(h){ globalThis.__m = h; }");
+  Q("App.openBadge('宗教章')");
+  ok(sb.__m.includes("以下其中一項課程進行研習"), "宗教章 rule 有 render 到 modal");
+  Q("App.openBadge('露營章')");
+  ok(!sb.__m.includes("class=\"mut\">完成下列"), "冇 rule 嘅章唔會多出空段落");
 }
 /* officialBadges 唔可以有重複 key：JS 會用後者覆蓋前者，靜靜地丟走官方內容，
    parse 完嘅物件睇唔出，所以一定要掃原始碼 */
