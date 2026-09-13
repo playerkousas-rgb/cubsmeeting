@@ -90,7 +90,7 @@ var App = {
     var badgeUrl = (typeof EXTERNAL !== "undefined") ? EXTERNAL.badge : "https://cubsbadge.vercel.app/";
     var circUrl = (typeof EXTERNAL !== "undefined") ? EXTERNAL.circulars : "https://scout-circulars.vercel.app/";
     var h = '<section class="hero"><div class="troop">🐺 我的幼童軍團</div><h1>拎起手機就帶到。</h1>' +
-      '<p>數碼道具全內置。想印紙？去印教材。獎章進度唔喺呢度記，交畀進度APP。</p>' +
+      '<p>據幼童軍訓練綱要設計，將訓練目標化成即用集會、教材與逐步帶領支援。數碼道具全內置。想印紙？去印教材。獎章進度唔喺呢度記，交畀進度APP。</p>' +
       '<div class="quick"><button class="btn gr" onclick="App.quickStart()">▶ 即開今場</button>' +
       '<button class="btn" onclick="App.go(\'#pack\')">🖨️ 印齊今場</button>' +
       '<button class="btn ghost" onclick="App.go(\'#lead\')">🎲 隨手開會</button></div>' +
@@ -134,7 +134,7 @@ var App = {
 
   /* ---------- 集會範本庫 ---------- */
   vMeetList: function () {
-    var h = '<section class="card"><h2>🧩 集會範本庫 <small>22場・每場自動加總時間</small></h2><p class="mut">撳入去睇程序＋照讀口令＋圖解。</p><div class="meetlist">';
+    var h = '<section class="card"><h2>🧩 集會範本庫 <small>22場・每場自動加總時間</small></h2><p class="mut">揀個範本，撳入去睇程序＋照讀口令＋圖解。撳標題準備呢場，STEP BY STEP 跟住做。</p><div class="meetlist">';
     DATA.meetings.forEach(function (m, i) {
       h += '<a class="meetrow" href="#meet?tid=' + m.tid + '"><span class="mno">' + (i + 1) + '</span><span class="mmain"><b>' + esc(m.n) + "</b><small>" + esc(m.badge) + "・" + esc(m.tags) + "・約" + m.mins + "分鐘</small></span><span class='go'>▶</span></a>";
     });
