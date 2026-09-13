@@ -103,40 +103,71 @@ for (const [name, expr, needles] of pages) {
   ok(Q("App.vPlan()").includes("c07") , "集會目錄列到 c07");
   Q("Lead.idx = 0");
 }
-/* 活動章覆蓋率：組別格仔每個章名都要撳到官方內容，除非明確列為待補。
-   呢個測試係棘輪：補咗內容就要由 PENDING 除名，加咗撳唔到嘅章名就會爆。 */
+/* 活動章對齊《幼童軍訓練綱要》2026 年第十版「幼童軍活動徽章目錄」。
+   來源：用戶提供嘅官方 PDF（一九九七年第一版／二零二六年第十版）第三章。
+   呢個測試係棘輪：補咗內容就要由 PENDING 除名；頁碼改錯會即刻爆。 */
 {
+  /* 官方 2026 第十版活動徽章目錄（42 項，展開「積極公民」系列後共 47 個章名） */
+  const OFFICIAL_2026 = {
+    露營章: 27, 探險章: 28,
+    愛護動物章: 29, 共融章: 30, 急救章: 31, 家務章: 32, 道路安全章: 33, 水上安全章: 34,
+    防騙先鋒章: 35, 禁毒章: 35, 保護兒童章: 35, 社區應急先鋒章: 35, 環保先鋒章: 35, 機電先鋒章: 35,
+    香港歷史章: 36, 國家安全大使章: 37,
+    藝術章: 38, 手藝章: 39, 娛樂章: 40, 資訊科技章: 41, 語言章: 42, 媒體製作章: 43,
+    音樂章: 44, 攝影章: 46, 寫作章: 47,
+    天象章: 48, 園藝章: 49, 科學章: 50, 氣象章: 51, "地球部落計劃": 52,
+    射箭章: 53, 田徑章: 54, 閱讀章: 55, 獨木舟章: 56, 搜集章: 57, 烹飪章: 58, 單車章: 59,
+    公園定向章: 60, 寵物章: 61, 體適能章: 62, 風帆章: 63, 水手章: 64, 運動章: 65,
+    游泳章: 66, 世界友誼章: 67, 宗教章: 68, 童軍先修章: 70,
+  };
   const PENDING = ["手藝章","資訊科技章","媒體製作章","地球部落計劃 – 走塑達人章、自然守護者章、日光善用者章","公園定向章（三級制度）","體適能章（三級制度）","風帆章","水手章","宗教章","童軍先修章"];
+  /* 舊制章：2026 第十版目錄已經冇呢 4 個章，所以唔入組別（撳唔到係正確行為） */
+  const LEGACY = ["勞作章","讀圖章","電腦章","體操章"];
+
   const items = Q("App.badgeGroups()").flatMap((g) => g.items);
-  ok(items.length === 51, `組別共 ${items.length} 個章名（51）`);
+  const norm = (n) => n.replace(/（[^）]*）/g, "").trim();
+  ok(items.length === 47, `組別共 ${items.length} 個章名（官方2026 展開後 47）`);
+  ok(items.every((n) => norm(n) in OFFICIAL_2026 || n.startsWith("地球部落計劃")), "組別冇多出官方2026以外嘅章");
+  /* 「地球部落計劃」喺組別係一條複合條目（走塑達人／自然守護者／日光善用者），所以用前綴比 */
+  ok(Object.keys(OFFICIAL_2026).every((k) => items.some((n) => norm(n) === k || n.startsWith(k))), "官方2026每個章都喺組別入面");
+
   const resolves = (n) => Q(`!!(App.officialBadges[${JSON.stringify(n)}] || App.officialBadges[String(${JSON.stringify(n)}).replace(/（[^）]*）/g,'').trim()])`);
   const missing = items.filter((n) => !resolves(n));
   const same = missing.length === PENDING.length && PENDING.every((n) => missing.includes(n)) && missing.every((n) => PENDING.includes(n));
-  ok(same, `仍待補官方內容剛好 ${PENDING.length} 個（實際 ${missing.length}：${missing.join("、")}）`);
+  ok(same, `仍待補官方內容剛好 ${PENDING.length} 個（實際 ${missing.length}）`);
   PENDING.forEach((n) => ok(!resolves(n), `「${n}」仍未補 —— 補咗請由 PENDING 除名`));
+
+  /* 官方綱要頁碼逐個核（之前 22 個係舊版頁碼） */
   const keys = Q("Object.keys(App.officialBadges)");
-  const orphan = keys.filter((k) => !items.some((n) => n === k || n.replace(/（[^）]*）/g, "") === k));
-  ok(orphan.length === 0, `冇孤兒官方內容（實際 ${orphan.length}：${orphan.join("、") || "冇"}）`);
-  /* 括號後綴嘅官方全名都要開到真內容，唔可以跌落 placeholder */
-  for (const n of ["體操章（三級制度）","音樂章（三級制度）","游泳章（三級制度章）","射箭章（三級制度）","田徑章（三級制度）","獨木舟章（三級制度）","勞作章","讀圖章","電腦章"]) {
+  const pageBad = keys.filter((k) => k in OFFICIAL_2026 && Q(`App.officialBadges[${JSON.stringify(k)}].page`) !== OFFICIAL_2026[k]);
+  ok(pageBad.length === 0, `officialBadges 頁碼全部對得上官方2026目錄（唔啱：${pageBad.join("、") || "冇"}）`);
+
+  /* 孤兒內容必須剛好係已知嘅 4 個舊制章，唔可以靜靜地多咗 */
+  const orphan = keys.filter((k) => !items.some((n) => n === k || norm(n) === k));
+  const orphanOk = orphan.length === LEGACY.length && LEGACY.every((k) => orphan.includes(k));
+  ok(orphanOk, `孤兒內容剛好係 4 個舊制章（實際 ${orphan.length}：${orphan.join("、")}）`);
+
+  /* 舊制章唔應該出現喺組別（2026 目錄冇佢哋） */
+  LEGACY.forEach((k) => ok(!items.includes(k) && !items.some((n) => norm(n) === k), `舊制「${k}」冇混入 2026 組別`));
+
+  /* 括號後綴嘅官方全名都要開到真內容 */
+  for (const n of ["音樂章（三級制度）","游泳章（三級制度章）","射箭章（三級制度）","田徑章（三級制度）","獨木舟章（三級制度）"]) {
     Q("Modal.open = function(h){ globalThis.__m = h; }");
     Q(`App.openBadge(${JSON.stringify(n)})`);
-    ok(!sb.__m.includes("逐章內置"), `「${n}」開到真官方內容（${sb.__m.replace(/<[^>]+>/g, " ").length} 字）`);
+    ok(!sb.__m.includes("逐章內置"), `「${n}」開到真官方內容`);
   }
+  /* 水上安全章：官方2026 係第34頁（舊制先係65頁） */
+  const w = Q("App.officialBadges['水上安全章']");
+  ok(w.page === 34, `水上安全章官方綱要頁 ${w.page}（34，2026第十版）`);
+  ok(w.items.length === 2, `水上安全章 ${w.items.length} 項要求（2，2026版；舊制4項版已撤）`);
 }
 /* officialBadges 唔可以有重複 key：JS 會用後者覆蓋前者，靜靜地丟走官方內容，
    parse 完嘅物件睇唔出，所以一定要掃原始碼 */
 {
   const src = fs.readFileSync(path.join(root, "js/redesign.js"), "utf8");
-  const keys = [...src.matchAll(/^    '([^']+章)':\{purpose/gm)].map((m) => m[1]);
-  const dup = keys.filter((k, i) => keys.indexOf(k) !== i);
-  ok(keys.length === 41, `officialBadges 原始碼 ${keys.length} 個章（41）`);
+  const ks = [...src.matchAll(/^    '([^']+章)':\{purpose/gm)].map((m) => m[1]);
+  const dup = ks.filter((k, i) => ks.indexOf(k) !== i);
   ok(dup.length === 0, `冇重複 key（實際：${dup.join("、") || "冇"}）`);
-  /* 水上安全章要係完整版（4項含手援／拋物，頁65），唔係被精簡版蓋咗 */
-  const w = Q("App.officialBadges['水上安全章']");
-  ok(w.items.length === 4, `水上安全章有 ${w.items.length} 項要求（4，唔係被精簡版蓋咗嘅 2）`);
-  ok(w.page === 65, `水上安全章官方綱要頁 ${w.page}（65，同官方目錄吻合）`);
-  ok(JSON.stringify(w.items).includes("手援"), "水上安全章保留「手援」拯救要求");
 }
 /* PackPrint 張數 */
 {
