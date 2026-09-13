@@ -70,6 +70,28 @@ for (const [name, expr, needles] of pages) {
   Q("Flow.quit()");
   ok(Q("Flow.on()") === false, "Flow.quit 退到");
 }
+/* 定位：嚮導只做「帶集會」5 步，帶完即散會；記錄交右上角外部APP，唔喺呢度 */
+{
+  Q("Flow.reset()");
+  ["pick", "print", "bag", "venue", "lead"].forEach((k, i) => {
+    ok(Q("Flow.cur().k") === k, `第 ${i + 1} 步係「${k}」（實際「${Q("Flow.cur().k")}」）`);
+    Q(`Flow.mark("${k}", true)`);
+  });
+  ok(Q("Flow.cur()") === null, "5 步做完即完成，冇第 6／7 步");
+  const done = Q("Flow.barHtml()");
+  ok(done.includes("散會"), "完成畫面講「散會」");
+  ok(done.includes("進度追蹤APP"), "完成畫面引流去右上角進度追蹤APP");
+  ok(!done.includes("同步落"), "完成畫面唔再提「同步落進度追蹤APP」");
+  ok(Q("typeof Flow.doRec") === "undefined", "Flow.doRec 已移除");
+  ok(Q("typeof Flow.doSync") === "undefined", "Flow.doSync 已移除");
+  Q("Flow.quit()");
+  /* inviteHtml 喺嚮導開住時回傳另一個分支，所以退咗先至讀到邀請文案 */
+  const invite = Q("Flow.inviteHtml()");
+  ok(invite.includes("帶領。帶完就散會"), "邀請卡文案止於「帶領」，帶完即散會");
+  ok(!/記出席|同步獎章/.test(invite), "邀請卡唔再提記出席／同步獎章");
+  /* 還原狀態：上面把 5 步全部標完成，會令後面「選集會直接開始印教材步驟」搵唔到 cur() */
+  Q("localStorage.removeItem('cub_flow')");
+}
 /* PackPrint 張數 */
 {
   const c = Q("PackPrint.count(curMeet())");

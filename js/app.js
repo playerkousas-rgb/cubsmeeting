@@ -223,7 +223,7 @@ var App = {
     /* 大卡：外部APP入口（第1位） */
     h += extBtn(badgeUrl, true, "🏅 開進度追蹤APP記獎章", "呢個套包只記今日出席；長期獎章（會員章→金紫荊）、服務／活動／訓練班履歷、金紫荊現行申請表，全部交畀嗰邊，唔好喺套包再起一套獎章資料庫。") + "</section>";
     h += '<section class="card"><h3>✅ 完場記出席（今場：' + esc(curMeet().n) + "）</h3>" +
-      '<p class="mut">剔邊個到咗 → 撳儲存。儲完嚮導會自動跳去「同步落進度追蹤APP」。</p><div id="attlist">' +
+      '<p class="mut">剔邊個到咗 → 撳儲存。長期獎章進度請去右上角 🏅 進度追蹤APP，呢度唔做獎章紀錄。</p><div id="attlist">' +
       roster.map(function (n, i) { return "<label class='att'><input type='checkbox' data-i='" + i + "' " + (att[i] ? "checked" : "") + "> " + esc(n) + "</label>"; }).join("") +
       '</div><div class="quick"><button class="btn sm gr" onclick="App.saveAtt()">💾 儲存出席</button>' +
       '<button class="btn sm ghost" onclick="App.editRoster()">✏️ 改名單</button>' +
@@ -237,7 +237,6 @@ var App = {
     Store.set("att_" + curTid(), o);
     var n = Object.keys(o).length;
     toast("✓ 記低 " + n + " 人出席");
-    if (typeof Flow !== "undefined") { Flow.mark("rec"); Flow.render(); }
     var badgeUrl = (typeof EXTERNAL !== "undefined") ? EXTERNAL.badge : "https://cubsbadge.vercel.app/";
     var el = document.getElementById("syncHint");
     if (el) el.innerHTML = '<div class="tipcard">下一步：去進度APP同步獎章進度（套包唔做獎章DB）。<br><a class="btn sm gr" href="' + badgeUrl + '" target="_blank" rel="noopener">🏅 同步落進度追蹤APP ↗</a></div>';

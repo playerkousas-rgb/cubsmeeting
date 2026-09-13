@@ -49,12 +49,15 @@ const flowCode = read("js/flow.js");
   const ctx = {};
   vm.createContext(ctx);
   vm.runInContext(flowCode, ctx);
-  ok(ctx.Flow.STEPS.length >= 7, `嚮導 ${ctx.Flow.STEPS.length} 步（含同步APP最後一步）`);
+  ok(ctx.Flow.STEPS.length === 5, `嚮導 ${ctx.Flow.STEPS.length} 步（5：揀→印→執袋→設場→帶領）`);
   ctx.Flow.STEPS.forEach((s) => {
     ok(!!(s.k && s.n && s.why && s.btn && s.go), `嚮導「${s.n}」四要素齊（做咩/點解/掣/go）`);
   });
   const keys = ctx.Flow.STEPS.map((s) => s.k);
-  ["pick", "print", "bag", "venue", "lead", "rec", "sync"].forEach((k) => ok(keys.includes(k), `嚮導有「${k}」步`));
+  ["pick", "print", "bag", "venue", "lead"].forEach((k) => ok(keys.includes(k), `嚮導有「${k}」步`));
+  /* 定位：套包只幫人「帶集會」，唔幫人記錄。記錄交右上角嘅進度追蹤APP／通告圖書館引流。 */
+  ["rec", "sync"].forEach((k) => ok(!keys.includes(k), `嚮導冇「${k}」步（記錄唔屬於呢個套包）`));
+  ok(keys[keys.length - 1] === "lead", "嚮導最後一步係「帶領」，帶完即散會");
   ok(!/下一步/.test(ctx.Flow.STEPS.map((s) => s.btn).join("")), "嚮導無「下一步」掣（要做完自動跳）");
   ok(/邀請|帶我由頭做到尾/.test(flowCode) || /帶我由頭做到尾/.test(app), "有邀請卡「第一次帶集會？我帶你由頭做到尾」");
   ok(/quit/.test(flowCode) && /唔再彈|唔使帶/.test(flowCode + html), "可退出，退咗唔再彈");
@@ -71,7 +74,7 @@ const flowCode = read("js/flow.js");
   ok(/navigator\.onLine|online.*offline|offline/.test(app), "有handle離線（online/offline監聽）");
   /* 三個位＋兩個位 */
   ok(/記獎章|開進度追蹤APP記獎章/.test(app), "記錄頁頂有大卡「開進度追蹤APP記獎章」");
-  ok(/同步落進度追蹤APP/.test(flowCode + app), "嚮導最後一步係同步落進度追蹤APP");
+  ok(!/同步落進度追蹤APP/.test(flowCode), "嚮導唔再有「同步落進度追蹤APP」步驟");
   ok(/相關APP|相關APP/.test(app), "手冊有「相關APP」區");
   ok(/睇最新通告同活動/.test(app), "年度計劃頁有細卡「睇最新通告同活動」");
   ok(/今天／七天／三十天|七天／三十天/.test(app), "通告文案有教時間視窗");
