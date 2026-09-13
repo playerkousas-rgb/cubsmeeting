@@ -103,6 +103,41 @@ for (const [name, expr, needles] of pages) {
   ok(Q("App.vPlan()").includes("c07") , "集會目錄列到 c07");
   Q("Lead.idx = 0");
 }
+/* 活動章覆蓋率：組別格仔每個章名都要撳到官方內容，除非明確列為待補。
+   呢個測試係棘輪：補咗內容就要由 PENDING 除名，加咗撳唔到嘅章名就會爆。 */
+{
+  const PENDING = ["手藝章","資訊科技章","媒體製作章","地球部落計劃 – 走塑達人章、自然守護者章、日光善用者章","公園定向章（三級制度）","體適能章（三級制度）","風帆章","水手章","宗教章","童軍先修章"];
+  const items = Q("App.badgeGroups()").flatMap((g) => g.items);
+  ok(items.length === 51, `組別共 ${items.length} 個章名（51）`);
+  const resolves = (n) => Q(`!!(App.officialBadges[${JSON.stringify(n)}] || App.officialBadges[String(${JSON.stringify(n)}).replace(/（[^）]*）/g,'').trim()])`);
+  const missing = items.filter((n) => !resolves(n));
+  const same = missing.length === PENDING.length && PENDING.every((n) => missing.includes(n)) && missing.every((n) => PENDING.includes(n));
+  ok(same, `仍待補官方內容剛好 ${PENDING.length} 個（實際 ${missing.length}：${missing.join("、")}）`);
+  PENDING.forEach((n) => ok(!resolves(n), `「${n}」仍未補 —— 補咗請由 PENDING 除名`));
+  const keys = Q("Object.keys(App.officialBadges)");
+  const orphan = keys.filter((k) => !items.some((n) => n === k || n.replace(/（[^）]*）/g, "") === k));
+  ok(orphan.length === 0, `冇孤兒官方內容（實際 ${orphan.length}：${orphan.join("、") || "冇"}）`);
+  /* 括號後綴嘅官方全名都要開到真內容，唔可以跌落 placeholder */
+  for (const n of ["體操章（三級制度）","音樂章（三級制度）","游泳章（三級制度章）","射箭章（三級制度）","田徑章（三級制度）","獨木舟章（三級制度）","勞作章","讀圖章","電腦章"]) {
+    Q("Modal.open = function(h){ globalThis.__m = h; }");
+    Q(`App.openBadge(${JSON.stringify(n)})`);
+    ok(!sb.__m.includes("逐章內置"), `「${n}」開到真官方內容（${sb.__m.replace(/<[^>]+>/g, " ").length} 字）`);
+  }
+}
+/* officialBadges 唔可以有重複 key：JS 會用後者覆蓋前者，靜靜地丟走官方內容，
+   parse 完嘅物件睇唔出，所以一定要掃原始碼 */
+{
+  const src = fs.readFileSync(path.join(root, "js/redesign.js"), "utf8");
+  const keys = [...src.matchAll(/^    '([^']+章)':\{purpose/gm)].map((m) => m[1]);
+  const dup = keys.filter((k, i) => keys.indexOf(k) !== i);
+  ok(keys.length === 41, `officialBadges 原始碼 ${keys.length} 個章（41）`);
+  ok(dup.length === 0, `冇重複 key（實際：${dup.join("、") || "冇"}）`);
+  /* 水上安全章要係完整版（4項含手援／拋物，頁65），唔係被精簡版蓋咗 */
+  const w = Q("App.officialBadges['水上安全章']");
+  ok(w.items.length === 4, `水上安全章有 ${w.items.length} 項要求（4，唔係被精簡版蓋咗嘅 2）`);
+  ok(w.page === 65, `水上安全章官方綱要頁 ${w.page}（65，同官方目錄吻合）`);
+  ok(JSON.stringify(w.items).includes("手援"), "水上安全章保留「手援」拯救要求");
+}
 /* PackPrint 張數 */
 {
   const c = Q("PackPrint.count(curMeet())");

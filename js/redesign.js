@@ -164,12 +164,12 @@
 
   /* 活動章工具書：先按官方組別，再按章；官方要求與建議用小分頁分開。 */
   App.badgeGroups = function(){return [
-    {id:'core-skills',name:'童軍技能（綠色）',icon:'🟢',items:['露營章','探險章']},
+    {id:'core-skills',name:'童軍技能（綠色）',icon:'🟢',items:['露營章','探險章','讀圖章']},
     {id:'core-care',name:'關己愛人（紅色）',icon:'🔴',items:['愛護動物章','共融章','急救章','家務章','道路安全章','水上安全章','防騙先鋒章','禁毒章','保護兒童章','社區應急先鋒章','環保先鋒章','機電先鋒章']},
     {id:'core-community',name:'國家與社區（黃色）',icon:'🟡',items:['香港歷史章','國家安全大使章']},
-    {id:'interest-creative',name:'多元創藝（藍色）',icon:'🔵',items:['藝術章','手藝章','娛樂章','資訊科技章','語言章','媒體製作章','音樂章（三級制度）','攝影章','寫作章']},
+    {id:'interest-creative',name:'多元創藝（藍色）',icon:'🔵',items:['藝術章','手藝章','勞作章','娛樂章','資訊科技章','電腦章','語言章','媒體製作章','音樂章（三級制度）','攝影章','寫作章']},
     {id:'interest-science',name:'科學與大自然（青色）',icon:'🟦',items:['天象章','園藝章','科學章','氣象章','地球部落計劃 – 走塑達人章、自然守護者章、日光善用者章']},
-    {id:'interest-sport',name:'運動與愛好（橙色）',icon:'🟠',items:['射箭章（三級制度）','田徑章（三級制度）','閱讀章','獨木舟章（三級制度）','搜集章','烹飪章','單車章','公園定向章（三級制度）','寵物章','體適能章（三級制度）','風帆章','水手章','運動章','游泳章（三級制度章）','世界友誼章']},
+    {id:'interest-sport',name:'運動與愛好（橙色）',icon:'🟠',items:['射箭章（三級制度）','田徑章（三級制度）','體操章（三級制度）','閱讀章','獨木舟章（三級制度）','搜集章','烹飪章','單車章','公園定向章（三級制度）','寵物章','體適能章（三級制度）','風帆章','水手章','運動章','游泳章（三級制度章）','世界友誼章']},
     {id:'other',name:'其他徽章',icon:'🏅',items:['宗教章','童軍先修章']}
   ];};
   App.vBadge = function(){
@@ -205,12 +205,10 @@
     '氣象章':{purpose:'認識天氣變化對日常生活的影響及需注意的事項。',items:['懂得利用大眾傳播媒介或電子工具獲取天氣資訊','認識氣溫、風、降雨及紫外線指數等天氣要素，並說出戶外活動時如何因應變化作出準備','懂得天氣警告發出後的注意事項，包括雷暴、暴雨及熱帶氣旋警告','認識雲的形成，並辨認層雲、積雲、卷雲及積雨雲','認識二十四節氣基本概念，並說出最少六個節氣及其特點','進行最少五天的天氣觀測，記錄個人對天氣的感覺，並與當時天氣資訊比較','完成以下兩項：製作海報或進行實驗描述水循環；製作測風儀模型；透過網上資源學習氣象知識並匯報'],page:66},
     '世界友誼章':{purpose:'讓幼童軍對世界童軍有更多認識。',items:['用不少於四個月完成剪貼簿，內容關於一個世界童軍組織成員國的民族生活方式、食物特色及風俗習慣','略知聯合國的組織、歷史、旗幟及其意義','向領袖列舉香港以外10個世界童軍組織成員國，並知道其中3個國家國旗的意義','曾與外國童軍通訊最少兩次'],page:67},
     '水上安全章':{purpose:'提升幼童軍的水上安全意識，使他們遇上水上意外時懂得如何協助。',items:['認識水上安全知識及守則','明瞭向成年人求助的重要性','在安全情況下示範手援：使用竹竿或木棒等棒類物品，或兩件緊縛在一起的衣物拯救近岸溺者','在安全情況下示範拋物：站在岸上將無負重繩索、水泡或其他浮物拋給離岸6米的溺者'],note:'所有示範必須在安全情況下進行，不應自行下水救人。',page:65},
-    '園藝章':{purpose:'讓幼童軍了解植物的特性及栽培過程，培養對園藝的興趣。',items:['介紹四種香港常見植物，包括特徵、生長時節及所在地方','用不少於一個月栽種一株植物，記錄由種子開始的生長、栽種過程及特性，包括每星期生長情況、土壤氣候等注意事項、繁殖栽種方法及控制或培養生長','知道栽種該植物所需用具，以及適當使用及保養方法'],page:57},
     '探險章':{purpose:'讓幼童軍學習基本閱讀地圖的技巧，同時了解野外旅程前的準備及需關注事項，並明瞭戶外基本求生技能。',items:['明瞭地圖或街道圖上的主要圖例，並能指出旅團及居所的位置','製作一個合比例之 100 米高小模型，該模型應能顯示相距 20 米的等高線','明瞭上述第 1、2 點，以便能夠形容出由地圖所指的一條 5,000 米長的路上會見到的事物','懂得利用地圖及西維氏（Silva-type）指南針正置地圖、指出前進方向或地標的方位','明瞭一日遠足行程前所需要之準備工作，包括旅程費用、適當之服裝、鞋襪、救傷用品及食物等','策劃及參加一次不少於六公里之幼童軍遠足活動'],page:28},
     '愛護動物章':{purpose:'提升幼童軍對愛護動物的意識，提倡善待動物、了解動物的需要及學習尊重生命。',items:['向領袖講述動物的需要及如何選擇合適的寵物','明瞭飼養寵物的責任','認識一種寵物的生命週期、生活習性、常見疾病、棲息地及生存的基本需要'],page:29},
     '共融章':{purpose:'讓幼童軍學習認識、接納和關懷社會上的弱能人士，與其融洽共處並理解他們的特質及需求。',items:['認識以下一種弱能人士的類別及其特質：弱智、弱聽／失聰、弱視／失明、身體弱能或自閉症','簡介特能童軍活動','參與一次傷健旅團聯合活動或一次弱能人士服務活動，並作簡單記錄'],page:30},
     '道路安全章':{purpose:'認識道路安全及保障行人和其他道路使用者。',items:['認識一些輔助行人及其他道路使用者的設施和交通標誌','知曉踏單車的安全守則','知曉乘客的安全守則'],page:33},
-    '水上安全章':{purpose:'認識水上安全及遇到水上意外時的求助方法。',items:['知道基本的水上安全守則','向他人推廣水上安全規則'],page:34},
     '急救章':{purpose:'讓幼童軍明白急救的目的及原則、求助的程序，並知曉日常生活中導致意外的因素及簡單處理方法。',items:['明瞭急救原則，能講出日常生活及戶外活動的危險因素，以及進行急救前的首要工作，例如向成年人求助及報警','認識輕微／嚴重出血及有異物傷口的處理方法','認識燒傷與燙傷的成因、預防方法及簡單處理方法','認識昏厥的徵狀及簡單處理方法','認識扭傷的徵狀及簡單處理方法','完成《幼童軍急救章手冊》內第一至第五課的討論及溫習項目','列舉個人藥囊的各項應用物品','示範三角繃帶的兩種紮法：大手掛及三角手掛'],note:'需確保幼童軍正確使用急救用品；請參閱官方《幼童軍急救章手冊》。',page:31},
     '家務章':{purpose:'鼓勵幼童軍分擔家務並能展示基本技能。',items:['煎煙肉或香腸，煮蛋和煮飯','佈置飯桌及懂得進膳時之禮貌（此項可與第一項同時進行）','洗碗碟並知道怎樣處理用過之鍋鑊、刀叉、筷子、玻璃器皿等','洗及熨旅巾','在制服上縫上一個徽章或鈕扣','整理睡床','清潔門窗、銀器或銅器'],page:32},
     '香港歷史章':{purpose:'鼓勵幼童軍探索香港歷史，讓他們了解本地的人和事。',items:['在與領袖商討後，以下列任何一個主題製作一本剪貼簿或一個互聯網站：一名本港歷史名人的事蹟','一個香港的古舊建築','一件香港歷史大事','其他經領袖同意且對本港具相當歷史意義的題目'],page:36},
@@ -222,7 +220,10 @@
     '環保先鋒章':{purpose:'培養成員保護環境的責任感及領導能力，鼓勵以積極行動保持地球永續環境。',items:['認識香港的環保政策及措施','認識本地及全球環境議題','認識人與環境的關係','認識保護環境的方法','完成由環境運動委員會委任的環保先鋒導師教授的環保內容','完成一項由環境運動委員會安排的環境教育培訓活動','完成一項由香港童軍總會或其他機構舉辦的環境教育培訓活動'],note:'官方頁面標示為先導計劃；培訓活動須按環境運動委員會及香港童軍總會的安排進行。',page:35},
     '國家安全大使章':{purpose:'培養幼童軍對《基本法》、國家、法治及國家安全的基本認識。',items:['明暸《基本法》第一條的內容','了解中華人民共和國的首都及重要城市、地理位置，以及代表國家的事物和有趣的國家事件或事物','說出20個國家安全重點領域，並認識國家和香港常見創新科技在日常生活的應用','認識執法和服務市民的部門、其工作及個人的公民責任','參觀國家安全展覽廳，或參加以國家安全為主題的展覽、活動或比賽'],note:'可按成員能力調整教學內容及考驗難度。',page:35}
   };
-  App.openBadge = function(name){var official='https://prog.scouting.org.hk/cub/training-scheme/', spec=App.officialBadges[name], officialHtml=spec?'<p><b>目的：</b>'+esc(spec.purpose)+'</p><ol>'+spec.items.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ol>'+(spec.note?'<p class="safe">'+esc(spec.note)+'</p>':'')+'<p class="mut">官方綱要頁 '+spec.page+'</p>':'<p>官方內容正在按 2026 年第十版逐章內置。</p>';Modal.open('<h2>🎖️ '+esc(name)+'</h2><div class="subtabs badge-detail-tabs"><button class="subtab cur" onclick="App.switchBadgeTab(this,\'official\')">官方要求</button><button class="subtab" onclick="App.switchBadgeTab(this,\'suggest\')">建議考核</button></div><div id="badge-official">'+officialHtml+'<p class="mut">官方活動章內容版本：幼童軍訓練綱要網上版。</p></div><div id="badge-suggest" class="hidden"><p>建議領袖流程：</p><ol><li>先逐項讀清楚要求及安全限制。</li><li>先示範，再讓成員按要求完成。</li><li>按官方要求即場判斷是否達標；不達標便安排再試。</li></ol><p class="mut">這一頁只是使用方法，不取代官方要求。</p></div><div class="attachment-row"><a class="btn ghost" href="'+official+'" target="_blank" rel="noopener">📎 開官方訓練綱要附件</a></div><button class="btn" onclick="Modal.close()">關閉</button>');};
+  App.openBadge = function(name){var official='https://prog.scouting.org.hk/cub/training-scheme/',
+      /* 組別格仔用官方全名（例：體操章（三級制度）），officialBadges 用短名（體操章）。
+         剝走括號後綴再查一次，否則內容明明寫好都撳唔到。 */
+      spec=App.officialBadges[name] || App.officialBadges[String(name).replace(/（[^）]*）/g,'').trim()], officialHtml=spec?'<p><b>目的：</b>'+esc(spec.purpose)+'</p><ol>'+spec.items.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ol>'+(spec.note?'<p class="safe">'+esc(spec.note)+'</p>':'')+'<p class="mut">官方綱要頁 '+spec.page+'</p>':'<p>官方內容正在按 2026 年第十版逐章內置。</p>';Modal.open('<h2>🎖️ '+esc(name)+'</h2><div class="subtabs badge-detail-tabs"><button class="subtab cur" onclick="App.switchBadgeTab(this,\'official\')">官方要求</button><button class="subtab" onclick="App.switchBadgeTab(this,\'suggest\')">建議考核</button></div><div id="badge-official">'+officialHtml+'<p class="mut">官方活動章內容版本：幼童軍訓練綱要網上版。</p></div><div id="badge-suggest" class="hidden"><p>建議領袖流程：</p><ol><li>先逐項讀清楚要求及安全限制。</li><li>先示範，再讓成員按要求完成。</li><li>按官方要求即場判斷是否達標；不達標便安排再試。</li></ol><p class="mut">這一頁只是使用方法，不取代官方要求。</p></div><div class="attachment-row"><a class="btn ghost" href="'+official+'" target="_blank" rel="noopener">📎 開官方訓練綱要附件</a></div><button class="btn" onclick="Modal.close()">關閉</button>');};
   App.switchBadgeTab = function(btn,key){var root=btn.closest('.mbox');root.querySelectorAll('.badge-detail-tabs .subtab').forEach(function(x){x.classList.remove('cur');});btn.classList.add('cur');root.querySelector('#badge-official').classList.toggle('hidden',key!=='official');root.querySelector('#badge-suggest').classList.toggle('hidden',key!=='suggest');};
 
   App.vSongs = App.vPrint;
