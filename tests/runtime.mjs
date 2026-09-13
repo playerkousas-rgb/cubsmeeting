@@ -144,13 +144,45 @@ for (const [name, expr, needles] of pages) {
   const pageBad = keys.filter((k) => k in OFFICIAL_2026 && Q(`App.officialBadges[${JSON.stringify(k)}].page`) !== OFFICIAL_2026[k]);
   ok(pageBad.length === 0, `officialBadges 頁碼全部對得上官方2026目錄（唔啱：${pageBad.join("、") || "冇"}）`);
 
-  /* 孤兒內容必須剛好係已知嘅 4 個舊制章，唔可以靜靜地多咗 */
+  /* 舊制章有自己嘅分組（App.legacyBadgeGroup），唔可以混入 badgeGroups() */
   const orphan = keys.filter((k) => !items.some((n) => n === k || norm(n) === k));
   const orphanOk = orphan.length === LEGACY.length && LEGACY.every((k) => orphan.includes(k));
-  ok(orphanOk, `孤兒內容剛好係 4 個舊制章（實際 ${orphan.length}：${orphan.join("、")}）`);
-
-  /* 舊制章唔應該出現喺組別（2026 目錄冇佢哋） */
+  ok(orphanOk, `badgeGroups() 以外嘅內容剛好係 4 個舊制章（實際 ${orphan.length}：${orphan.join("、")}）`);
   LEGACY.forEach((k) => ok(!items.includes(k) && !items.some((n) => norm(n) === k), `舊制「${k}」冇混入 2026 組別`));
+
+  const lg = Q("App.legacyBadgeGroup()");
+  ok(lg.id === "legacy" && lg.items.length === LEGACY.length, `legacyBadgeGroup 有 ${lg.items.length} 個章`);
+  ok(LEGACY.every((k) => lg.items.includes(k)), "legacyBadgeGroup 內容剛好係嗰 4 個舊制章");
+  ok(!Q("App.badgeGroups()").some((g) => g.id === "legacy"), "badgeGroups() 唔包 legacy 組");
+
+  /* 舊制章區必須摺埋（<details> 冇 open 屬性）先算合規格 */
+  const sec = Q("App.legacySection()");
+  ok(sec.startsWith("<details class=\"badge-legacy\">") && !sec.includes("<details class=\"badge-legacy\" open"),
+     "舊制章區用 <details> 且預設收埋");
+  LEGACY.forEach((k) => ok(sec.includes(k), `舊制章區列到「${k}」`));
+  ok(sec.includes("2026 第十版"), "舊制章區講明 2026 目錄已無呢啲章");
+  ok(Q("App.vBadge()").includes("App.legacySection") || Q("App.vBadge()").includes("badge-legacy"),
+     "vBadge 有 render 舊制章區");
+
+  /* 舊制章 modal 唔可以顯示「官方綱要頁」（2026 該頁係另一個章） */
+  Q("Modal.open = function(h){ globalThis.__m = h; }");
+  for (const k of LEGACY) {
+    const spec = Q(`App.officialBadges[${JSON.stringify(k)}]`);
+    ok(spec.legacy === true, `「${k}」標記為 legacy`);
+    Q(`App.openBadge(${JSON.stringify(k)})`);
+    ok(sb.__m.includes("舊制綱要頁 " + spec.page), `「${k}」顯示「舊制綱要頁 ${spec.page}」`);
+    ok(!sb.__m.includes("官方綱要頁"), `「${k}」冇誤顯示「官方綱要頁」`);
+    ok(sb.__m.includes("2026 第十版目錄已無此章"), `「${k}」有舊制警告`);
+    ok(spec.legacyNote && spec.legacyNote.length > 5, `「${k}」有承接說明`);
+    ok(sb.__m.includes("<h2>🎖️ " + k + "（舊制）</h2>"), `「${k}」modal 標題標明（舊制）`);
+    ok(sb.__m.includes("內容來源：舊制《幼童軍訓練綱要》"), `「${k}」來源行係舊制版`);
+    ok(!sb.__m.includes("官方內容來源"), `「${k}」唔會誤寫「官方內容來源：2026 第十版」`);
+  }
+  /* 現行章仍然顯示「官方綱要頁」，唔可以俾 legacy 分支污染 */
+  Q("App.openBadge('露營章')");
+  ok(sb.__m.includes("官方綱要頁 27") && !sb.__m.includes("舊制綱要頁"), "現行章仍然顯示「官方綱要頁」");
+  ok(sb.__m.includes("<h2>🎖️ 露營章</h2>"), "現行章標題冇（舊制）標記");
+  ok(sb.__m.includes("官方內容來源：《幼童軍訓練綱要》2026 年第十版第三章"), "現行章來源行係 2026 第十版");
 
   /* 括號後綴嘅官方全名都要開到真內容 */
   for (const n of ["音樂章（三級制度）","游泳章（三級制度章）","射箭章（三級制度）","田徑章（三級制度）","獨木舟章（三級制度）"]) {
