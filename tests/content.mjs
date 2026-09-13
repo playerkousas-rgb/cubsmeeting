@@ -38,7 +38,7 @@ assert(App.vBook().includes(DATA.source.url));
 console.log('CONTENT PASS: 27 lessons, 135 authored stages, syllabus mappings, materials, text worksheets and print isolation');
 
 assert.equal(DATA.jungle.characters.length,11);
-assert.equal(DATA.jungle.episodes.length,2);
+assert.equal(DATA.jungle.episodes.length,5);
 for(const episode of DATA.jungle.episodes){assert.equal(episode.scenes.length,4);for(const scene of episode.scenes){assert(scene.text&&scene.question&&scene.answer&&scene.lesson);for(const id of scene.cast)assert(DATA.jungle.characters.some(c=>c.id===id));}}
 App.prepare('c07');
 ctx.location.hash='#jungle';App.route();assert(elements.view.innerHTML.includes('11位角色'));assert.equal(ctx.curTid(),'c07');

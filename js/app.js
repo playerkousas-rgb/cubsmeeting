@@ -11,7 +11,7 @@ var Store = {
   set: function (k, v) { try { localStorage.setItem("cub_" + k, JSON.stringify(v)); } catch (e) {} }
 };
 var Modal = {
-  open: function (html) { var m = document.getElementById("modal"); m.innerHTML = '<div class="mbox"><button class="mx" onclick="Modal.close()">✕</button>' + html + "</div>"; m.className = "on"; },
+  open: function (html) { var m = document.getElementById("modal"); if (!m) return; m.innerHTML = '<div class="mbox" role="dialog" aria-modal="true" onclick="if(event.target===this)Modal.close()"><button class="mx" onclick="Modal.close()" aria-label="關閉">✕</button><div class="modal-content">' + html + "</div></div>"; m.className = "on"; },
   close: function () { var m = document.getElementById("modal"); if (m) { m.className = ""; m.innerHTML = ""; } }
 };
 /* 外部APP：全部新分頁＋離線變灰 */
@@ -449,3 +449,10 @@ var Lead = {
   next: function () { Lead.stopTimer(); Lead.beep(880, 0.2); Lead.idx++; Lead.render(); if (Lead.idx >= curMeet().segs.length && typeof Flow !== "undefined") Flow.mark("lead"); },
   prev: function () { Lead.stopTimer(); Lead.idx = Math.max(0, Lead.idx - 1); Lead.render(); }
 };
+/* ESC always closes the active dialog; useful on desktop and prevents modal dead ends. */
+if (typeof document !== "undefined" && typeof document.addEventListener === "function") document.addEventListener("keydown", function (e) {
+  if (e.key === "Escape") {
+    var m = document.getElementById("modal");
+    if (m && m.classList.contains("on")) Modal.close();
+  }
+});
