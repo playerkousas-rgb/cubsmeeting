@@ -23,6 +23,12 @@ const ok = (c, msg) => { console.log((c ? "✓ " : "✗ FAIL ") + msg); if (!c) 
     ok(sw.includes(a), `SW有cache ${a}`));
   ok(/skipWaiting|clients\.claim/.test(sw), "SW即時接管");
   ok(/cubsbadge|scout-circulars/.test(sw), "SW放過外部APP（唔cache網上服務）");
+  /* index.html 引用嘅每個 script 都要 cache 到，漏一個離線就白屏 */
+  const scripts = [...read("index.html").matchAll(/<script src="([^"]+)"><\/script>/g)].map((m) => m[1]);
+  ok(scripts.length >= 15, `index.html 載入 ${scripts.length} 個 script`);
+  scripts.forEach((s) => ok(sw.includes("./" + s), `SW有cache index.html 引用嘅 ${s}`));
+  /* SW 係 cache-first：改咗殼一定要 bump CACHE，否則舊用戶永遠攞舊 index.html */
+  ok(/var CACHE = "cubhub-[^"]*-20\d{6}";/.test(sw), "SW CACHE 版本有日期戳（改殼要 bump，cache-first 先換到新嘢）");
 }
 /* 3. 圖細張：AVIF／內聯SVG，無大JPG/PNG */
 {

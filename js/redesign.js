@@ -268,7 +268,8 @@
     // 舊版兼容對照：只轉換 craft/songs/safety/official，保留 sheets/skills 獨立
     var legacyMap = {
       'craft':'print',
-      'songs':'song',
+      'songs':'print',
+      'song':'print',
       'safety':'tools',
       'official':'plan'
     };
@@ -342,7 +343,7 @@
 
     document.querySelectorAll('#topnav a, #tabbar a').forEach(function(a){
       var t = a.dataset.tab;
-      var isOn = (t===tab) || (tab==='craft' && t==='print') || (tab==='songs' && t==='song') || (tab==='safety' && t==='tools');
+      var isOn = (t===tab) || (tab==='craft' && t==='print') || (tab==='songs' && t==='print') || (tab==='safety' && t==='tools');
       a.classList.toggle('on', !!isOn);
       a.classList.toggle('cur', !!isOn);
     });

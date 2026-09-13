@@ -94,6 +94,25 @@ for (const route of ['prep','sheets','play','skills','teams','tools']) {
   Q("location.hash='#" + route + "'; App.route()");
   ok(Q("App.tab") === route, '新路由可開啟：' + route);
 }
+/* 下方導覽五粒掣逐粒撳得開；#badge 開到 App.vBadge() */
+for (const route of ['print','play','badge','jungle','tools']) {
+  Q("location.hash='#" + route + "'; App.route()");
+  ok(Q("App.tab") === route, '下方導覽開到：' + route);
+}
+ok(Q("App.vBadge()").includes('活動章工具書'), '#badge 開到 App.vBadge() 活動章工具書');
+ok(Q("App.vBadge()").includes('badge-group-grid'), '活動章頁有官方組別分類');
+/* 舊 #song / #songs 唔再有自己嘅主導覽掣：一律轉入「工作紙＋歌曲」合併頁 */
+for (const legacy of ['song','songs','craft']) {
+  Q("location.hash='#" + legacy + "'; App.route()");
+  ok(Q("App.tab") === 'print', '舊 #' + legacy + ' 轉入工作紙＋歌曲頁');
+}
+{
+  const p = Q("App.vPrint()");
+  ok(p.includes('工作紙＋歌曲'), '合併頁標題係「工作紙＋歌曲」');
+  ok(p.includes("App.showMiniTab(this,'worksheets')") && p.includes("App.showMiniTab(this,'songs')"), '合併頁有工作紙／歌曲兩個小分頁掣');
+  ok(p.includes('id="mini-worksheets"') && p.includes('id="mini-songs"'), '兩個小分頁內容區都存在');
+  ok(Q("App.vSongs()") === p && Q("App.vSong()") === p, '舊歌頁函數同一個合併頁（唔會開到孤兒版）');
+}
 for (const expr of ['App.vPrep()', 'App.vSheets()', 'App.vLibrary(true)', 'App.vLibrary(false)', 'App.vTools(true)', 'App.vTools(false)']) {
   ok(Q(expr).length > 100, '新頁面有內容：' + expr);
 }

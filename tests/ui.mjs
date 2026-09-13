@@ -25,6 +25,24 @@ const flowCode = read("js/flow.js");
   ok(read('js/jungle.js').includes("a.getAttribute('href')==='#jungle'"), '森林故事頁高亮自己的入口');
   ok(bn === 5, `下面工具箱 ${bn} 粒（5）`);
   ok(!/一二三四|步驟一|Step 1/.test(top + bot), "導覽掣無標一二三四扮流程");
+  /* 下方導覽必須同 js/redesign.js 的 BOTTOM 一模一樣（防止兩邊漂移） */
+  const redesign = read("js/redesign.js");
+  const bottomSrc = (redesign.match(/var BOTTOM = \[([\s\S]*?)\n  \];/) || ["", ""])[1];
+  const entries = [...bottomSrc.matchAll(/\{id:'([^']+)',\s*icon:'([^']+)',\s*title:'([^']+)'/g)]
+    .map((m) => ({ id: m[1], icon: m[2], title: m[3] }));
+  const btns = [...bot.matchAll(/<a href="#([^"]+)" data-tab="([^"]+)"><span>([^<]*)<\/span>([^<]+)<\/a>/g)]
+    .map((m) => ({ href: m[1], tab: m[2], icon: m[3], label: m[4] }));
+  ok(entries.length === 5, `redesign.js BOTTOM ${entries.length} 項（5）`);
+  ok(btns.length === bn, `下方導覽解析到 ${btns.length} 粒掣（同 <a> 數一致）`);
+  entries.forEach((e, i) => {
+    const b = btns[i] || {};
+    ok(b.href === e.id && b.tab === e.id, `第${i + 1}粒去 #${e.id}（實際 #${b.href} / data-tab=${b.tab}）`);
+    ok(b.icon === e.icon, `第${i + 1}粒圖示 ${e.icon}（實際 ${b.icon}）`);
+    ok(b.label === e.title, `第${i + 1}粒文案「${e.title}」（實際「${b.label}」）`);
+  });
+  ok(!/#song/.test(bot), "#song 唔再係固定下方導覽掣");
+  ok(bot.includes('href="#badge"') && bot.includes("活動章"), "下方有活動章直接入口");
+  ok(/badge:\s*App\.vBadge/.test(redesign), "#badge 路由指去 App.vBadge()");
 }
 /* 2. 嚮導每步四要素齊（做咩n／點解why／動作掣btn／go） */
 {
