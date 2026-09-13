@@ -1,7 +1,7 @@
 /* Cub Hub · 2026 content edition. Original lesson plans, not official assessment sign-off. */
 var DATA = {};
 var EXTERNAL = { badge: 'https://cubsbadge.vercel.app/', circulars: 'https://scout-circulars.vercel.app/' };
-DATA.source = { title: '幼童軍訓練綱要', version: '2026-08-09', url: 'https://drive.google.com/file/d/19StE5sobEUb8DOSkW0e57T0j784S6-R5/view', verified: '已核對第5、8、12–24頁的支部核心、會員章及進度性獎章內容；活動徽章細則及儀式章節另行核對。' };
+DATA.source = { title: '幼童軍訓練綱要（官方網上版）', version: '2026-08-09', url: 'https://prog.scouting.org.hk/cub/training-scheme/', verified: '內置內容按2026年第十版逐頁整理；原始資料連結固定使用香港童軍總會官方網上版。' };
 DATA.facts = {
   promise: ['我願盡所能；', '對神明，對國家，盡責任；', '對別人，要幫助；', '對規律，必遵行。'],
   law: '幼童軍，盡所能，先顧別人才顧己，日行一善富精神。',

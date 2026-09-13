@@ -2278,3 +2278,28 @@ body.offline .extcard{opacity:.55}
 
 /* 5支部共用模板標記 */
 .branch-tag{display:inline-block;font-size:.62rem;font-weight:800;padding:2px 8px;border-radius:99px;background:var(--or);color:#fff;margin-left:6px}
+/* Modal safety: every content card can be dismissed, including long cards. */
+#modal.on{display:flex}
+#modal .mbox{position:relative;background:#fff;width:min(94vw,720px);max-height:90dvh;overflow:auto;border-radius:20px;padding:42px 16px 18px;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+#modal .mbox .mx{position:absolute;right:12px;top:10px;width:36px;height:36px;border-radius:50%;background:#f6efe6;color:var(--brn);font-size:1.1rem;font-weight:800;z-index:2}
+#modal .mbox .modal-content{min-width:0}
+#modal .mbox .quick{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+#modal .mbox button:disabled{opacity:.45;cursor:not-allowed}
+@media(max-width:599px){#modal .mbox{width:100%;max-height:88dvh;border-radius:20px 20px 0 0}}
+/* 簡潔目錄首頁 */
+.catalog-hero{background:linear-gradient(135deg,#fff3e0,#fff 62%,#e8f5e9);border:2px solid #ffd9a8}
+.catalog-hero h1{font-size:clamp(1.55rem,5vw,2.1rem);margin:.1em 0 .2em;color:var(--ord)}
+.catalog-hero p{margin:.2em 0;font-size:.92rem}
+.catalog-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.catalog-head h2{margin:0;color:var(--ord)}
+.toc-row .toc-mid{display:block;text-decoration:none;color:inherit}
+.toc-row .pill{flex:none;margin:0;font-size:.72rem;white-space:nowrap}
+.route-back{display:inline-flex;align-items:center;gap:3px;margin:0 0 8px;color:var(--ord);font-weight:700;font-size:.88rem}
+.route-back:focus-visible{outline:2px solid var(--or);outline-offset:3px;border-radius:5px}
+.compact-tabs{margin:10px 0}.badge-tabs{overflow-x:auto;flex-wrap:nowrap}.badge-tabs .subtab{white-space:nowrap}
+.badge-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:12px}
+.badge-card{border:1.5px solid #e1bee7;border-radius:14px;background:linear-gradient(135deg,#fff,#f8f0fb);padding:12px;cursor:pointer;transition:.15s}
+.badge-card:hover{transform:translateY(-2px);box-shadow:var(--sh)}.badge-card>span{font-size:1.7rem}.badge-card h3{margin:3px 0;color:#6a1b9a;font-size:.98rem}.badge-card p{font-size:.78rem;color:var(--mute);margin:2px 0 8px}.badge-card b{font-size:.76rem;color:#6a1b9a}
+#mini-songs .activity-card{display:flex;flex-direction:column;align-items:flex-start;text-align:left;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff;gap:3px}
+#mini-songs .activity-card small{font-size:.78rem}
+.badge-group-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:12px 0}.badge-group-card{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:3px;border:1.5px solid #e1bee7;border-radius:14px;background:#fff8ff;padding:13px}.badge-group-card span{font-size:1.7rem}.badge-group-card b{color:#6a1b9a}.badge-group-card small{color:var(--mute)}.badge-library{border-top:1px dashed #e1bee7;padding-top:10px}.badge-library-head{display:flex;align-items:center;justify-content:space-between}.badge-library-head h3{margin:0}.badge-name-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:8px}.badge-name-card{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:10px;border:1px solid var(--line);border-radius:12px;background:#fff;text-align:left}.badge-name-card span{font-size:1.3rem}.badge-name-card b{font-size:.88rem}.badge-name-card small{font-size:.72rem;color:var(--mute)}.badge-detail-tabs{margin:8px 0}.attachment-row{margin:14px 0 8px;padding-top:10px;border-top:1px dashed var(--line)}
