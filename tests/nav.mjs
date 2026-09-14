@@ -57,6 +57,22 @@ for (const b of btns) {
   for (const n of (expect[b.href] || [])) ok(out.includes(n), `撳「${b.icon}${b.label}」→ 版面有「${n}」`);
 }
 
+/* 1b. 底欄必須逐項吻合 js/redesign.js 嘅 BOTTOM 宣告（用戶明確要求）。
+   之前呢個要求冇棘輪：nav.mjs 只比對自己嘅 expect map，BOTTOM 改咗都唔會爆。 */
+{
+  const src = read("js/redesign.js");
+  const m = src.match(/var BOTTOM = (\[[\s\S]*?\]);/);
+  ok(!!m, "redesign.js 讀到 BOTTOM 宣告");
+  const BOTTOM = Q("(" + m[1] + ")");
+  ok(BOTTOM.length === btns.length, `BOTTOM ${BOTTOM.length} 項 vs tabbar ${btns.length} 粒`);
+  BOTTOM.forEach((b, i) => {
+    const a = btns[i] || {};
+    ok(a.tab === b.id, `第${i + 1}粒 id '${a.tab}'（BOTTOM '${b.id}'）`);
+    ok(String(a.icon) === String(b.icon), `第${i + 1}粒 icon '${a.icon}'（BOTTOM '${b.icon}'）`);
+    ok(String(a.label).includes(b.title), `第${i + 1}粒 title '${a.label}'（BOTTOM '${b.title}'）`);
+  });
+}
+
 /* 2. #song 唔再係主導覽掣，舊書籤一律落入合併頁 */
 ok(!/#song/.test(bot), "#song 唔再係固定下方導覽掣");
 for (const legacy of ["#song", "#songs", "#craft"]) {
