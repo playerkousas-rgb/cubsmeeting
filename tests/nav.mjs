@@ -43,7 +43,7 @@ const ok = (c, msg) => { console.log((c ? "✓ " : "✗ FAIL ") + msg); if (!c) 
 /* 1. 下方導覽逐粒撳：路由開到 + 真係渲染到對應版面 */
 const expect = {
   "#print":  ["工作紙＋歌曲", 'id="mini-worksheets"', 'id="mini-songs"'],
-  "#play":   ["活動（即開即用）"],
+  "#play":   ["活動・技能帶領卡", "森林故事・角色卡"],
   "#badge":  ["活動章工具書", "badge-group-grid"],
   "#jungle": ["森林故事"],
   "#tools":  ["快鍵"],

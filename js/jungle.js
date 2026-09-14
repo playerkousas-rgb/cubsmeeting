@@ -8,9 +8,8 @@ var Jungle = {
   view:function(){return '<section class="card"><a class="back" href="#book">‹ 手冊</a><h1>🌳 森林故事</h1><p>先認角色，再講故事，最後連回小隊生活。</p><div class="template-grid">'+DATA.jungle.episodes.map(function(ep,i){return '<article class="template-card"><span class="eyebrow">'+esc(ep.refs.join('／'))+'</span><h3>'+esc(ep.title)+'</h3><p>四段短故事 · 每段一個問題 · 領袖答案</p><div class="quick"><button class="btn gr" onclick="Jungle.open('+i+')">即開故事</button><span class="mut">文字工具卡，可按需要加入集會</span></div></article>';}).join('')+'</div></section><section class="card"><h2>11位角色：認人與配對</h2><p class="mut">撳角色先睇介紹，再展開答案。哈蒂與戴白祺可作延伸，不硬放入每段故事。</p><div class="template-grid">'+DATA.jungle.characters.map(function(c){return '<button class="btn character-card" onclick="Jungle.card(\''+c.id+'\')"><b>'+esc(c.name)+'</b><span>'+esc(c.english)+' · '+esc(c.kind)+'</span></button>';}).join('')+'</div></section><details class="card"><summary>故事來源及你提供的圖卡</summary><p>'+esc(DATA.jungle.sourceNote)+'</p>'+extBtn(DATA.jungle.source,false,'幼童軍支部：森林故事','角色及情節核對來源')+DATA.jungle.assets.map(function(a){return extBtn(a.url,false,a.label,a.status);}).join('')+'<p class="mut">目前只確認資源清單，未逐圖批准清晰度、去背或圖中文字。文字內容不依賴外部圖片載入。</p></details>';}
 };
 (function(){
-  var route=App.route,book=App.vBook,play=App.vLibrary;
+  var route=App.route,book=App.vBook;
   App.vBook=function(){return '<section class="card"><h2>🌳 森林故事帶領</h2><p>角色介紹、四段故事及問題，撳開就可以講。</p><a class="btn gr" href="#jungle">開森林故事 →</a></section>'+book();};
-  App.vLibrary=function(skills){return (skills?'':'<section class="card"><h2>🌳 想加一段故事？</h2><a class="btn" href="#jungle">森林故事・角色卡 →</a></section>')+play(skills);};
   App.route=function(){if((location.hash||'').split('?')[0]!=='#jungle'){route();return;}App.tab='jungle';document.getElementById('view').innerHTML=Jungle.view();document.getElementById('view').style.paddingBottom='';var bar=document.getElementById('flowbar');bar.className='';bar.innerHTML='';document.querySelectorAll('#topnav a, #tabbar a').forEach(function(a){a.classList.toggle('cur',a.getAttribute('href')==='#jungle');});handleOffline();window.scrollTo(0,0);};
 })();
 (function(){
