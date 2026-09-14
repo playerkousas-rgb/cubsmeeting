@@ -242,10 +242,51 @@
     '環保先鋒章':{purpose:'培養成員保護環境的責任感及領導能力，鼓勵以積極行動保持地球永續環境。',items:['認識香港的環保政策及措施','認識本地及全球環境議題','認識人與環境的關係','認識保護環境的方法','完成由環境運動委員會委任的環保先鋒導師教授的環保內容','完成一項由環境運動委員會安排的環境教育培訓活動','完成一項由香港童軍總會或其他機構舉辦的環境教育培訓活動'],note:'官方頁面標示為先導計劃；培訓活動須按環境運動委員會及香港童軍總會的安排進行。',page:35},
     '國家安全大使章':{purpose:'培養幼童軍對《基本法》、國家、法治及國家安全的基本認識。',items:['明暸《基本法》第一條的內容','了解中華人民共和國的首都及重要城市、地理位置，以及代表國家的事物和有趣的國家事件或事物','說出20個國家安全重點領域，並認識國家和香港常見創新科技在日常生活的應用','認識執法和服務市民的部門、其工作及個人的公民責任','參觀國家安全展覽廳，或參加以國家安全為主題的展覽、活動或比賽'],note:'可按成員能力調整教學內容及考驗難度。',page:37}
   };
+  /* 「建議考核」係本套包自己嘅帶法，唔係官方條文。官方要求一律喺「官方要求」tab。
+     寫法跟 docs/teaching-copy-style.md：短口語、一句一事、安全要睇到。
+     未寫嘅章會 fallback 去通用流程，並明確標示「未寫」，唔會扮有內容。 */
+  App.badgeAssess = {
+    '露營章':{
+      time:'一次不少於一晚嘅團露營內完成；唔好拆開幾次做。',
+      prep:'事前同家長講清楚過夜安排；執好個人背囊清單；營地要有廁所同煮食位。',
+      steps:['開營嗰陣，畀佢跟住你落釘、拉繩、起營幕。做完叫佢自己再檢查一次。',
+             '膳食由佢落手：洗菜、睇火、派飯、執枱。你企喺旁邊睇安全就得。',
+             '拆營嗰陣叫佢数返清楚所有釘同繩，先至算完成。'],
+      pass:'八項全部有佢親手做过，唔係企喺度睇你做。營幕起得起、拆得返，膳食有份落手，就算達標。',
+      watch:'生火、用刀、夜間去廁所一定要有領袖同行。衞生：飯前洗手、生熟分開、垃圾即日清走。'},
+    '急救章':{
+      time:'分 2 至 3 次集會做；第 6 項要用《幼童軍急救章手冊》第一至五課。',
+      prep:'執好個人藥囊實物、三角繃帶同假傷口道具。必須有合資格急救領袖在場。',
+      steps:['先問：「日常生活同戶外，邊啲嘢會整親人？」等佢自己講，你先補漏。',
+             '出血、燒傷、昏厥、扭傷逐個出情境題：「而家有人暈低，你第一步做乜？」',
+             '三角繃帶大手掛同三角手掛：你先示範一次，再叫佢喺你手上綁一次。'],
+      pass:'八項全部答到或者做到。藥囊物品要講得出用途，唔係淨係背名。',
+      watch:'呢章涉及真實急救，必須由合資格人士在場評核。千祈唔好叫幼童軍攞真傷者實習。'},
+    '藝術章':{
+      time:'建議 3 至 4 次集會，每次做一項。',
+      prep:'先同佢傾定做邊三項，寫低喺卡上；備好黏土、卡紙、相機。',
+      steps:['每項做完即場影相存檔，唔好留到最後先追。',
+             '每項完成叫佢用一句話講：我做咗乜、用咗乜方法。',
+             '三項齐晒，砌個小展示俾其他團員睇。'],
+      pass:'完成三項唔同項目就達標。揀「其他」要先得到你同意。',
+      watch:'唔好代手。作品粗糙唔緊要，重點係佢自己做完同講得出意念。'}
+  };
+  /* 建議考核 HTML：有寫就用專屬內容，未寫就明確講未寫（唔好扮有） */
+  App.assessHtml = function(name){
+    var key = App.officialBadges[name] ? name : String(name).replace(/（[^）]*）/g,'').trim();
+    var a = App.badgeAssess[key];
+    if(!a) return '<p class="mut">呢章嘅建議考核未寫。而家只顯示通用流程；官方要求請睇上一個分頁。</p><p>通用流程：</p><ol><li>先逐項讀清楚要求及安全限制。</li><li>先示範，再讓成員按要求完成。</li><li>按官方要求即場判斷是否達標；不達標便安排再試。</li></ol>';
+    return '<p class="mut">以下係本套包建議嘅帶法，唔取代官方要求。</p>'+
+      '<p><b>⏱ 時間：</b>'+esc(a.time)+'</p>'+
+      '<p><b>🧰 準備：</b>'+esc(a.prep)+'</p>'+
+      '<p><b>🎯 即場點做：</b></p><ol>'+a.steps.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ol>'+
+      '<p><b>✅ 點算達標：</b>'+esc(a.pass)+'</p>'+
+      '<p class="safe"><b>⚠ 小心：</b>'+esc(a.watch)+'</p>';
+  };
   App.openBadge = function(name){var official='https://prog.scouting.org.hk/cub/training-scheme/',
       /* 組別格仔用官方全名（例：體操章（三級制度）），officialBadges 用短名（體操章）。
          剝走括號後綴再查一次，否則內容明明寫好都撳唔到。 */
-      spec=App.officialBadges[name] || App.officialBadges[String(name).replace(/（[^）]*）/g,'').trim()], officialHtml=spec?'<p><b>目的：</b>'+esc(spec.purpose)+'</p>'+(spec.rule?'<p class="mut">'+esc(spec.rule)+'</p>':'')+'<ol>'+spec.items.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ol>'+(spec.note?'<p class="safe">'+esc(spec.note)+'</p>':'')+(spec.legacy?'<p class="safe">⚠️ 舊制章 — 2026 第十版目錄已無此章。舊制綱要頁 '+spec.page+'。'+esc(spec.legacyNote)+'</p>':'<p class="mut">官方綱要頁 '+spec.page+'</p>')+(spec.legacy?'<p class="mut">內容來源：舊制《幼童軍訓練綱要》。2026 年第十版第三章已無此章。</p>':'<p class="mut">官方內容來源：《幼童軍訓練綱要》2026 年第十版第三章（活動徽章及其他徽章）。</p>'):'<p>官方內容正在按 2026 年第十版逐章內置。</p>';Modal.open('<h2>🎖️ '+esc(name)+(spec&&spec.legacy?'（舊制）':'')+'</h2><div class="subtabs badge-detail-tabs"><button class="subtab cur" onclick="App.switchBadgeTab(this,\'official\')">官方要求</button><button class="subtab" onclick="App.switchBadgeTab(this,\'suggest\')">建議考核</button></div><div id="badge-official">'+officialHtml+'</div><div id="badge-suggest" class="hidden"><p>建議領袖流程：</p><ol><li>先逐項讀清楚要求及安全限制。</li><li>先示範，再讓成員按要求完成。</li><li>按官方要求即場判斷是否達標；不達標便安排再試。</li></ol><p class="mut">這一頁只是使用方法，不取代官方要求。</p></div><div class="attachment-row"><a class="btn ghost" href="'+official+'" target="_blank" rel="noopener">📎 開官方訓練綱要附件</a></div><button class="btn" onclick="Modal.close()">關閉</button>');};
+      spec=App.officialBadges[name] || App.officialBadges[String(name).replace(/（[^）]*）/g,'').trim()], officialHtml=spec?'<p><b>目的：</b>'+esc(spec.purpose)+'</p>'+(spec.rule?'<p class="mut">'+esc(spec.rule)+'</p>':'')+'<ol>'+spec.items.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ol>'+(spec.note?'<p class="safe">'+esc(spec.note)+'</p>':'')+(spec.legacy?'<p class="safe">⚠️ 舊制章 — 2026 第十版目錄已無此章。舊制綱要頁 '+spec.page+'。'+esc(spec.legacyNote)+'</p>':'<p class="mut">官方綱要頁 '+spec.page+'</p>')+(spec.legacy?'<p class="mut">內容來源：舊制《幼童軍訓練綱要》。2026 年第十版第三章已無此章。</p>':'<p class="mut">官方內容來源：《幼童軍訓練綱要》2026 年第十版第三章（活動徽章及其他徽章）。</p>'):'<p>官方內容正在按 2026 年第十版逐章內置。</p>';Modal.open('<h2>🎖️ '+esc(name)+(spec&&spec.legacy?'（舊制）':'')+'</h2><div class="subtabs badge-detail-tabs"><button class="subtab cur" onclick="App.switchBadgeTab(this,\'official\')">官方要求</button><button class="subtab" onclick="App.switchBadgeTab(this,\'suggest\')">建議考核</button></div><div id="badge-official">'+officialHtml+'</div><div id="badge-suggest" class="hidden">'+App.assessHtml(name)+'</div><div class="attachment-row"><a class="btn ghost" href="'+official+'" target="_blank" rel="noopener">📎 開官方訓練綱要附件</a></div><button class="btn" onclick="Modal.close()">關閉</button>');};
   App.switchBadgeTab = function(btn,key){var root=btn.closest('.mbox');root.querySelectorAll('.badge-detail-tabs .subtab').forEach(function(x){x.classList.remove('cur');});btn.classList.add('cur');root.querySelector('#badge-official').classList.toggle('hidden',key!=='official');root.querySelector('#badge-suggest').classList.toggle('hidden',key!=='suggest');};
 
   App.vSongs = App.vPrint;

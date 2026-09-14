@@ -270,6 +270,37 @@ for (const [name, expr, needles] of pages) {
     ok(b.items[exp.n - 1].startsWith(exp.last), `「${name}」末項同官方原文一致`);
   }
 
+  /* 建議考核（本套包自己嘅帶法，非官方條文）。棘輪：寫咗新章就要加入 DONE。 */
+  {
+    const DONE = ["露營章","急救章","藝術章"];
+    const got = Q("Object.keys(App.badgeAssess)");
+    ok(got.length === DONE.length && DONE.every((k) => got.includes(k)),
+       `已寫建議考核剛好 ${DONE.length} 個（實際 ${got.length}：${got.join("、")}）`);
+    for (const k of DONE) {
+      const a = Q(`App.badgeAssess[${JSON.stringify(k)}]`);
+      ok(!!a.time && !!a.prep && !!a.pass && !!a.watch && Array.isArray(a.steps) && a.steps.length >= 3,
+         `「${k}」建議考核五欄齊（time/prep/steps≥3/pass/watch）`);
+      const h = Q(`App.assessHtml(${JSON.stringify(k)})`);
+      ok(h.includes("即場點做") && h.includes("點算達標") && h.includes("小心"), `「${k}」建議考核有 render 到`);
+      ok(!h.includes("未寫"), `「${k}」唔會顯示「未寫」`);
+    }
+    /* 未寫嘅章要明確標示，唔可以靜靜地出罐頭文字扮有內容 */
+    /* 舊制章係過渡期參考，唔使寫建議考核，所以要排除 */
+    const LEGACY_SET = ["勞作章","讀圖章","電腦章","體操章"];
+    const rest = Q("Object.keys(App.officialBadges)").filter((k) => !DONE.includes(k) && !LEGACY_SET.includes(k));
+    ok(rest.length === 44, `仍有 ${rest.length} 個現行章未寫建議考核（47 − 3 = 44）`);
+    for (const k of rest.slice(0, 5)) {
+      ok(Q(`App.assessHtml(${JSON.stringify(k)})`).includes("未寫"), `「${k}」未寫嘅章明確標示「未寫」`);
+    }
+    /* 括號後綴嘅官方全名都要 fallback 正確 */
+    ok(Q("App.assessHtml('音樂章（三級制度）')").includes("未寫"), "括號後綴章名 fallback 正常");
+    /* 建議考核唔可以溝淡官方要求：官方要求仍然喺 official tab */
+    Q("Modal.open = function(h){ globalThis.__m = h; }");
+    Q("App.openBadge('急救章')");
+    ok(sb.__m.includes("badge-official") && sb.__m.includes("明瞭急救原則") && sb.__m.includes("官方綱要頁 31"), "官方要求仍然完整喺 official tab");
+    ok(sb.__m.includes("以下係本套包建議嘅帶法"), "建議考核有聲明唔取代官方要求");
+  }
+
   /* rule 欄要真係 render 到，唔可以淨係存喺 data 度 */
   Q("Modal.open = function(h){ globalThis.__m = h; }");
   Q("App.openBadge('宗教章')");
