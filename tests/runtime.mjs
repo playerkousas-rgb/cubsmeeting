@@ -374,7 +374,7 @@ for (const [name, expr, needles] of pages) {
     ok(!sb.__m.includes("未寫") && sb.__m.includes("ABRSM"), "括號後綴章名開到建議考核同官方要求");
   }
 
-  /* App.vLibrary 只可以有一個定義；活動同技能帶領卡係同一頁 */
+  /* App.vLibrary 只可以有一個定義；活動同技能係同一頁嘅兩個分頁 */
   {
     const jsFiles = fs.readdirSync(path.join(root, "js")).filter((f) => f.endsWith(".js"));
     let defs = 0, where = [];
@@ -384,9 +384,14 @@ for (const [name, expr, needles] of pages) {
     }
     ok(defs === 1, `成個 js/ 目錄 App.vLibrary 只有 ${defs} 個定義（${where.join(", ")}）`);
     const a = Q("App.vLibrary(false)"), b = Q("App.vLibrary(true)");
-    ok(a === b, "#play 同 #skills render 同一頁（活動＋技能合併）");
+    ok(a === b, "#play 同 #skills render 同一頁（活動＋技能兩分頁）");
     ok(a.includes("活動・技能帶領卡"), "合併頁標題係「活動・技能帶領卡」");
     ok(a.includes("森林故事・角色卡"), "合併頁保留森林故事入口");
+    ok(a.includes("🎮 活動") && a.includes("🛠️ 技能"), "有「活動」「技能」兩個分頁掣");
+    ok(a.includes('id="lib-activity"') && a.includes('id="lib-skill"'), "兩個分頁內容區都存在");
+    const skill = Q("App.libraryCards('skill')"), act = Q("App.libraryCards('activity')");
+    ok(skill.length > 300 && act.length > 300, "技能／活動兩個分頁都有卡（技能 " + skill.length + " 字，活動 " + act.length + " 字）");
+    ok(!skill.includes("小隊成立") && !act.includes("反手結"), "技能／活動內容有分流（冇互相混入）");
   }
 
   /* rule 欄要真係 render 到，唔可以淨係存喺 data 度 */

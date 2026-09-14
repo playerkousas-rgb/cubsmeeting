@@ -8,6 +8,12 @@
   var oldLead = App.vLead;
   var oldPlay = App.vPlay;
 
+  /* 手冊工具分頁：各 plugin 唔再疊喺手冊尾拖成一堆，改為註冊成 compact 分頁 */
+  App.bookPanels = [];
+  App.registerBookPanel = function (id, icon, label, htmlFn) {
+    App.bookPanels.push({ id: id, icon: icon, label: label, html: htmlFn });
+  };
+
   /* 準備流程：跟 ghmeeting 同一套 Flow */
   App.prepare = function (tid) {
     setTid(tid);
@@ -84,6 +90,7 @@
 
   App.vBook = function(){
     var subs = [
+      {id:'core',label:'誓詞·規律'},
       {id:'six',label:'六色'},
       {id:'roles',label:'領袖角色'},
       {id:'sixer',label:'隊長'},
@@ -92,12 +99,16 @@
       {id:'ceremony',label:'儀式'},
       {id:'apps',label:'相關APP'}
     ];
-    var cur = (location.hash.split('sub=')[1]||'six').split('&')[0];
+    var cur = (location.hash.split('sub=')[1]||'core').split('&')[0];
     var badgeUrl = (typeof EXTERNAL !== "undefined") ? EXTERNAL.badge : "https://cubsbadge.vercel.app/";
     var circUrl = (typeof EXTERNAL !== "undefined") ? EXTERNAL.circulars : "https://scout-circulars.vercel.app/";
     var origHtml = '';
     try { if(typeof oldBook==='function') origHtml = oldBook(); } catch(e){ origHtml=''; }
     function tabContent(){
+      if(cur==='core'){
+        /* 預設顯示完整手冊核心：誓詞、規律、銘言、團呼、小隊制、禮儀，加獎章路線及物資庫 */
+        return (origHtml ? origHtml : '<div class="info-section"><h3>🤝 誓詞</h3><p style="font-size:14px;line-height:2">'+DATA.facts.promise.map(esc).join('<br>')+'</p><h3>📏 規律</h3><p>'+esc(DATA.facts.law)+'</p><h3>💪 銘言</h3><p>'+esc(DATA.facts.motto)+'</p></div>');
+      }
       if(cur==='six') return '<div class="info-section"><h3>🌈 六色分工</h3><div style="border-radius:10px;overflow:hidden;max-height:150px;margin-bottom:8px"><img src="assets/manual/details/six-colors.avif" style="width:100%;height:auto" onerror="this.parentElement.style.display=\'none\'"></div><p style="font-size:13px;line-height:1.8">棕·紅·黃·綠·藍·白，每色一隊，隊長帶頭，唔係靠嗌大聲。隊長=服務，唔係管人。</p></div>';
       if(cur==='roles') return '<div class="info-section"><h3>👥 領袖4角色</h3><div style="border-radius:10px;overflow:hidden;max-height:150px;margin-bottom:8px"><img src="assets/manual/details/leader-roles.avif" style="width:100%;height:auto" onerror="this.parentElement.style.display=\'none\'"></div><p style="font-size:13px;line-height:1.8">Akela(總領袖)·Baloo(活動)·Bagheera(技能)·Kaa(安全)。4人輪流，唔使一個做晒。</p></div>';
       if(cur==='sixer') return '<div class="info-section"><h3>⭐ 隊長訓練卡</h3><div style="border-radius:10px;overflow:hidden;max-height:150px;margin-bottom:8px"><img src="assets/manual/details/sixer-training.avif" style="width:100%;height:auto" onerror="this.parentElement.style.display=\'none\'"></div><p style="font-size:13px;line-height:1.8">大童教細童，3步：示範→陪做→放手。隊長任務卡：點名、帶遊戲、執拾，唔係罰人。</p></div>';
@@ -109,35 +120,85 @@
         return '<div class="info-section"><h3>🎪 儀式禮儀（3指敬禮）</h3><div style="border-radius:10px;overflow:hidden;max-height:150px;margin-bottom:8px"><img src="assets/manual/details/flag-steps.avif" style="width:100%;height:auto" onerror="this.style.display=\'none\'"></div><p style="font-size:12px;line-height:2">旗禮5步：立正→旗手出旗→3指敬禮→禮畢→團呼<br>宣誓5步：企旗前半禮→問→答→頒章→歡呼<br>敬禮：童軍幼童軍都用3指，拇指按小指，代表3條誓詞。</p><div class="btns"><button class="btn sm" onclick="Ceremony.open(\'howl\')">開團呼逐步卡</button><button class="btn sm ghost" onclick="Ceremony.open(\'commands\')">六個口令</button></div></div>';
       }
       if(cur==='apps'){
-        return '<div class="info-section"><h3>🔗 相關APP / 物資庫 / 大聲呼叫</h3><p style="font-size:13px;line-height:1.8">相關APP：一站式獎章追蹤、物資庫（集會物資清單、借用）、大聲呼叫（集合用語、安靜訊號）。舊版保留關鍵字以便搜尋。</p><div class="btns" style="margin-top:8px">'+extBtn(badgeUrl,false,'🏅 進度追蹤APP','vercel.app')+extBtn(circUrl,false,'📨 通告圖書館','vercel.app')+'<a class="extcard" href="https://cubsbadge.vercel.app/" target="_blank" rel="noopener"><div class="exleft"><div class="extitle">🏅 cubsbadge 物資庫</div><div class="exnote">vercel.app · 物資庫</div></div><div class="extgo">↗</div></a><a class="extcard" href="https://scout-circulars.vercel.app/" target="_blank" rel="noopener"><div class="exleft"><div class="extitle">📨 scout-circulars 大聲呼叫</div><div class="exnote">vercel.app · 大聲呼叫</div></div><div class="extgo">↗</div></a></div></div>'+origHtml;
+        return '<div class="info-section"><h3>🔗 相關APP / 物資庫 / 大聲呼叫</h3><p style="font-size:13px;line-height:1.8">相關APP：一站式獎章追蹤、物資庫（集會物資清單、借用）、大聲呼叫（集合用語、安靜訊號）。</p><div class="btns" style="margin-top:8px">'+extBtn(badgeUrl,false,'🏅 進度追蹤APP','vercel.app')+extBtn(circUrl,false,'📨 通告圖書館','vercel.app')+'<a class="extcard" href="https://cubsbadge.vercel.app/" target="_blank" rel="noopener"><div class="exleft"><div class="extitle">🏅 cubsbadge 物資庫</div><div class="exnote">vercel.app · 物資庫</div></div><div class="extgo">↗</div></a><a class="extcard" href="https://scout-circulars.vercel.app/" target="_blank" rel="noopener"><div class="exleft"><div class="extitle">📨 scout-circulars 大聲呼叫</div><div class="exnote">vercel.app · 大聲呼叫</div></div><div class="extgo">↗</div></a></div></div>';
       }
       return '<div class="info-section"><h3>📖 手冊總覽</h3><p class="mut">制服、儀式、六色、領袖角色、隊長訓練、團呼，全部喺呢度。</p></div>';
     }
-    return '<section class="card handbook"><a class="back" href="#plan">‹ 返回目錄</a><span class="eyebrow">手冊＝幼童軍核心</span><h1>📖 手冊</h1><p class="mut">撳標籤，直接去要找的內容。</p><div class="subtabs">'+subs.map(function(s){return '<button class="subtab '+(cur===s.id?'cur':'')+'" onclick="location.hash=\'#book?sub='+s.id+'\'">'+s.label+'</button>';}).join('')+'</div>'+tabContent()+'<div class="handbook-links"><a class="pill" href="https://cubsbadge.vercel.app/" target="_blank" rel="noopener">🏅 進度追蹤 APP</a><a class="pill" href="https://scout-circulars.vercel.app/" target="_blank" rel="noopener">📨 通告圖書館</a><span class="mut">物資庫／大聲呼叫：用相關 APP 即開</span></div></section>';
+    var core = '<section class="card handbook"><a class="back" href="#plan">‹ 返回目錄</a><span class="eyebrow">手冊＝幼童軍核心</span><h1>📖 手冊</h1><p class="mut">撳標籤，直接去要找的內容。</p><div class="subtabs">'+subs.map(function(s){return '<button class="subtab '+(cur===s.id?'cur':'')+'" onclick="location.hash=\'#book?sub='+s.id+'\'">'+s.label+'</button>';}).join('')+'</div>'+tabContent()+'<div class="handbook-links"><a class="pill" href="https://cubsbadge.vercel.app/" target="_blank" rel="noopener">🏅 進度追蹤 APP</a><a class="pill" href="https://scout-circulars.vercel.app/" target="_blank" rel="noopener">📨 通告圖書館</a><span class="mut">物資庫／大聲呼叫：用相關 APP 即開</span></div></section>';
+    /* 教材工具：由各 plugin 註冊，分頁收埋，唔再一路疊落手冊底 */
+    var tools = (App.bookPanels && App.bookPanels.length) ? App.bookPanels : [];
+    var toolsHtml = '';
+    if (tools.length) {
+      var toolTabs = tools.map(function (t, i) {
+        return '<button class="subtab booktool' + (i === 0 ? ' cur' : '') + '" data-tool="' + t.id + '" onclick="App.showBookTool(this)">' + (t.icon ? t.icon + ' ' : '') + esc(t.label) + '</button>';
+      }).join('');
+      var toolPanels = tools.map(function (t, i) {
+        var panelHtml = '';
+        try { panelHtml = t.html(); } catch (e) { panelHtml = '<p class="mut">呢件教材暫時開唔到。</p>'; }
+        return '<div class="booktool-panel' + (i === 0 ? '' : ' hidden') + '" data-panel="' + t.id + '">' + panelHtml + '</div>';
+      }).join('');
+      toolsHtml = '<section class="card booktools"><h2>🧰 教材工具</h2><p class="mut">撳標籤直接開教材，唔使一路碌到落底。</p><div class="subtabs booktool-tabs">' + toolTabs + '</div>' + toolPanels + '</section>';
+    }
+    return core + toolsHtml;
 
   };
 
-  /* 舊版獨立頁：保留但導向手冊，確保書籤唔死 */
+  /* 手冊教材工具分頁切換：撳標籤只顯示該件教材 */
+  App.showBookTool = function (btn) {
+    var root = btn && btn.closest ? btn.closest('.booktools') : null;
+    if (!root) return;
+    var id = btn.getAttribute('data-tool');
+    var tabs = root.querySelectorAll('.booktool');
+    for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('cur');
+    btn.classList.add('cur');
+    var panels = root.querySelectorAll('.booktool-panel');
+    for (var j = 0; j < panels.length; j++) {
+      panels[j].classList.toggle('hidden', panels[j].getAttribute('data-panel') !== id);
+    }
+  };
+
+  /* 制服同集會儀式係獨立嘅事前準備頁，唔再跳去手冊小分頁。 */
   App.vUniform = function(){
-    location.hash='#book?sub=uniform';
-    return App.vBook();
+    return '<section class="card"><a class="back" href="#plan">‹ 返回目錄</a><span class="eyebrow">事前準備・必用</span><h1>👕 制服</h1><p class="mut">認清六區位置、學捲旅巾、戴帽同出門自查；附官方款式圖，可放大或印成觀察紙。</p></section>'
+      + (typeof Uniform !== 'undefined' && Uniform.panel ? Uniform.panel() : '')
+      + (typeof FormalKit !== 'undefined' && FormalKit.get ? '<section class="card"><h2>🔍 制服實物核對卡</h2><div class="quick">'
+        + ['uniform','hats'].map(function(id){var c=FormalKit.get(id);return c?'<button class="btn" onclick="FormalKit.open(\''+id+'\')">'+esc(c.title)+'</button>':'';}).join('')
+        + '</div><p class="mut">開卡即看準備、辨別要點及來源；印領袖卡可離線用。</p></section>' : '');
   };
   App.vCeremony = function(){
-    location.hash='#book?sub=ceremony';
-    return App.vBook();
+    return '<section class="card"><a class="back" href="#plan">‹ 返回目錄</a><span class="eyebrow">事前準備・必用</span><h1>🎪 集會儀式</h1><p class="mut">團呼、六個口令、展旗、宣誓、敬禮同開始結束，逐步卡可直接開或印。</p></section>'
+      + (typeof Ceremony !== 'undefined' && Ceremony.panel ? Ceremony.panel() : '')
+      + (typeof FormalKit !== 'undefined' && FormalKit.get ? '<section class="card"><h2>🚩 升旗・國歌・旗幟核對卡</h2><div class="quick">'
+        + ['respect','flags'].map(function(id){var c=FormalKit.get(id);return c?'<button class="btn" onclick="FormalKit.open(\''+id+'\')">'+esc(c.title)+'</button>':'';}).join('')
+        + '</div><p class="mut">升旗／國歌／旗架屬正式程序，開卡核對來源；摺旗繫旗仍未核閱，不當已完成。</p></section>' : '');
   };
 
+  /* 活動／技能兩個分頁。分類按各場主題：技能＝結繩、急救、指南針、煮食、
+     追蹤、遠足、紮作／工程、天氣等；活動＝遊戲、情境、分享、故事、手工等。
+     每場只出三個核心節（第2–4個），集合／回顧係例行段，唔當活動／技能卡。 */
+  App.skillTids = {c06:1,c07:1,c08:1,c09:1,c10:1,c12:1,c15:1,c17:1,c18:1,c20:1,c23:1};
+  App.libraryCards = function (kind) {
+    var cards = [];
+    DATA.meetings.forEach(function(m){
+      var isSkill = !!App.skillTids[m.tid];
+      if ((kind === 'skill') !== isSkill) return;
+      m.segs.forEach(function(s,i){
+        if (i === 0 || i === m.segs.length - 1) return; // 略過集合／回顧例行段
+        cards.push('<div class="activity-card" style="border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff"><div style="font-size:24px">'+(s.ic||'📋')+'</div><h3 style="margin:4px 0">'+esc(s.n)+'</h3><p class="mut" style="font-size:12px">'+s.m+'分鐘 · '+esc(m.n)+'</p><button class="btn sm" onclick="App.activity(\''+m.tid+'\','+i+')">▶ 即開帶領卡</button></div>');
+      });
+    });
+    return cards.join('');
+  };
   App.vLibrary = function (skills) {
-    var cards = [], seen = {};
-    DATA.meetings.forEach(function(m){m.segs.forEach(function(s,i){
-      if(seen[s.n]) return;
-      seen[s.n]=1;
-      cards.push('<div class="activity-card" style="border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff"><div style="font-size:24px">'+(s.ic||'📋')+'</div><h3 style="margin:4px 0">'+esc(s.n)+'</h3><p class="mut" style="font-size:12px">'+s.m+'分鐘 · '+esc(m.n)+'</p><button class="btn sm" onclick="App.activity(\''+m.tid+'\','+i+')">▶ 即開帶領卡</button></div>');
-    });});
-    /* 活動同技能帶領卡係同一頁（用戶要求放埋一齊），skills 參數保留但唔再分流 */
     var title = '🎮 活動・技能帶領卡';
     var jungleCard = '<section class="card"><h2>🌳 想加一段故事？</h2><a class="btn" href="#jungle">森林故事・角色卡 →</a></section>';
-    return jungleCard+'<section class="card"><a class="back" href="#plan" style="text-decoration:none;color:var(--ord)">‹ 返回</a><h2>'+title+'</h2><p class="mut">跟 ghmeeting 同款活動架：每個活動淨出名＋分鐘＋「▶ 即開」，詳細收埋喺卡入面。</p><div class="manual-grid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr))">'+cards.join('')+'</div></section>';
+    return jungleCard+'<section class="card"><a class="back" href="#plan" style="text-decoration:none;color:var(--ord)">‹ 返回</a><h2>'+title+'</h2><p class="mut">撳分頁切換：<b>活動</b>＝遊戲、情境、分享、故事、手工；<b>技能</b>＝結繩、急救、指南針、煮食、追蹤、遠足等。每張淨出名＋分鐘，詳細收埋喺卡入面。</p><div class="subtabs"><button class="subtab cur" onclick="App.showLibraryTab(this,\'activity\')">🎮 活動</button><button class="subtab" onclick="App.showLibraryTab(this,\'skill\')">🛠️ 技能</button></div><div id="lib-activity" class="manual-grid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr))">'+App.libraryCards('activity')+'</div><div id="lib-skill" class="manual-grid hidden" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr))">'+App.libraryCards('skill')+'</div></section>';
+  };
+  App.showLibraryTab = function (btn, key) {
+    var root = btn.closest('.card'); if (!root) return;
+    root.querySelectorAll('.subtab').forEach(function(x){x.classList.remove('cur');}); btn.classList.add('cur');
+    root.querySelector('#lib-activity').classList.toggle('hidden', key !== 'activity');
+    root.querySelector('#lib-skill').classList.toggle('hidden', key !== 'skill');
   };
 
   App.vCraft = function(){
@@ -383,20 +444,24 @@
   App.vSafety = function(){
     return '<section class="card"><a class="back" href="#plan" style="text-decoration:none;color:var(--ord)">‹ 返回</a><h2>🛡️ 安全（RAM風險評估）</h2><div style="border-radius:12px;overflow:hidden;max-height:150px;margin-bottom:8px"><img src="assets/manual/safety.avif" style="width:100%;height:auto" onerror="this.style.display=\'none\'"></div><p class="mut">跟 ghmeeting 工具頁同款：即開即用卡片。</p>'+
       '<div class="manual-grid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr))"><div class="activity-card" style="border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff"><div style="border-radius:8px;overflow:hidden;max-height:100px;margin-bottom:6px"><img src="assets/manual/details/ram-checklist.avif" style="width:100%;height:auto" onerror="this.parentElement.style.display=\'none\'"></div><h3>風險評估</h3><p class="mut" style="font-size:12px">RAM清單，checklist</p><button class="btn sm" onclick="Modal.open(\'<h2>RAM風險評估</h2><p>天氣·場地·人·物資·活動，5項檢查</p>\')">▶ 開清單</button></div>'+
-      '<div class="activity-card" style="border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff"><div style="border-radius:8px;overflow:hidden;max-height:100px;margin-bottom:6px"><img src="assets/manual/details/sfh-principles.avif" style="width:100%;height:auto" onerror="this.parentElement.style.display=\'none\'"></div><h3>安全原則</h3><p class="mut" style="font-size:12px">SFH原則，兩人同行</p><button class="btn sm">▶ 開原則</button></div>'+
-      '<div class="activity-card" style="border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff"><div style="border-radius:8px;overflow:hidden;max-height:100px;margin-bottom:6px"><img src="assets/manual/details/first-aid.avif" style="width:100%;height:auto" onerror="this.parentElement.style.display=\'none\'"></div><h3>急救</h3><p class="mut" style="font-size:12px">擦傷·包紮·求助</p><button class="btn sm">▶ 開急救卡</button></div></div></section>';
+      '<div class="activity-card" style="border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff"><div style="border-radius:8px;overflow:hidden;max-height:100px;margin-bottom:6px"><img src="assets/manual/details/sfh-principles.avif" style="width:100%;height:auto" onerror="this.parentElement.style.display=\'none\'"></div><h3>安全原則</h3><p class="mut" style="font-size:12px">SFH原則，兩人同行</p><button class="btn sm" onclick="Modal.open(\'<h2>安全原則</h2><p>SFH：Safety First（安全第一）；活動前檢查場地、天氣、人手；兩名成人同行，不讓成員落單。</p>\')">▶ 開原則</button></div>'+
+      '<div class="activity-card" style="border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff"><div style="border-radius:8px;overflow:hidden;max-height:100px;margin-bottom:6px"><img src="assets/manual/details/first-aid.avif" style="width:100%;height:auto" onerror="this.parentElement.style.display=\'none\'"></div><h3>急救</h3><p class="mut" style="font-size:12px">擦傷·包紮·求助</p><button class="btn sm" onclick="App.activity(\'c08\',1)">▶ 開急救卡</button></div></div></section>';
   };
 
   App.vTools = function(teams){
     var isTeams = !!teams;
-    var base = '<section class="card"><a class="back" href="#plan" style="text-decoration:none;color:var(--ord)">‹ 返回</a><h2>'+(isTeams?'🐾 小隊計分':'🎲 快鍵（即插即用）')+'</h2><p class="mut">跟 ghmeeting 快鍵頁同款：即撳即用，唔影響今場流程。</p>';
     if(isTeams){
-      base += '<div id="leadscore"></div></section>';
-    } else {
-      base += '<div class="tk-grid"><button class="tk-btn" onclick="Lead.whistle()"><b>🤫 安靜訊號</b><small>5秒安靜·望住我</small></button><button class="tk-btn" onclick="Lead.horn()"><b>📣 集合</b><small>吹哨·全體集合</small></button><button class="tk-btn" onclick="Lead.pick()"><b>🎲 抽籤</b><small>隨機抽一個人</small></button><a class="tk-btn" href="#teams"><b>🐾 小隊計分</b><small>紅黃藍綠四隊</small></a><button class="tk-btn" onclick="App.go(\'#book?sub=six\')"><b>🌈 六色分工</b><small>小隊色·隊旗</small></button><button class="tk-btn" onclick="App.go(\'#book?sub=ceremony\')"><b>🎪 儀式</b><small>旗禮·宣誓·敬禮</small></button></div>'+
-        '<h3>⏱️ 倒數計時</h3><div style="display:flex;gap:8px;align-items:center"><label style="flex:1">分鐘 <input id="toolMinutes" type="number" min="1" max="120" value="5" onchange="Tools.reset()"></label><div id="toolClock" role="status" class="tool-clock" style="font-size:32px;font-weight:800">05:00</div></div><div class="btns"><button class="btn gr" onclick="Tools.start()">開始</button><button class="btn" onclick="Tools.stop()">暫停</button><button class="btn ghost" onclick="Tools.reset()">重設</button></div></section>';
+      return '<section class="card"><a class="back" href="#tools" style="text-decoration:none;color:var(--ord)">‹ 返回快鍵</a><h2>🐾 小隊計分</h2><p class="mut">紅黃藍綠四隊；撳 ＋1／－1 即加分。分數只喺今場畫面，唔會儲存。</p><div id="leadscore"></div></section>';
     }
-    return base;
+    return '<section class="card"><a class="back" href="#plan" style="text-decoration:none;color:var(--ord)">‹ 返回</a><h2>🎲 快鍵（集會中途即用）</h2><p class="mut">即撳即用，唔影響今場流程：發訊號、抽籤、計分、倒數。</p>'
+      + '<div class="tk-grid">'
+      + '<button class="tk-btn" onclick="Lead.whistle()"><b>🤫 安靜訊號</b><small>響兩下·5秒望住我</small></button>'
+      + '<button class="tk-btn" onclick="Lead.horn()"><b>📣 集合</b><small>吹哨·全體集合</small></button>'
+      + '<button class="tk-btn" onclick="Tools.pick()"><b>🎲 抽籤</b><small>隨機抽一個人</small></button>'
+      + '<a class="tk-btn" href="#teams"><b>🐾 小隊計分</b><small>開計分板·紅黃藍綠</small></a>'
+      + '</div>'
+      + '<div id="toolpick" class="toolpick" style="min-height:28px;margin:10px 0;font-size:20px;font-weight:800;color:var(--ord)"></div>'
+      + '<h3>⏱️ 倒數計時</h3><div style="display:flex;gap:8px;align-items:center"><label style="flex:1">分鐘 <input id="toolMinutes" type="number" min="1" max="120" value="5" onchange="Tools.reset()"></label><div id="toolClock" role="status" class="tool-clock" style="font-size:32px;font-weight:800">05:00</div></div><div class="btns"><button class="btn gr" onclick="Tools.start()">開始</button><button class="btn" onclick="Tools.stop()">暫停</button><button class="btn ghost" onclick="Tools.reset()">重設</button></div></section>';
   };
 
   /* === 路由：對齊 ghmeeting 的 5+5，同時兼容舊連結，保留 sheets/skills 獨立 tab === */
@@ -508,6 +573,31 @@
     window.scrollTo(0,0);
   };
 
+  /* 全站搜尋：搵集會題目、目標、活動名、徽章或綱要編號，即時列出可點結果 */
+  App.searchOpen = function(){
+    Modal.open('<h2>🔍 全站搵嘢</h2><p class="mut">打關鍵字，即時搵集會題目、目標、活動名、徽章或綱要編號。</p><input id="searchbox" class="search-input" type="search" placeholder="例：急救／指南針／誓詞／會員章" autocomplete="off" oninput="App.searchRun()"><div id="searchout" class="searchout"></div>');
+    setTimeout(function(){var b=document.getElementById('searchbox');if(b)b.focus();},60);
+  };
+  App.search = App.searchOpen;
+  App.searchRun = function(){
+    var q = (document.getElementById('searchbox').value||'').trim().toLowerCase();
+    var out = document.getElementById('searchout');
+    if(!out) return;
+    if(q.length < 1){ out.innerHTML=''; return; }
+    var hits = [];
+    DATA.meetings.forEach(function(m){
+      var hay = (m.n+' '+m.goal+' '+m.badge+' '+m.month+' '+m.refs.join(' ')+' '+m.segs.map(function(s){return s.n+' '+s.how+' '+s.safety;}).join(' ')).toLowerCase();
+      if(hay.indexOf(q) >= 0) hits.push(m);
+    });
+    if(!hits.length){
+      out.innerHTML = '<p class="mut">搵唔到「'+esc(q)+'」。試其他字眼，例如「繩」「急救」「地圖」。</p>';
+      return;
+    }
+    out.innerHTML = '<p class="mut">搵到 '+hits.length+' 場，撳落去即開：</p>'+hits.slice(0,30).map(function(m){
+      return '<a class="search-hit" href="#meet?tid='+m.tid+'" onclick="Modal.close()"><b>'+esc(m.n)+'</b><small>'+esc(m.month)+' · '+esc(m.badge)+' · '+esc(m.refs.join('／'))+'</small></a>';
+    }).join('');
+  };
+
   var origMark = Flow.mark;
   Flow.mark = function(k,quiet){origMark(k,quiet);if(App.tab==='prep')App.route();};
 
@@ -522,5 +612,15 @@ var Tools = {
   draw:function(){var e=document.getElementById('toolClock');if(e)e.textContent=Tools.time();},
   stop:function(){clearInterval(Tools.timer);Tools.timer=null;},
   reset:function(){Tools.stop();var e=document.getElementById('toolMinutes');Tools.seconds=Math.max(1,Math.min(120,Number(e&&e.value)||5))*60;Tools.draw();},
-  start:function(){if(Tools.timer)return;if(Tools.seconds<=0)Tools.reset();Tools.timer=setInterval(function(){Tools.seconds--;Tools.draw();if(Tools.seconds<=0){Tools.stop();if(typeof Lead!=='undefined'&&Lead.beep)Lead.beep();toast('⏱️ 時間到！');}},1000);}
+  start:function(){if(Tools.timer)return;if(Tools.seconds<=0)Tools.reset();Tools.timer=setInterval(function(){Tools.seconds--;Tools.draw();if(Tools.seconds<=0){Tools.stop();if(typeof Lead!=='undefined'&&Lead.beep)Lead.beep();toast('⏱️ 時間到！');}},1000);},
+  /* 抽籤：結果直接顯示喺快鍵頁（#toolpick），唔再靠隱形嘅投影區 */
+  pick:function(){
+    var roster = (typeof Store!=='undefined') ? Store.get('roster',[]) : [];
+    var pool = roster.length ? roster : ['1號','2號','3號','4號','5號','6號','7號','8號','9號','10號','11號','12號'];
+    var n = pool[Math.floor(Math.random()*pool.length)];
+    if(typeof Lead!=='undefined'&&Lead.beep) Lead.beep(1200,0.3);
+    var el = document.getElementById('toolpick');
+    if(el) el.textContent = '🎲 抽中：'+n+'（再撳一次再抽）';
+    toast('🎲 抽中：'+n);
+  }
 };

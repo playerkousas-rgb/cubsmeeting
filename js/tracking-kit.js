@@ -25,8 +25,8 @@ var TrackingKit = {
  panel:function(){return '<section class="card"><h2>追蹤符號實戰教材</h2><p>六款看圖配對、無答案剪卡、三站安全帶法及成員符號圖表。</p><button class="btn gr" onclick="TrackingKit.open()">開追蹤符號教材</button></section>';}
 };
 (function(){
- var book=App.vBook,summary=Practical.summary,activity=App.activity,build=SessionPack.build;
- App.vBook=function(){return TrackingKit.panel()+book();};
+ var summary=Practical.summary,activity=App.activity,build=SessionPack.build;
+ App.registerBookPanel('tracking','🔍','追蹤教材',function(){return TrackingKit.panel();});
  Practical.summary=function(m){return summary(m)+(m.tid==='c18'?TrackingKit.panel():'');};
  App.activity=function(tid,i){if(tid==='c18'&&!Practical.meeting(tid).segs[i])return;activity(tid,i);if(tid==='c18'){var el=document.getElementById('modal');if(el&&el.querySelector){var box=el.querySelector('.mbox');if(box)box.insertAdjacentHTML('beforeend','<button class="btn gr" onclick="TrackingKit.open()">開追蹤圖卡與三站帶法</button>');}}};
  SessionPack.build=function(m,n,children){var html=build(m,n,children);if(!html||m.tid!=='c18')return html;var marker='<section class="psheet divider">',extra=TrackingKit.sheets('guide');html=html.includes(marker)?html.replace(marker,extra+marker):html+extra;return children?html+TrackingKit.sheets('cards'):html;};

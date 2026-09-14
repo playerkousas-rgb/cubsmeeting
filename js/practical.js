@@ -32,11 +32,11 @@ var Followup = {
   save:function(tid){if(!DATA.followupContent[tid])return;var date=document.getElementById('followup-date').value;if(!Followup.validDate(date)){toast('請填寫有效回顧日期');return false;}var all=Store.get('followupNotes',{});if(!all||typeof all!=='object'||Array.isArray(all))all={};all[tid]={due:date,note:String(document.getElementById('followup-note').value||'').trim().slice(0,1000),reviewed:!!document.getElementById('followup-reviewed').checked};if(!Practical.persist('followupNotes',all))return false;Modal.close();App.route();toast('✓ 已儲存回顧安排；不會自動標示獎章達標');return true;},
 };
 (function(){
- var prep=App.vPrep,detail=App.vMeetDetail,lead=App.vLead,book=App.vBook,act=App.activity;
+ var prep=App.vPrep,detail=App.vMeetDetail,lead=App.vLead,act=App.activity;
  App.vPrep=function(){return Practical.summary(curMeet())+prep()+Followup.panel(curMeet());};
  App.vMeetDetail=function(m){return Practical.summary(m)+detail(m)+Followup.panel(m);};
  App.vLead=function(){return Practical.summary(curMeet())+lead();};
-  App.vBook=function(){return '<section class="card"><h2>📋 開場前可直接用的文字材料</h2><div class="quick"><button class="btn" onclick="Practical.deck(\'troop\')">我的旅團四資料</button>'+Object.keys(DATA.fieldDecks).map(function(k){return '<button class="btn" onclick="Practical.deck(\''+k+'\')">'+esc(DATA.fieldDecks[k].title)+'</button>';}).join('')+'</div><p class="mut">文字材料已內置，可離線用；正式動作、圖樣及考驗要求仍需合適領袖核對。</p></section>'+book();};
+  App.registerBookPanel('plain-text','📋','文字材料',function(){return '<section class="card"><h2>📋 開場前可直接用的文字材料</h2><div class="quick"><button class="btn" onclick="Practical.deck(\'troop\')">我的旅團四資料</button>'+Object.keys(DATA.fieldDecks).map(function(k){return '<button class="btn" onclick="Practical.deck(\''+k+'\')">'+esc(DATA.fieldDecks[k].title)+'</button>';}).join('')+'</div><p class="mut">文字材料已內置，可離線用；正式動作、圖樣及考驗要求仍需合適領袖核對。</p></section>';});
  App.activity=function(tid,i){var m=Practical.meeting(tid);if(!m||!m.segs[i])return;if(!m.practical){act(tid,i);return;}var s=m.segs[i];Modal.open('<h2>'+esc(s.n)+'</h2><p class="mut">'+s.m+'分鐘 · '+esc(m.n)+'</p><p class="say">📢 '+esc(s.script)+'</p><ol class="lsteps">'+s.steps.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ol><p class="safe">'+esc(s.safety)+'</p><details><summary>本節物資／觀察／節奏</summary><p>'+esc(s.mats.join('、')||'無額外物資')+'</p><p>'+esc(s.watch)+'</p><p>'+esc(s.rhythm)+'</p></details><div class="quick"><button class="btn" onclick="Practical.open(\''+tid+'\')">今場少人／冷場／缺物資點接</button><button class="btn" onclick="Practical.quiz(\''+tid+'\')">今場問題卡</button></div>');};
 })();
 
@@ -57,10 +57,10 @@ var SessionPack = {
   },
   overview:function(){Modal.open('<h2>整套內容總覽</h2><p>據幼童軍訓練綱要設計，將訓練目標化成即用集會、教材與逐步帶領支援。</p><p><b>27場集會・135節帶法・27份工作紙</b><br>其中25場非森林故事集會有實戰後備、共50題問答及完整出隊包。兩場森林故事保持既有文字版。</p><h3>同一條使用路線</h3><p>選集會 → 完整出隊包／精簡列印 → 執袋 → 設場 → 逐節帶領 → 出席與真實觀察 → 需要時一週後回顧。</p><p>正式儀式、實物辨認及各章完整考驗仍須按已核對教材與合適領袖安排；沒有用出席自動換章。</p>'+DATA.meetings.filter(function(m){return m.practical;}).map(function(m){return '<details><summary>'+esc(m.n)+'</summary><p>'+esc(m.goal)+'</p><p>對應：'+esc(m.refs.join('／'))+'</p><p>仍需跟進：'+esc(m.gap)+'</p><button class="btn" onclick="SessionPack.open(\''+m.tid+'\')">開完整出隊包</button></details>';}).join('')+'<p class="mut">只有森林故事項目暫停；正式儀式及實物教材仍須完成，目前部分來源核對未結束。實地帶領須按環境調整。</p>');}
 };
-(function(){var pack=App.vPack,book=App.vBook,summary=Practical.summary;
+(function(){var pack=App.vPack,summary=Practical.summary;
  App.vPack=function(){return SessionPack.panel(curMeet())+pack();};
  Practical.summary=function(m){return summary(m)+(m.practical?'<div class="quick"><button class="btn" onclick="SessionPack.open(\''+m.tid+'\')">完整出隊包・一次印齊</button></div>':'');};
- App.vBook=function(){return '<section class="card"><h2>完整版本，一次掌握</h2><p>查看全部主題、使用路線及每場尚需實作的部分。</p><button class="btn gr" onclick="SessionPack.overview()">整套內容總覽</button></section>'+book();};
+ App.registerBookPanel('full','📦','完整版本',function(){return '<section class="card"><h2>完整版本，一次掌握</h2><p>查看全部主題、使用路線及每場尚需實作的部分。</p><button class="btn gr" onclick="SessionPack.overview()">整套內容總覽</button></section>';});
 })();
 
 /* Verified factual aids. Formal ceremony scripts remain a required open work item. */
@@ -78,8 +78,8 @@ var FormalKit = {
  print:function(id){var c=FormalKit.get(id);if(c)Practical.printModal(c.title,'<section class="psheet leader-sheet">'+FormalKit.content(c)+'</section>');},
  panel:function(){return '<section class="card"><h2>正式儀式與實物教材</h2><p>兩部分均列入本輪必須完成範圍，只有森林故事項目暫停。以下是已核對的實物觀察與場合判斷教材。</p><div class="quick">'+FormalKit.cards.map(function(c){return '<button class="btn" onclick="FormalKit.open(\''+c.id+'\')">'+esc(c.title)+'</button>';}).join('')+'</div><details><summary>本輪仍須完成的來源核對</summary><p>2026綱要第五章文字已核清。隊長就職／晉團及摺旗繫旗操作仍待核閱官方示範；肩章、徽章完整縫製位置與香港追蹤符號原圖留待圖片階段補核。</p><p>正式程序仍須完成；圖片按安排後補。已核對卡片不代表整套教材已完成。</p>'+extBtn(DATA.source.url,false,'新版綱要','第73–75頁：典禮與儀式')+extBtn('https://prog.scouting.org.hk/cub/ceremonies/',false,'官方儀式示範','六項示範；影片內容仍須實際核閱')+'</details></section>';}
 };
-(function(){var book=App.vBook,summary=Practical.summary,build=SessionPack.build;
- App.vBook=function(){return FormalKit.panel()+book();};
+(function(){var summary=Practical.summary,build=SessionPack.build;
+ App.registerBookPanel('formal','👕','制服與儀式',function(){return FormalKit.panel();});
  Practical.summary=function(m){return summary(m)+(m.tid==='c04'?FormalKit.panel():'');};
  SessionPack.build=function(m,n,children){var html=build(m,n,children);if(!html||m.tid!=='c04')return html;var aids=FormalKit.cards.map(function(c){return '<section class="psheet leader-sheet">'+FormalKit.content(c)+'</section>';}).join(''),marker='<section class="psheet divider">';return html.includes(marker)?html.replace(marker,aids+marker):html+aids;};
 })();

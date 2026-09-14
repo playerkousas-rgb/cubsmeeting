@@ -29,4 +29,4 @@ var MaterialDesk = {
  preview:function(){var d=MaterialDesk.capture(),result=MaterialDesk.build(d);if(result.error){toast(result.error);return false;}MaterialDesk.draft=d;Practical.printModal('所選教材｜'+result.pages+'頁',result.html);var el=document.getElementById('modal');if(el&&el.querySelector){var q=el.querySelector('.quick');if(q)q.insertAdjacentHTML('beforeend','<button class="btn" onclick="MaterialDesk.open()">返回修改教材與份數</button>');}return true;},
  panel:function(){return '<section class="card"><h2>教材工作台</h2><p>制服、敬禮、儀式及追蹤：自己選教材，領袖答案、共用卡及成員紙分區一次印。</p><button class="btn gr" onclick="MaterialDesk.open()">選教材・打包列印</button></section>';}
 };
-(function(){var book=App.vBook,sheets=App.vSheets;App.vBook=function(){return MaterialDesk.panel()+book();};App.vSheets=function(){return MaterialDesk.panel()+sheets();};})();
+(function(){var sheets=App.vSheets;App.registerBookPanel('desk','🖨️','教材工作台',function(){return MaterialDesk.panel();});App.vSheets=function(){return MaterialDesk.panel()+sheets();};})();
