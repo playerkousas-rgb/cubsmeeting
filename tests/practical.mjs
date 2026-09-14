@@ -134,10 +134,20 @@ console.log('SALUTE POSITIONS PASS: explicit observer orientation, hand/height l
 
 const {TrackingKit}=ctx,trackingBefore=JSON.stringify(mem),trackingTid=ctx.curTid();
 assert.equal(TrackingKit.items.length,6);assert.equal(new Set(TrackingKit.items.map(s=>s.key)).size,6);
-assert(TrackingKit.scope.includes('馬耳他'));assert(TrackingKit.scope.includes('仍待逐圖比對'));
+assert(TrackingKit.scope.includes('馬耳他'), 'scope 要講明圖形屬自繪');
+/* 六個符號名已核對官方《幼童軍獎章—追蹤》工作紙；官方共十個，未收四個要講明 */
+assert(TrackingKit.scope.includes('《幼童軍獎章—追蹤》'), 'scope 要引用官方工作紙名');
+for (const n of TrackingKit.items.map(x=>x.name)) assert(TrackingKit.scope.includes(n), 'scope 要列出已核名稱「'+n+'」');
+for (const n of ['繼續前進','前面有水','前面有障礙','我們分途前進']) assert(TrackingKit.scope.includes(n), 'scope 要講明未收「'+n+'」');
+assert(!TrackingKit.scope.includes('仍待逐圖比對'), '名稱已核對，唔好再寫「仍待比對」');
+assert(TrackingKit.sources.hk.includes('TrackingSigns.pdf'), '要有官方追蹤工作紙連結');
 assert(TrackingKit.items[4].answer.includes('不代表可以自己離場回家'));
 assert(TrackingKit.items[5].answer.includes('不是固定米數'));
-TrackingKit.open();assert(html.includes('三站'));TrackingKit.start();assert(!html.includes('class="field-answer"'));
+TrackingKit.open();assert(html.includes('三站'));
+/* scope 話「開下面連結」，連結就要真係喺 open() 入面 render 到 */
+assert(TrackingKit.open.toString().includes('TrackingKit.sources.hk'), 'open() 要 render 官方連結');
+assert(TrackingKit.scope.includes('開下面'), '連結喺 note() 之後，措辭要寫「下面」');
+assert(!TrackingKit.open.toString().includes('仍待逐圖比對'), 'extBtn 副題唔好再用舊句');TrackingKit.start();assert(!html.includes('class="field-answer"'));
 for(let i=0;i<6;i++){TrackingKit.reader.index=i;TrackingKit.reader.reveal=false;TrackingKit.render();assert(!html.includes(ctx.esc(TrackingKit.items[i].answer)));TrackingKit.reveal();assert(html.includes(ctx.esc(TrackingKit.items[i].answer)));}
 TrackingKit.move(-99);assert.equal(TrackingKit.reader.index,0);assert(!TrackingKit.reader.reveal);TrackingKit.move(99);assert.equal(TrackingKit.reader.index,5);TrackingKit.move(NaN);assert.equal(TrackingKit.reader.index,5);TrackingKit.start();assert.equal(TrackingKit.reader.index,0);
 for(const mode of ['cards','guide','worksheet']){const sheet=TrackingKit.sheets(mode);assert.equal((sheet.match(/class="tracking-symbol"/g)||[]).length,6);for(const item of TrackingKit.items)assert.equal(sheet.includes(ctx.esc(item.answer)),mode==='guide');TrackingKit.print(mode);assert.equal(ctx.PackPrint.activeTid,null);}
