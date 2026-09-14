@@ -2297,6 +2297,13 @@ body.offline .extcard{opacity:.55}
 .route-back{display:inline-flex;align-items:center;gap:3px;margin:0 0 8px;color:var(--ord);font-weight:700;font-size:.88rem}
 .route-back:focus-visible{outline:2px solid var(--or);outline-offset:3px;border-radius:5px}
 .compact-tabs{margin:10px 0}.badge-tabs{overflow-x:auto;flex-wrap:nowrap}.badge-tabs .subtab{white-space:nowrap}
+/* 手冊教材工具：分頁收埋，唔再拖成一堆；窄屏橫向捲動 */
+.booktools{margin-top:16px}
+.booktools>h2{margin-bottom:2px}
+.booktool-tabs{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:4px}
+.booktool-tabs::-webkit-scrollbar{display:none}
+.booktool-tabs .booktool{flex:0 0 auto;white-space:nowrap}
+.booktool-panel{margin-top:4px}
 .badge-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:12px}
 .badge-card{border:1.5px solid #e1bee7;border-radius:14px;background:linear-gradient(135deg,#fff,#f8f0fb);padding:12px;cursor:pointer;transition:.15s}
 .badge-card:hover{transform:translateY(-2px);box-shadow:var(--sh)}.badge-card>span{font-size:1.7rem}.badge-card h3{margin:3px 0;color:#6a1b9a;font-size:.98rem}.badge-card p{font-size:.78rem;color:var(--mute);margin:2px 0 8px}.badge-card b{font-size:.76rem;color:#6a1b9a}
@@ -2307,3 +2314,13 @@ body.offline .extcard{opacity:.55}
 /* 森林故事角色頭像（AI 插畫，教學參考，非官方原圖） */
 .character-card img{display:block;width:56px;height:56px;object-fit:cover;border-radius:12px;margin:0 auto 6px;background:#E8F5E9}
 .character-portrait{display:block;width:100%;max-width:220px;height:auto;border-radius:14px;margin:0 auto 10px;background:#E8F5E9}
+
+/* 全站搜尋（頂欄 🔍）與快鍵抽籤結果 */
+.search-input{width:100%;padding:11px 12px;border:2px solid var(--line);border-radius:10px;font-size:15px;margin:8px 0;box-sizing:border-box}
+.search-input:focus{outline:none;border-color:var(--brand,#FF6F00)}
+.searchout{margin-top:6px}
+.search-hit{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;margin:6px 0;text-decoration:none;color:inherit;background:#fff}
+.search-hit:hover{border-color:var(--brand,#FF6F00)}
+.search-hit b{color:var(--ord)}
+.search-hit small{color:var(--mute);font-size:.78rem}
+.toolpick{display:flex;align-items:center;justify-content:center;text-align:center;border:1.5px dashed var(--line);border-radius:12px;padding:10px;background:#fff}

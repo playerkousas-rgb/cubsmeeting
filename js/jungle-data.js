@@ -2,12 +2,6 @@
 DATA.jungle = {
   source: 'https://prog.scouting.org.hk/cub/the-jungle-book/',
   sourceNote: '角色及情節依幼童軍支部「森林故事」網頁核對；以下為簡短教學改寫，省略暴力細節。該舊網頁的年齡介紹不作現行支部年齡依據。',
-  assets: [
-    {label:'角色去背圖（11款）',url:'https://drive.google.com/drive/folders/1GAYYbvPU35h0CJ9hdFCL-fMHCBsipMji',status:'已讀檔名，未逐圖視覺核對'},
-    {label:'角色原圖及版本（14個檔案）',url:'https://drive.google.com/drive/folders/189SurMtEGDxBxCE3qXCVRqeB4cVlmUqt',status:'已讀檔名，含JPEG／PNG及青年毛吉利版本，未逐圖視覺核對'},
-    {label:'森林故事卡牌頁',url:'https://sites.google.com/view/skwai/教材系列/幼童軍/森林故事卡牌',status:'頁面列出12張圖片，尚未讀取圖片中文字'},
-    {label:'角色圖相簿',url:'https://postimg.cc/gallery/NHM4Ldq',status:'已讀11個角色圖連結，未核對原圖清晰度及去背邊緣'}
-  ],
   characters: [
     {id:'mowgli',img:'assets/jungle/mowgli.avif',name:'毛吉利',english:'Mowgli',gender:'男孩',visual:'男孩；人類孩子；非童軍制服；簡單森林衣著',kind:'人類孩子',role:'由狼家庭照顧，在森林中學習規律及與朋友相處。',question:'毛吉利是小狼，還是人類孩子？',answer:'是人類孩子；他得到狼家庭照顧及狼群接納。',check:'入狼群情節用幼年版本；青年版本另用於成長故事。'},
     {id:'raksha',img:'assets/jungle/raksha.avif',name:'駱石',english:'Raksha',gender:'母狼',visual:'雌性母狼；自然狼形；非人類服裝',kind:'母狼',role:'照顧及保護毛吉利的母狼。',question:'誰在狼家庭中照顧毛吉利？',answer:'父狼和母狼照顧他；母狼名叫駱石。',check:'不要與狼群首領亞基拿混淆。'},
