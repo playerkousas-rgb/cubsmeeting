@@ -1,5 +1,5 @@
 /* 🐺 幼童軍團集會助手 — Service Worker (offline first，cache齊) */
-var CACHE = "cubhub-v9-jungleimg-20260914";
+var CACHE = "cubhub-v9-jungle11-20260914";
 var ASSETS = [
   "./", "./index.html", "./manifest.webmanifest", "./css/app.css",
   "./js/data.js", "./js/guide.js", "./js/flow.js", "./js/app.js", "./js/redesign.js", "./js/content.js", "./js/jungle-data.js", "./js/jungle.js", "./js/practical-data.js", "./js/practical.js", "./js/uniform-ceremony.js", "./js/field-visuals.js", "./js/salute-lab.js", "./js/salute-positions.js", "./js/tracking-kit.js", "./js/material-desk.js", "./js/plain-content.js", "./js/worksheet-guides.js",
@@ -9,7 +9,7 @@ var ASSETS = [
   "./assets/teaching/right-hand-salute.jpg",
   "./icons/icon-192.png", "./icons/icon-512.png",
   "./assets/jungle/mowgli.avif", "./assets/jungle/raksha.avif", "./assets/jungle/akela.avif", "./assets/jungle/baloo.avif",
-  "./assets/jungle/bagheera.avif", "./assets/jungle/sherekhan.avif", "./assets/jungle/kaa.avif", "./assets/jungle/chil.avif", "./assets/jungle/banderlog.avif"
+  "./assets/jungle/bagheera.avif", "./assets/jungle/sherekhan.avif", "./assets/jungle/kaa.avif", "./assets/jungle/chil.avif", "./assets/jungle/banderlog.avif", "./assets/jungle/hathi.avif", "./assets/jungle/tabaqui.avif"
 ];
 self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(ASSETS); }).then(function () { return self.skipWaiting(); }));

@@ -59,9 +59,9 @@ for(const c of DATA.jungle.characters){
 }
 assert(jungleView.includes("AI 繪製教學示意"),"要標明頭像係 AI 教學示意、非官方原圖");
 const withImg=DATA.jungle.characters.filter(c=>c.img);
-assert(withImg.length>=9,"至少 9 個角色有頭像，實際 " + withImg.length);
+assert.equal(withImg.length,11,"11 個角色全部要有頭像，實際 " + withImg.length);
 ctx.Jungle.card("mowgli");assert(output.includes("character-portrait"),"角色卡要 render 肖像");
-ctx.Jungle.card("hathi");assert(!output.includes("character-portrait"),"未有頭像嘅角色唔得硬塞空圖");
+ctx.Jungle.card("hathi");assert(output.includes("character-portrait"),"哈蒂而家有頭像，card 要 render 肖像");
 PackPrint.open('sheet','c26');assert(output.includes('排序並重述'));assert.equal(ctx.curTid(),'c07');
 ctx.location.hash='#prep?tid=c27';App.route();assert.equal(ctx.curTid(),'c27');assert(App.vPrep().includes('2.4.2'));
 console.log('JUNGLE PASS: characters, source-linked scenes, independent reader, lesson routes and worksheets');

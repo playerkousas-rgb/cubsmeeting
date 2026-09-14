@@ -4,7 +4,7 @@ var MaterialDesk = {
  kits:[
   {id:'uniform',title:'制服圖解與位置配對',group:'制服',scope:'制服手冊及生效修訂；真實肩章、新制核心章完整位置仍待核對。',open:function(){Uniform.open();},leader:function(){return Uniform.sheets(true);},pupil:function(){return Uniform.sheets(false);}},
   {id:'salutes',title:'手形、敬禮位置與情境',group:'禮儀',scope:'文字已核2026第五章；AI手形及自繪位置圖非官方照片，不按比例。',open:function(){SaluteLab.open();},leader:function(){return SaluteLab.sheets(true);},pupil:function(){return SaluteLab.sheets(false);}},
-  {id:'tracking',title:'追蹤符號與三站活動',group:'技能',scope:'六款有來源描述的教學图；香港完整圖表仍待逐圖比對。',open:function(){TrackingKit.open();},leader:function(){return TrackingKit.sheets('guide');},shared:function(){return TrackingKit.sheets('cards');},pupil:function(){return TrackingKit.sheets('worksheet');}},
+  {id:'tracking',title:'追蹤符號與三站活動',group:'技能',scope:'六款有來源描述的教學圖；六個符號名已核對官方工作紙，圖形屬自繪，原圖另開連結。',open:function(){TrackingKit.open();},leader:function(){return TrackingKit.sheets('guide');},shared:function(){return TrackingKit.sheets('cards');},pupil:function(){return TrackingKit.sheets('worksheet');}},
   {id:'commands',title:'六個集合口令',group:'禮儀',scope:'依已讀典禮附錄；傳統Alert／At Ease不混作中式隊列。',open:function(){Ceremony.open('commands');},leader:function(){return Ceremony.sheets('commands');}},
   {id:'howl',title:'團呼、隊形與角色提示',group:'禮儀',scope:'依2026第五章一般集會版本；呼號後立正，不混入2025比賽躍起要求。',open:function(){Ceremony.open('howl');},leader:function(){return Ceremony.sheets('howl');}},
   {id:'unfurl',title:'團旗展旗逐步卡',group:'禮儀',scope:'已備妥團旗的展旗程序；未含摺旗繫旗，不代替國旗／區旗程序。',open:function(){Ceremony.open('unfurl');},leader:function(){return Ceremony.sheets('unfurl');}},
