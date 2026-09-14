@@ -184,7 +184,12 @@
       if ((kind === 'skill') !== isSkill) return;
       m.segs.forEach(function(s,i){
         if (i === 0 || i === m.segs.length - 1) return; // 略過集合／回顧例行段
-        cards.push('<div class="activity-card" style="border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff"><div style="font-size:24px">'+(s.ic||'📋')+'</div><h3 style="margin:4px 0">'+esc(s.n)+'</h3><p class="mut" style="font-size:12px">'+s.m+'分鐘 · '+esc(m.n)+'</p><button class="btn sm" onclick="App.activity(\''+m.tid+'\','+i+')">▶ 即開帶領卡</button></div>');
+        var art = (typeof SkillArt!=='undefined' && SkillArt.thumb) ? SkillArt.thumb(m.tid,i) : '';
+        cards.push('<div class="activity-card lib-card'+(art?' has-art':'')+'">'+
+          (art || '<div class="lib-emoji">'+(s.ic||'📋')+'</div>')+
+          '<h3>'+esc(s.n)+'</h3><p class="mut" style="font-size:12px">'+s.m+'分鐘 · '+esc(m.n)+'</p>'+
+          (s.art?'<span class="lib-tag"> 有圖解</span>':'<span class="lib-tag plain">文字卡</span>')+
+          '<button class="btn sm" onclick="App.activity(\''+m.tid+'\','+i+')">▶ 即開帶領卡</button></div>');
       });
     });
     return cards.join('');
@@ -192,7 +197,7 @@
   App.vLibrary = function (skills) {
     var title = '🎮 活動・技能帶領卡';
     var jungleCard = '<section class="card"><h2>🌳 想加一段故事？</h2><a class="btn" href="#jungle">森林故事・角色卡 →</a></section>';
-    return jungleCard+'<section class="card"><a class="back" href="#plan" style="text-decoration:none;color:var(--ord)">‹ 返回</a><h2>'+title+'</h2><p class="mut">撳分頁切換：<b>活動</b>＝遊戲、情境、分享、故事、手工；<b>技能</b>＝結繩、急救、指南針、煮食、追蹤、遠足等。每張淨出名＋分鐘，詳細收埋喺卡入面。</p><div class="subtabs"><button class="subtab cur" onclick="App.showLibraryTab(this,\'activity\')">🎮 活動</button><button class="subtab" onclick="App.showLibraryTab(this,\'skill\')">🛠️ 技能</button></div><div id="lib-activity" class="manual-grid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr))">'+App.libraryCards('activity')+'</div><div id="lib-skill" class="manual-grid hidden" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr))">'+App.libraryCards('skill')+'</div></section>';
+    return jungleCard+'<section class="card"><a class="back" href="#plan" style="text-decoration:none;color:var(--ord)">‹ 返回</a><h2>'+title+'</h2><p class="mut">撳分頁切換：<b>活動</b>＝遊戲、情境、分享、故事、手工；<b>技能</b>＝結繩、急救、指南針、煮食、追蹤、遠足等。有圖解嘅卡會先畀你圖：點企、點做、小心乜；開卡後可單印一張A4圖解卡（點哪張印哪張）。</p><div class="subtabs"><button class="subtab'+(skills?'':' cur')+'" onclick="App.showLibraryTab(this,\'activity\')">🎮 活動</button><button class="subtab'+(skills?' cur':'')+'" onclick="App.showLibraryTab(this,\'skill\')">🛠️ 技能</button></div><div id="lib-activity" class="manual-grid lib-grid'+(skills?' hidden':'')+'">'+App.libraryCards('activity')+'</div><div id="lib-skill" class="manual-grid lib-grid'+(skills?'':' hidden')+'">'+App.libraryCards('skill')+'</div></section>';
   };
   App.showLibraryTab = function (btn, key) {
     var root = btn.closest('.card'); if (!root) return;
@@ -211,10 +216,16 @@
     return '<section class="card"><a class="back" href="#plan" style="text-decoration:none;color:var(--ord)">‹ 返回</a><h2>✂️ 工作紙 / 手工（即開即用）</h2><p class="mut">跟 ghmeeting 的工作紙庫同款：卡片只出重點，全文撳開先睇。</p><div class="manual-grid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr))">'+crafts.map(function(c){return '<div class="activity-card" style="border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff"><div style="border-radius:8px;overflow:hidden;max-height:100px;margin-bottom:6px"><img src="'+c.img+'" style="width:100%;height:auto" onerror="this.parentElement.style.display=\'none\'"></div><h3>'+c.n+'</h3><p class="mut" style="font-size:12px">'+c.d+'</p><button class="btn sm" onclick="toast(\'即開即用：'+c.n+'\')">▶ 開教材</button></div>';}).join('')+'</div><div class="btns" style="margin-top:12px"><a class="btn sm ghost" href="#play">去活動庫 →</a><a class="btn sm ghost" href="#jungle">去森林故事 →</a></div></section>';
   };
 
-  /* 工作紙庫：對應 ghmeeting #print + 舊 #sheets */
+  /* 工作紙庫：對應 ghmeeting #print + 舊 #sheets。
+     實裝版：工作紙分頁用真實27張索引（逐張預覽／列印＋領袖參考），
+     歌曲分頁用 Songbook（跟唱卡＋A4歌紙），冇再係死掣 toast。 */
   App.vPrint = function(){
-    var worksheets = (typeof Content!=='undefined' && Content.worksheetIndex) ? Content.worksheetIndex() : App.vCraft();
-    return '<section class="card"><a class="back" href="#plan">‹ 返回目錄</a><h2>✂️ 工作紙＋歌曲</h2><p class="mut">內容較少，合併成兩個小分頁。</p><div class="subtabs compact-tabs"><button class="subtab cur" onclick="App.showMiniTab(this,\'worksheets\')">工作紙</button><button class="subtab" onclick="App.showMiniTab(this,\'songs\')">歌曲</button></div><div id="mini-worksheets">'+worksheets+'</div><div id="mini-songs" class="hidden"><h3>🎵 歌曲、口號、營火</h3><div class="manual-grid"><button class="activity-card" onclick="toast(\'🎵 播放團歌\')"><b>團歌</b><small>幼童軍團歌，跟住唱</small></button><button class="activity-card" onclick="toast(\'📣 開口號卡\')"><b>口號</b><small>日行一善，準備</small></button><button class="activity-card" onclick="toast(\'🔥 開營火流程\')"><b>營火</b><small>營火晚會流程</small></button></div></div></section>';
+    var hasContent = (typeof Content!=='undefined');
+    var worksheets = (hasContent && Content.worksheetIndex) ? Content.worksheetIndex()
+      : (hasContent && Content.worksheetBase) ? Content.worksheetBase() : App.vCraft();
+    var songs = (typeof Songbook!=='undefined' && Songbook.panel) ? Songbook.panel()
+      : '<p class="mut">歌曲模組未載入：重新整理一次。</p>';
+    return '<section class="card"><a class="back" href="#plan">‹ 返回目錄</a><h2>✂️ 工作紙＋歌曲</h2><p class="mut">兩個小分頁，全部即開即用：工作紙逐張預覽及列印（點哪張印哪張）；歌曲有圍圈跟唱同單張A4歌紙。</p><div class="subtabs compact-tabs"><button class="subtab cur" onclick="App.showMiniTab(this,\'worksheets\')">✂️ 工作紙</button><button class="subtab" onclick="App.showMiniTab(this,\'songs\')">🎵 歌曲</button></div><div id="mini-worksheets" class="mini-pane">'+worksheets+'</div><div id="mini-songs" class="hidden mini-pane">'+songs+'</div></section>';
   };
   App.showMiniTab = function(btn, key){
     var root=btn.closest('.card'); if(!root)return;

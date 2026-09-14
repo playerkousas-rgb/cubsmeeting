@@ -4,7 +4,8 @@
   "description": "幼童軍團集會助手 Cub Hub — 靜態PWA，無build step",
   "type": "module",
   "scripts": {
-    "test": "node tests/smoke.mjs && node tests/ui.mjs && node tests/nav.mjs && node tests/audit.mjs && node tests/runtime.mjs && node tests/content.mjs && node tests/practical.mjs",
+    "test": "node tests/smoke.mjs && node tests/ui.mjs && node tests/nav.mjs && node tests/audit.mjs && node tests/runtime.mjs && node tests/content.mjs && node tests/practical.mjs && node tests/print-songs-art.mjs",
+    "test:print": "node tests/print-songs-art.mjs",
     "test:smoke": "node tests/smoke.mjs",
     "test:ui": "node tests/ui.mjs",
     "test:nav": "node tests/nav.mjs",
