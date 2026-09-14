@@ -2324,3 +2324,131 @@ body.offline .extcard{opacity:.55}
 .search-hit b{color:var(--ord)}
 .search-hit small{color:var(--mute);font-size:.78rem}
 .toolpick{display:flex;align-items:center;justify-content:center;text-align:center;border:1.5px dashed var(--line);border-radius:12px;padding:10px;background:#fff}
+
+/* ==========================================================================
+   🖨️ 列印隔离（2026-09-14）：點哪項印哪項
+   - 開咗列印預覽（body.print-pack）：只印 #printarea 入面嘅版面，
+     背後嘅畫面、導覽、彈窗標題同掣一律唔出紙。
+   - 冇開預覽直接 Ctrl+P：只印當前畫面，唔印彈出式視窗。
+   ========================================================================== */
+@media print {
+  /* 冇彈窗、冇預覽：只印當前畫面 */
+  body:not(.print-pack):not(.modal-open) #modal { display: none !important; }
+  body.print-pack #app,
+  body.print-pack #leadroot,
+  body.print-pack #netbar,
+  body.print-pack #toast { display: none !important; }
+  body.print-pack #modal {
+    position: static !important;
+    display: block !important;
+    background: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  body.print-pack #modal .mbox {
+    width: auto !important;
+    max-width: none !important;
+    max-height: none !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  body.print-pack #modal .mx { display: none !important; }
+  /* 彈窗入面只留 #printarea：標題、說明、掣都唔出紙 */
+  body.print-pack #modal .modal-content > *:not(#printarea) { display: none !important; }
+  body.print-pack #printarea { display: block !important; }
+}
+
+/* ==========================================================================
+   🎨 活動／技能圖解（SkillArt）＋ 🎵 歌曲實裝（Songbook）
+   ========================================================================== */
+.skill-art { width: 100%; height: auto; display: block; }
+.skill-thumb { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin-bottom: 6px; background: #fff; }
+.lib-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+.lib-card { border: 1px solid var(--line); border-radius: 14px; padding: 10px; background: #fff; display: flex; flex-direction: column; gap: 4px; }
+.lib-card h3 { margin: 2px 0 0; font-size: .92rem; }
+.lib-emoji { font-size: 26px; }
+.lib-tag { align-self: flex-start; font-size: .66rem; font-weight: 800; color: #1b5e20; background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 999px; padding: 2px 8px; }
+.lib-tag.plain { color: #6d6455; background: #f4f1ea; border-color: #d8cfc0; }
+.skill-figure { margin: 8px 0; }
+.skill-zoom { display: block; margin: 6px auto 0; }
+.skill-zoomwrap { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 8px; }
+/* 工作紙分頁：索引卡唔再疊雙層卡框 */
+.mini-pane > .card { border: 0; background: transparent; padding: 0; margin: 6px 0 0; box-shadow: none; }
+.sheet-no { display: inline-block; min-width: 26px; margin-right: 8px; padding: 1px 6px; border-radius: 8px; background: #ffe0b2; color: #8d4e00; font-weight: 800; font-size: .72rem; text-align: center; }
+/* 歌曲卡與跟唱畫面 */
+.song-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin: 8px 0; }
+.song-card { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; text-align: left; border: 1.5px solid var(--line); border-radius: 14px; background: #fff; padding: 11px; font: inherit; cursor: pointer; }
+.song-card:active { transform: scale(.99); }
+.song-card b { font-size: .9rem; color: #4527a0; }
+.song-card.own b { color: #e65100; }
+.song-card.formal b { color: #2e7d32; }
+.song-card small { font-size: .74rem; color: var(--mute); line-height: 1.35; }
+.song-kind { font-size: .66rem; font-weight: 800; border-radius: 999px; padding: 2px 8px; background: #ede7f6; color: #4527a0; }
+.song-card.own .song-kind { background: #fff3e0; color: #e65100; }
+.song-card.formal .song-kind { background: #e8f5e9; color: #2e7d32; }
+.song-lines { display: grid; gap: 4px; margin: 10px 0; }
+.song-line { margin: 0; padding: 7px 10px; border-radius: 10px; font-size: .95rem; line-height: 1.5; background: #f6f4ff; border-left: 4px solid #7e57c2; }
+.song-line b { display: inline-block; min-width: 22px; margin-right: 6px; font-size: .72rem; color: #fff; background: #7e57c2; border-radius: 6px; padding: 1px 6px; text-align: center; vertical-align: 2px; }
+.song-line.cubs { background: #e8f5e9; border-left-color: #2e7d32; }
+.song-line.cubs b { background: #2e7d32; }
+.song-line.all { background: #fff8e1; border-left-color: #f9a825; }
+.song-line.all b { background: #f9a825; }
+.song-line.big { font-size: clamp(1.3rem, 6vw, 2rem); padding: 16px 14px; font-weight: 800; }
+.song-now { border: 2px dashed #b39ddb; border-radius: 16px; padding: 10px; margin: 10px 0; background: #fbfaff; }
+.song-now.done { border-color: #a5d6a7; background: #f4fbf2; }
+.song-prov { font-size: .72rem; line-height: 1.5; }
+@media print {
+  .song-sheet { break-after: page; page-break-after: always; }
+  .song-sheet:last-child { break-after: auto; page-break-after: auto; }
+  .skill-sheet .skill-art, .song-sheet .skill-art { max-height: 95mm; width: 100%; margin: 2mm auto; }
+  .song-lines.print .song-line { font-size: 11pt; padding: 2mm 3mm; }
+  .lib-tag, .skill-zoom, .song-now .quick { display: none !important; }
+}
+
+/* 投影帶領頁嘅圖解尺寸（.ldia 之前無樣式） */
+.ldia { margin: 6px 0; }
+.ldia svg { max-width: 620px; margin: 0 auto; display: block; }
+.skill-figure .skill-art { border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+
+/* ==========================================================================
+   🖨️ 列印隔离第二層（2026-09-14 補）：開咗卡／彈窗而未開列印預覽時，
+   列印只印彈窗入面嗰項（例如活動A）；背後成頁清單（A–H）唔出紙。
+   三層規則：print-pack→#printarea；modal-open→彈窗內容；否則當前畫面。
+   ========================================================================== */
+@media print {
+  body.modal-open:not(.print-pack) #app,
+  body.modal-open:not(.print-pack) #leadroot,
+  body.modal-open:not(.print-pack) #netbar,
+  body.modal-open:not(.print-pack) #toast { display: none !important; }
+  body.modal-open:not(.print-pack) #modal {
+    position: static !important;
+    display: block !important;
+    background: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  body.modal-open:not(.print-pack) #modal .mbox {
+    width: auto !important;
+    max-width: none !important;
+    max-height: none !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  /* 彈窗入面嘅互動元素唔出紙：只留內容 */
+  body.modal-open:not(.print-pack) #modal .mx,
+  body.modal-open:not(.print-pack) #modal .quick,
+  body.modal-open:not(.print-pack) #modal .subtabs,
+  body.modal-open:not(.print-pack) #modal button,
+  body.modal-open:not(.print-pack) #modal form { display: none !important; }
+  body.modal-open:not(.print-pack) #modal .modal-content { font-size: 11pt; }
+  body.modal-open:not(.print-pack) #modal .skill-art { max-height: 95mm; width: 100%; margin: 2mm auto; }
+  body.modal-open:not(.print-pack) #modal .song-line.big { font-size: 16pt; }
+}
+.lib-btns { margin: 2px 0 0; }
+.lib-btns .btn { flex: 1 1 auto; }

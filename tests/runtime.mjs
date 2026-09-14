@@ -20,7 +20,7 @@ const sb = {
 };
 sb.window = sb; sb.globalThis = sb;
 vm.createContext(sb);
-for (const f of ["js/data.js", "js/jungle-data.js", "js/practical-data.js", "js/guide.js", "js/flow.js", "js/app.js", "js/redesign.js", "js/content.js", "js/jungle.js", "js/practical.js", "js/uniform-ceremony.js", "js/field-visuals.js", "js/salute-lab.js", "js/salute-positions.js", "js/tracking-kit.js", "js/material-desk.js", "js/plain-content.js", "js/worksheet-guides.js"]) {
+for (const f of ["js/data.js", "js/jungle-data.js", "js/practical-data.js", "js/guide.js", "js/flow.js", "js/app.js", "js/redesign.js", "js/content.js", "js/jungle.js", "js/practical.js", "js/uniform-ceremony.js", "js/field-visuals.js", "js/salute-lab.js", "js/salute-positions.js", "js/tracking-kit.js", "js/material-desk.js", "js/plain-content.js", "js/worksheet-guides.js", "js/skill-art.js", "js/songbook.js"]) {
   vm.runInContext(fs.readFileSync(path.join(root, f), "utf8"), sb, { filename: f });
 }
 const Q = (s) => vm.runInContext(s, sb);
@@ -384,7 +384,9 @@ for (const [name, expr, needles] of pages) {
     }
     ok(defs === 1, `成個 js/ 目錄 App.vLibrary 只有 ${defs} 個定義（${where.join(", ")}）`);
     const a = Q("App.vLibrary(false)"), b = Q("App.vLibrary(true)");
-    ok(a === b, "#play 同 #skills render 同一頁（活動＋技能兩分頁）");
+    /* 同一頁兩個分頁：兩版都要齊兩個分頁區；#skills 只係預設揀中技能分頁 */
+    ok(["id=\"lib-activity\"", "id=\"lib-skill\"", "App.showLibraryTab(this,'activity')", "App.showLibraryTab(this,'skill')"].every((k) => a.includes(k) && b.includes(k)), "#play 同 #skills 同一頁（活動＋技能兩分頁齊晒）");
+    ok(!a.includes("subtab cur\" onclick=\"App.showLibraryTab(this,'skill')") && b.includes("subtab cur\" onclick=\"App.showLibraryTab(this,'skill')"), "#skills 預設開技能分頁，#play 預設開活動分頁");
     ok(a.includes("活動・技能帶領卡"), "合併頁標題係「活動・技能帶領卡」");
     ok(a.includes("森林故事・角色卡"), "合併頁保留森林故事入口");
     ok(a.includes("🎮 活動") && a.includes("🛠️ 技能"), "有「活動」「技能」兩個分頁掣");

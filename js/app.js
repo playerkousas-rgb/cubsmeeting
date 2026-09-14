@@ -11,9 +11,29 @@ var Store = {
   set: function (k, v) { try { localStorage.setItem("cub_" + k, JSON.stringify(v)); } catch (e) {} }
 };
 var Modal = {
-  open: function (html) { var m = document.getElementById("modal"); if (!m) return; m.innerHTML = '<div class="mbox" role="dialog" aria-modal="true" onclick="if(event.target===this)Modal.close()"><button class="mx" onclick="Modal.close()" aria-label="關閉">✕</button><div class="modal-content">' + html + "</div></div>"; m.className = "on"; },
-  close: function () { var m = document.getElementById("modal"); if (m) { m.className = ""; m.innerHTML = ""; } }
+  open: function (html) { var m = document.getElementById("modal"); if (!m) return; m.innerHTML = '<div class="mbox" role="dialog" aria-modal="true" onclick="if(event.target===this)Modal.close()"><button class="mx" onclick="Modal.close()" aria-label="關閉">✕</button><div class="modal-content">' + html + "</div></div>"; m.className = "on"; if (document.body && document.body.classList) document.body.classList.add("modal-open"); },
+  close: function () { var m = document.getElementById("modal"); if (m) { m.className = ""; m.innerHTML = ""; } if (document.body && document.body.classList) document.body.classList.remove("modal-open"); }
 };
+/* 列印跟住「你眼前嗰項」走：列印前暫開收埋嘅 details，印完還原。
+   印邊度由 CSS 決定：print-pack→#printarea；modal-open→彈窗內容；否則當前畫面。 */
+if (typeof window !== "undefined" && window.addEventListener) {
+  var printOpened = [];
+  window.addEventListener("beforeprint", function () {
+    var root = null;
+    try {
+      if (document.body.classList.contains("print-pack")) root = document.getElementById("printarea");
+      else if (document.body.classList.contains("modal-open")) root = document.querySelector("#modal .modal-content");
+      else root = document.getElementById("view");
+    } catch (e) { root = null; }
+    if (!root || !root.querySelectorAll) return;
+    printOpened = Array.prototype.slice.call(root.querySelectorAll("details:not([open])"));
+    printOpened.forEach(function (d) { d.setAttribute("open", ""); d.setAttribute("data-print-opened", "1"); });
+  });
+  window.addEventListener("afterprint", function () {
+    printOpened.forEach(function (d) { if (d.getAttribute("data-print-opened")) { d.removeAttribute("open"); d.removeAttribute("data-print-opened"); } });
+    printOpened = [];
+  });
+}
 /* 外部APP：全部新分頁＋離線變灰 */
 function extBtn(url, big, title, desc) {
   var off = (typeof navigator !== "undefined" && navigator.onLine === false);
