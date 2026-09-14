@@ -270,49 +270,78 @@ for (const [name, expr, needles] of pages) {
     ok(b.items[exp.n - 1].startsWith(exp.last), `「${name}」末項同官方原文一致`);
   }
 
-  /* 建議考核（本套包自己嘅帶法，非官方條文）。棘輪：寫咗新章就要加入 DONE。
+  /* 建議考核（本套包自己嘅帶法，非官方條文）。
+     47 個現行章必須全部有，冇一個可以跌返做「未寫」。
      只有兩欄 how／pass —— 刻意冇「時間／準備」欄，因為好多章係返屋企做嘅功課。 */
   {
-    const DONE = ["露營章","探險章","愛護動物章","共融章","急救章","家務章","道路安全章","水上安全章",
-                  "防騙先鋒章","禁毒章","保護兒童章","社區應急先鋒章","環保先鋒章","機電先鋒章",
-                  "香港歷史章","國家安全大使章"];
-    const got = Q("Object.keys(App.badgeAssess)");
-    ok(got.length === DONE.length && DONE.every((k) => got.includes(k)),
-       `已寫建議考核剛好 ${DONE.length} 個（實際 ${got.length}）`);
-    for (const k of DONE) {
+    const LEGACY_SET = ["勞作章","讀圖章","電腦章","體操章"];
+    const keys = Q("Object.keys(App.badgeAssess)");
+    ok(keys.length === 47, `建議考核共 ${keys.length} 個（47 個現行章）`);
+    ok(!keys.some((k) => LEGACY_SET.includes(k)), "舊制章唔使寫建議考核，badgeAssess 冇佢哋");
+
+    /* 47 個現行章逐個撳開，冇一個可以顯示「未寫」 */
+    const items = Q("App.badgeGroups()").flatMap((g) => g.items);
+    const norm = (n) => n.replace(/（[^）]*）/g, "").trim();
+    const missing = items.filter((n) => {
+      const k = Q(`!!App.officialBadges[${JSON.stringify(n)}]`) ? n : norm(n);
+      return !Q(`!!App.badgeAssess[${JSON.stringify(k)}]`);
+    });
+    ok(missing.length === 0, `全部 47 個章都有建議考核（缺：${missing.join("、") || "冇"}）`);
+    for (const n of items) {
+      const h = Q(`App.assessHtml(${JSON.stringify(n)})`);
+      ok(h.includes("如何進行考核") && h.includes("何謂達標") && !h.includes("未寫"),
+         `「${n}」建議考核完整（兩欄齐、唔顯示未寫）`);
+    }
+    /* 每章內容要有實質：how ≥3 步、pass 有字，唔可以係空殼 */
+    for (const k of keys) {
       const a = Q(`App.badgeAssess[${JSON.stringify(k)}]`);
-      ok(Array.isArray(a.how) && a.how.length >= 3 && !!a.pass, `「${k}」有 how(≥3)＋pass 兩欄`);
+      ok(Array.isArray(a.how) && a.how.length >= 3, `「${k}」how 有 ${a.how && a.how.length} 步（≥3）`);
+      ok(typeof a.pass === "string" && a.pass.length >= 15, `「${k}」pass 有實質內容（${a.pass && a.pass.length} 字）`);
       ok(a.time === undefined && a.prep === undefined && a.watch === undefined,
          `「${k}」冇 time/prep/watch（已改做兩欄）`);
-      const h = Q(`App.assessHtml(${JSON.stringify(k)})`);
-      ok(h.includes("如何進行考核") && h.includes("何謂達標"), `「${k}」兩個標題都 render 到`);
-      ok(!h.includes("未寫"), `「${k}」唔會顯示「未寫」`);
+      ok(a.how.every((x) => x.length >= 8), `「${k}」how 每步都唔係空句`);
     }
     /* 返屋企做嘅章要講明喺屋企做，唔好假設集會 */
-    ok(Q("App.assessHtml('家務章')").includes("屋企"), "家務章講明喺屋企做");
-    /* 安全要喺 pass 或者 how 睇到 */
+    for (const k of ["家務章","園藝章","搜集章","寵物章","世界友誼章"]) {
+      const all = Q(`App.badgeAssess[${JSON.stringify(k)}].how.join("")`);
+      ok(all.includes("屋企") || all.includes("四個月") || all.includes("三個月") || all.includes("一個月"),
+         `「${k}」講明係長周期／屋企功課`);
+    }
+    /* 安全界線要睇到 */
     ok(Q("App.assessHtml('水上安全章')").includes("唔好叫幼童軍落水救人"), "水上安全章有安全界線");
     ok(Q("App.assessHtml('急救章')").includes("合資格"), "急救章有合資格評核要求");
-    /* 積極公民系列：要求喺外部網站，要講明唔好自己設標準 */
-    for (const k of ["防騙先鋒章","禁毒章","國家安全大使章"]) {
-      ok(Q(`App.assessHtml(${JSON.stringify(k)})`).includes("積極公民」獎章網站"), `「${k}」指向官方獎章網站`);
-      ok(Q(`App.badgeAssess[${JSON.stringify(k)}].pass`).includes("本套包唔另設標準"), `「${k}」聲明唔另設標準`);
+    ok(Q("App.assessHtml('游泳章（三級制度章）')").includes("合資格"), "游泳章有合資格評核要求");
+    ok(Q("App.assessHtml('射箭章（三級制度）')").includes("合資格教練"), "射箭章要合資格教練");
+    ok(Q("App.assessHtml('單車章')").includes("保護裝備"), "單車章要保護裝備");
+    ok(Q("App.assessHtml('天象章')").includes("千祈唔好直接用眼"), "天象章有觀太陽警告");
+    /* 要求喺外部網站嘅章要指向該網站並聲明唔另設標準 */
+    const EXT = ["防騙先鋒章","禁毒章","保護兒童章","社區應急先鋒章","環保先鋒章","機電先鋒章",
+                 "國家安全大使章","地球部落計劃 – 走塑達人章、自然守護者章、日光善用者章",
+                 "獨木舟章","體適能章","風帆章"];
+    for (const k of EXT) {
+      ok(Q(`App.badgeAssess[${JSON.stringify(k)}].pass`).includes("本套包唔另設標準"),
+         `「${k}」聲明唔另設標準`);
     }
-    /* 未寫嘅章要明確標示，唔可以靜靜地扮有內容 */
-    const LEGACY_SET = ["勞作章","讀圖章","電腦章","體操章"];
-    const rest = Q("Object.keys(App.officialBadges)").filter((k) => !DONE.includes(k) && !LEGACY_SET.includes(k));
-    ok(rest.length === 31, `仍有 ${rest.length} 個現行章未寫建議考核（47 − 16 = 31）`);
-    for (const k of rest.slice(0, 5)) {
-      ok(Q(`App.assessHtml(${JSON.stringify(k)})`).includes("未寫"), `「${k}」未寫嘅章明確標示「未寫」`);
+    /* 三級制度章要講明逐級考 */
+    for (const k of ["音樂章","射箭章","游泳章","公園定向章"]) {
+      ok(Q(`App.badgeAssess[${JSON.stringify(k)}].how.join("")`).includes("級"),
+         `「${k}」how 講到級別`);
     }
-    ok(Q("App.assessHtml('音樂章（三級制度）')").includes("未寫"), "括號後綴章名 fallback 正常");
+    /* 公園定向章官方註明中級d同高級e唔可以同一事工 */
+    ok(Q("App.badgeAssess['公園定向章'].pass").includes("唔可以係同一個活動"), "公園定向章保留官方限制");
+    /* 寫作章要保留官方分級字數 */
+    const w = Q("App.badgeAssess['寫作章'].pass");
+    ok(w.includes("50 字") && w.includes("150 字") && w.includes("250 字"), "寫作章保留 50/150/250 字門檻");
     /* 官方要求唔可以俾建議考核溝淡 */
     Q("Modal.open = function(h){ globalThis.__m = h; }");
     Q("App.openBadge('急救章')");
     ok(sb.__m.includes("badge-official") && sb.__m.includes("明瞭急救原則") && sb.__m.includes("官方綱要頁 31"),
        "官方要求仍然完整喺 official tab");
     ok(sb.__m.includes("以下係本套包建議嘅帶法"), "建議考核有聲明唔取代官方要求");
+    Q("App.openBadge('音樂章（三級制度）')");
+    ok(!sb.__m.includes("未寫") && sb.__m.includes("ABRSM"), "括號後綴章名開到建議考核同官方要求");
   }
+
   /* App.vLibrary 只可以有一個定義；活動同技能帶領卡係同一頁 */
   {
     const jsFiles = fs.readdirSync(path.join(root, "js")).filter((f) => f.endsWith(".js"));
