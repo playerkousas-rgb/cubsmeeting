@@ -332,6 +332,38 @@ for (const [name, expr, needles] of pages) {
     /* 寫作章要保留官方分級字數 */
     const w = Q("App.badgeAssess['寫作章'].pass");
     ok(w.includes("50 字") && w.includes("150 字") && w.includes("250 字"), "寫作章保留 50/150/250 字門檻");
+
+    /* ---- 官方教學資源 refs：只有 3 章有，全部要真係 render 到 ---- */
+    const REFS_EXPECT = {
+      "天象章": ["1XH2XOBwovsxY3kKspSQsrXW3JGdahKLs", "香港童軍總會天文組"],
+      "露營章": ["1999_07.pdf", "訓練署"],
+      "香港歷史章": ["GH6iviEibnC", "康樂及文化事務署"],
+    };
+    const refKeys = Q("Object.keys(App.badgeAssess).filter(k => App.badgeAssess[k].refs)");
+    ok(refKeys.length === 3, "只應有 3 章有 refs（避免太多太亂），實際 " + refKeys.length);
+    for (const [name, [frag, src]] of Object.entries(REFS_EXPECT)) {
+      const r = Q(`App.badgeAssess[${JSON.stringify(name)}].refs`);
+      ok(r.length === 1, name + " 只應有一條官方連結，實際 " + r.length);
+      ok(r[0].url.includes(frag), name + " 官方連結 URL 要含 " + frag);
+      ok(r[0].src === src, name + " 來源要係 " + src + "，實際 " + r[0].src);
+      ok(/^https:\/\//.test(r[0].url), name + " 連結要係 https");
+      ok(!r[0].url.includes('"') && !r[0].url.includes("'"), name + " URL 唔可以含引號（會炸 attribute）");
+      const h = Q(`App.assessHtml(${JSON.stringify(name)})`);
+      ok(h.includes("官方教學資源"), name + " 建議考核要 render 出「官方教學資源」標題");
+      ok(h.includes(r[0].label), name + " 要 render 出連結文字");
+      ok(h.includes('target="_blank"') && h.includes('rel="noopener"'), name + " 外連要開新頁 + noopener");
+      /* 連結要喺「何謂達標」之後，即係尾部 */
+      ok(h.indexOf("官方教學資源") > h.indexOf("何謂達標"), name + " 連結要放喺達標之後");
+    }
+    /* 冇 refs 嘅章唔應該 render 出呢個標題 */
+    ok(!Q("App.assessHtml('急救章')").includes("官方教學資源"), "冇 refs 嘅章唔使 render 連結標題");
+
+    /* ---- 簡體字守衛：本套全繁體，建議考核內容唔准有簡體殘留 ---- */
+    const SIMP = "个够数级观过齐实认说风险项图预许缘轮样单释";
+    for (const k of keys) {
+      const txt = Q(`App.badgeAssess[${JSON.stringify(k)}].how.join("") + App.badgeAssess[${JSON.stringify(k)}].pass`);
+      for (const ch of SIMP) ok(!txt.includes(ch), k + " 建議考核有簡體字「" + ch + "」");
+    }
     /* 官方要求唔可以俾建議考核溝淡 */
     Q("Modal.open = function(h){ globalThis.__m = h; }");
     Q("App.openBadge('急救章')");
