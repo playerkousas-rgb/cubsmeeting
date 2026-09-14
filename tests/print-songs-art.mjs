@@ -33,8 +33,15 @@ const Q = (s) => vm.runInContext(s, sb);
   const css = fs.readFileSync(path.join(root, "css/app.css"), "utf8");
   ok(/body\.print-pack #app[\s\S]{0,200}display: none !important/.test(css), "print-pack 時背後 #app 唔出紙");
   ok(/body\.print-pack #modal \.modal-content > \*:not\(#printarea\)\s*\{\s*display: none !important/.test(css), "print-pack 時彈窗只留 #printarea（標題／說明／掣唔出紙）");
-  ok(/body:not\(\.print-pack\) #modal\s*\{\s*display: none !important/.test(css), "冇開預覽直接列印時彈窗唔出紙（只印當前畫面）");
+  ok(/body:not\(\.print-pack\):not\(\.modal-open\) #modal\s*\{\s*display: none !important/.test(css), "冇彈窗冇預覽直接列印時彈窗唔出紙（只印當前畫面）");
   ok(/body\.print-pack #modal \.mx\s*\{\s*display: none !important/.test(css), "列印時收埋彈窗關閉掣");
+  /* 第二層：開咗活動卡／任何彈窗而未開預覽 → 只印彈窗嗰項，背後清單（A–H）唔出紙 */
+  ok(/body\.modal-open:not\(\.print-pack\) #app[\s\S]{0,220}display: none !important/.test(css), "modal-open 列印時背後 #app（成頁清單）唔出紙");
+  ok(/body\.modal-open:not\(\.print-pack\) #modal \.modal-content\s*\{/.test(css), "modal-open 列印時出彈窗內容");
+  ok(/body\.modal-open:not\(\.print-pack\) #modal button[\s\S]{0,80}display: none !important/.test(css), "modal-open 列印時收埋彈窗內嘅掣");
+  const app = fs.readFileSync(path.join(root, "js/app.js"), "utf8");
+  ok(/classList\.add\("modal-open"\)/.test(app) && /classList\.remove\("modal-open"\)/.test(app), "Modal.open/close 維護 body.modal-open");
+  ok(/addEventListener\("beforeprint"/.test(app) && /addEventListener\("afterprint"/.test(app), "beforeprint 暫開 details、afterprint 還原");
 }
 
 /* 2. 工作紙＋歌曲實裝 */
@@ -99,6 +106,7 @@ const Q = (s) => vm.runInContext(s, sb);
   ok(Q("SkillArt.sheet('c06',0)").includes("呢節以文字帶法為主"), "例行段冇圖時坦白講明，唔硬塞");
   ok(Q("App.libraryCards('skill')").includes("skill-thumb"), "技能卡格仔有圖縮圖");
   ok(Q("App.libraryCards('activity')").includes("lib-tag"), "活動卡标明有圖解／文字卡");
+  ok((Q("App.libraryCards('activity')").match(/只印呢張/g) || []).length >= 10 && (Q("App.libraryCards('skill')").match(/只印呢張/g) || []).length >= 10, "活動／技能卡格仔有「🖨️ 只印呢張」單張列印鈕");
 }
 
 console.log(fail === 0 ? "\nPRINT/SONGS/ART PASS: print isolation, real worksheets+songs tab, sing-along cards with A4 sheets, per-stage skill diagrams" : `\nPRINT/SONGS/ART FAIL (${fail})`);

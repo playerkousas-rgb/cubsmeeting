@@ -176,4 +176,6 @@ c26支援會員章e；c27支援2.4.2(a)及角色重溫，但未宣稱完成團�
 
 用戶回饋「列印應該點那項印那項」。新增 `body.print-pack` 規則：開咗列印預覽只印 `#printarea`；冇開預覽直接列印只印當前畫面（`body:not(.print-pack) #modal{display:none}`）。所有既有列印入口（出隊包、教材工作台、工作紙、領袖參考、制服／敬禮／追蹤／儀式卡、歌紙、圖解卡）都經 `Practical.printModal` 或 `PackPrint.open`，已統一加 `print-pack`，毋須逐處改。
 
+用戶再回饋：「想印活動A，卻把A–H全塞進來」——即開住活動卡用瀏覽器列印時，背後成頁活動清單照出紙。第二輪補三層列印目標：① `print-pack`→只印 `#printarea`；② `body.modal-open`（任何彈窗而未開預覽）→隱藏 `#app`，只印彈窗內容（收埋關閉掣、功能掣、表單與分頁掣）；兩者皆無→只印當前畫面。`Modal.open/close` 維護 `body.modal-open`；`beforeprint` 暫開目標範圍內收埋嘅 `<details>`（否則清單頁只印到 summary），`afterprint` 還原。SW cache 已 bump 至 v12。
+
 驗證：`npm test` 新增 `tests/print-songs-art.mjs`；jsdom 真DOM檢查分頁、跟唱、單印與投影圖解。未實體試印、未試教；歌曲與圖解不當作官方教材或考核完成。

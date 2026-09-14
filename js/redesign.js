@@ -189,7 +189,8 @@
           (art || '<div class="lib-emoji">'+(s.ic||'📋')+'</div>')+
           '<h3>'+esc(s.n)+'</h3><p class="mut" style="font-size:12px">'+s.m+'分鐘 · '+esc(m.n)+'</p>'+
           (s.art?'<span class="lib-tag"> 有圖解</span>':'<span class="lib-tag plain">文字卡</span>')+
-          '<button class="btn sm" onclick="App.activity(\''+m.tid+'\','+i+')">▶ 即開帶領卡</button></div>');
+          '<div class="quick lib-btns"><button class="btn sm" onclick="App.activity(\''+m.tid+'\','+i+')">▶ 即開帶領卡</button>'+
+          ((typeof SkillArt!=='undefined' && SkillArt.print)?'<button class="btn sm ghost" onclick="SkillArt.print(\''+m.tid+'\','+i+')">🖨️ 只印呢張</button>':'')+'</div></div>');
       });
     });
     return cards.join('');
