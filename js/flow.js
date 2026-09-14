@@ -1,13 +1,12 @@
-/* 🐺 flow.js — 🧭「帶你由頭做到尾」：揀咗一場集會之後，一步接一步帶到散會＋同步進度APP */
+/* 🐺 flow.js — 🧭「帶你由頭做到尾」：揀咗一場集會之後，一步接一步帶到散會。
+   呢個套包只做「帶集會」，唔做記錄：出席同獎章進度交畀右上角嘅進度追蹤APP／通告圖書館。 */
 var Flow = {
   STEPS: [
     { k: "pick", ic: "📅", n: "揀今場集會", why: "揀咗之後，印教材、執袋、帶領全部自動跟呢一場。", btn: "去揀集會", go: "Flow.doPick()" },
     { k: "print", ic: "🖨️", n: "印齊教案＋圖紙", why: "撳一下成疊出：領袖教案打頭陣，分隔頁之後就係小朋友圖紙。", btn: "即刻印", go: "Flow.doPrint()" },
     { k: "bag", ic: "🧺", n: "執袋（喺APP剔）", why: "逐樣剔，人數一改數量自動計，剔晒先好出門口。", btn: "開執袋單", go: "Flow.doBag()" },
     { k: "venue", ic: "📍", n: "到場設場", why: "邊度做遊戲、邊度坐低、地貼貼邊度，逐項剔完先開場。", btn: "睇設場清單", go: "Flow.doVenue()" },
-    { k: "lead", ic: "▶️", n: "開始帶領", why: "跟綠色領袖卡一步步做，計時同畫面撳個掣就出。", btn: "即開帶領", go: "Flow.doLead()" },
-    { k: "rec", ic: "📝", n: "完場記出席", why: "剔邊個到咗，今場出席即記低，唔使返去再諗。", btn: "去記錄", go: "Flow.doRec()" },
-    { k: "sync", ic: "🏅", n: "同步落進度追蹤APP", why: "套包只記今日出席，長期獎章進度交畀嗰邊，唔好兩邊入。", btn: "開進度追蹤APP", go: "Flow.doSync()" }
+    { k: "lead", ic: "▶️", n: "開始帶領", why: "跟綠色領袖卡一步步做，計時同畫面撳個掣就出。帶完就散會。", btn: "即開帶領", go: "Flow.doLead()" }
   ],
   st: function () {
     try {
@@ -69,14 +68,6 @@ var Flow = {
   doBag: function () { if (typeof App !== "undefined" && App.go) { App.go("#pack"); setTimeout(function () { if (typeof Bag !== "undefined" && Bag.open) Bag.open(); }, 80); } },
   doVenue: function () { if (typeof App !== "undefined" && App.go) { if (typeof Venue !== "undefined" && Venue.open) Venue.open(); else App.go("#pack"); } },
   doLead: function () { if (typeof Modal !== "undefined" && Modal.close) { try { Modal.close(); } catch (e) {} } if (typeof App !== "undefined" && App.go) App.go("#lead"); },
-  doRec: function () { if (typeof Modal !== "undefined" && Modal.close) { try { Modal.close(); } catch (e) {} } if (typeof App !== "undefined" && App.go) App.go("#track"); },
-  doSync: function () {
-    Flow.mark("sync", true);
-    var url = (typeof EXTERNAL !== "undefined" && EXTERNAL.badge) ? EXTERNAL.badge : "https://cubsbadge.vercel.app/";
-    try { window.open(url, "_blank", "noopener"); } catch (e) { location.href = url; }
-    if (typeof toast !== "undefined") toast("🏅 已開進度追蹤APP：記獎章＋報履歷");
-    Flow.render();
-  },
   render: function () {
     if (typeof document === "undefined") return;
     var el = document.getElementById("flowbar");
@@ -104,8 +95,8 @@ var Flow = {
       '<button class="fb-ic" onclick="Flow.minimize()" title="縮細／放大">' + (s.min ? "▲" : "▼") + "</button>" +
       '<button class="fb-ic" onclick="if(confirm(\'真係唔使帶？退出後唔會再彈。\'))Flow.quit()" title="唔使帶，我自己嚟">✕</button></div>';
     if (!c) {
-      return head + (s.min ? "" : '<div class="fb-main"><div class="fb-txt"><b>🎉 散會！今場由頭到尾做齊晒。</b>' +
-        "<small>獎章進度記咗落另一APP就安樂晒。下場想再帶：撳重頭再嚟。</small></div>" +
+      return head + (s.min ? "" : '<div class="fb-main"><div class="fb-txt"><b>🎉 散會！今場由頭到尾帶齊晒。</b>' +
+        "<small>出席同獎章進度唔喺呢度記：撳右上角 🏅 進度追蹤APP。下場想再帶：撳重頭再嚟。</small></div>" +
         '<div class="fb-act"><button class="btn sm" onclick="Flow.reset()">🔁 下一場重頭再嚟</button>' +
         '<button class="btn sm ghost" onclick="Flow.quit()">完成</button></div></div>');
     }
@@ -123,7 +114,7 @@ var Flow = {
         '<button class="btn sm ghost" onclick="Flow.quit()">✕ 唔使帶</button></div></div>';
     }
     return '<div class="flow-invite"><b>🧭 第一次帶集會？我帶你由頭做到尾</b>' +
-      "<span>撳一下，畫面底部會一步步帶你：印教材 → 執袋 → 設場 → 帶領 → 記出席 → 同步獎章。</span>" +
+      "<span>撳一下，畫面底部會一步步帶你：印教材 → 執袋 → 設場 → 帶領。帶完就散會。</span>" +
       '<div class="btns"><button class="btn sm gr" onclick="Flow.start()">🧭 帶我由頭做到尾</button></div></div>';
   }
 };

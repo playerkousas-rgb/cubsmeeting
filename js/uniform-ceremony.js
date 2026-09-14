@@ -43,7 +43,7 @@ var Ceremony = {
 
 (function(){
  FormalKit.sources.uniform=Uniform.sources.base.url;
- FormalKit.get('uniform').scope='依制服手冊第28–29頁、PC05/2024及P013-23整理。六區位置圖解已提供；真實肩章圖樣與新制核心範疇章完整縫製圖仍待核對。';
+ FormalKit.get('uniform').scope='依制服手冊第28–29頁、PC05/2024及P013-23整理。六區位置圖解已提供。範圍只限幼童軍團員制服（方便新領袖教幼童軍穿著）；領袖職級肩章不屬本套包範圍。新制核心範疇章完整縫製圖仍待核對。';
  DATA.facts.howl='團呼是幼童軍向亞基拿致敬、在集會開始和結束時表達招呼與感謝的儀式。內置一般集會逐步卡依2026綱要第73頁，來源版本及比賽差異另列。';
  FormalKit.get('hats').items.push(['室內不戴帽不一定不整齊','制服手冊FAQ明確說明：室內不用戴帽的場合，制服仍可視為整齊；在螢幕或會場展示旗幟本身不用戴帽。']);
  FormalKit.get('flags').scope='旗幟檢查配合內置團旗展旗卡使用；摺旗、繫旗圖解及國旗／區旗完整升降程序仍須補核。';

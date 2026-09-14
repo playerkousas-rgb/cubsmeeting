@@ -25,18 +25,39 @@ const flowCode = read("js/flow.js");
   ok(read('js/jungle.js').includes("a.getAttribute('href')==='#jungle'"), '森林故事頁高亮自己的入口');
   ok(bn === 5, `下面工具箱 ${bn} 粒（5）`);
   ok(!/一二三四|步驟一|Step 1/.test(top + bot), "導覽掣無標一二三四扮流程");
+  /* 下方導覽必須同 js/redesign.js 的 BOTTOM 一模一樣（防止兩邊漂移） */
+  const redesign = read("js/redesign.js");
+  const bottomSrc = (redesign.match(/var BOTTOM = \[([\s\S]*?)\n  \];/) || ["", ""])[1];
+  const entries = [...bottomSrc.matchAll(/\{id:'([^']+)',\s*icon:'([^']+)',\s*title:'([^']+)'/g)]
+    .map((m) => ({ id: m[1], icon: m[2], title: m[3] }));
+  const btns = [...bot.matchAll(/<a href="#([^"]+)" data-tab="([^"]+)"><span>([^<]*)<\/span>([^<]+)<\/a>/g)]
+    .map((m) => ({ href: m[1], tab: m[2], icon: m[3], label: m[4] }));
+  ok(entries.length === 5, `redesign.js BOTTOM ${entries.length} 項（5）`);
+  ok(btns.length === bn, `下方導覽解析到 ${btns.length} 粒掣（同 <a> 數一致）`);
+  entries.forEach((e, i) => {
+    const b = btns[i] || {};
+    ok(b.href === e.id && b.tab === e.id, `第${i + 1}粒去 #${e.id}（實際 #${b.href} / data-tab=${b.tab}）`);
+    ok(b.icon === e.icon, `第${i + 1}粒圖示 ${e.icon}（實際 ${b.icon}）`);
+    ok(b.label === e.title, `第${i + 1}粒文案「${e.title}」（實際「${b.label}」）`);
+  });
+  ok(!/#song/.test(bot), "#song 唔再係固定下方導覽掣");
+  ok(bot.includes('href="#badge"') && bot.includes("活動章"), "下方有活動章直接入口");
+  ok(/badge:\s*App\.vBadge/.test(redesign), "#badge 路由指去 App.vBadge()");
 }
 /* 2. 嚮導每步四要素齊（做咩n／點解why／動作掣btn／go） */
 {
   const ctx = {};
   vm.createContext(ctx);
   vm.runInContext(flowCode, ctx);
-  ok(ctx.Flow.STEPS.length >= 7, `嚮導 ${ctx.Flow.STEPS.length} 步（含同步APP最後一步）`);
+  ok(ctx.Flow.STEPS.length === 5, `嚮導 ${ctx.Flow.STEPS.length} 步（5：揀→印→執袋→設場→帶領）`);
   ctx.Flow.STEPS.forEach((s) => {
     ok(!!(s.k && s.n && s.why && s.btn && s.go), `嚮導「${s.n}」四要素齊（做咩/點解/掣/go）`);
   });
   const keys = ctx.Flow.STEPS.map((s) => s.k);
-  ["pick", "print", "bag", "venue", "lead", "rec", "sync"].forEach((k) => ok(keys.includes(k), `嚮導有「${k}」步`));
+  ["pick", "print", "bag", "venue", "lead"].forEach((k) => ok(keys.includes(k), `嚮導有「${k}」步`));
+  /* 定位：套包只幫人「帶集會」，唔幫人記錄。記錄交右上角嘅進度追蹤APP／通告圖書館引流。 */
+  ["rec", "sync"].forEach((k) => ok(!keys.includes(k), `嚮導冇「${k}」步（記錄唔屬於呢個套包）`));
+  ok(keys[keys.length - 1] === "lead", "嚮導最後一步係「帶領」，帶完即散會");
   ok(!/下一步/.test(ctx.Flow.STEPS.map((s) => s.btn).join("")), "嚮導無「下一步」掣（要做完自動跳）");
   ok(/邀請|帶我由頭做到尾/.test(flowCode) || /帶我由頭做到尾/.test(app), "有邀請卡「第一次帶集會？我帶你由頭做到尾」");
   ok(/quit/.test(flowCode) && /唔再彈|唔使帶/.test(flowCode + html), "可退出，退咗唔再彈");
@@ -52,8 +73,11 @@ const flowCode = read("js/flow.js");
   ok(/要上網先用得/.test(app + html), "離線掣變灰＋顯示「要上網先用得」");
   ok(/navigator\.onLine|online.*offline|offline/.test(app), "有handle離線（online/offline監聽）");
   /* 三個位＋兩個位 */
-  ok(/記獎章|開進度追蹤APP記獎章/.test(app), "記錄頁頂有大卡「開進度追蹤APP記獎章」");
-  ok(/同步落進度追蹤APP/.test(flowCode + app), "嚮導最後一步係同步落進度追蹤APP");
+  /* 定位：套包只幫帶集會，唔做記錄。內部冇記錄頁，只留引流去外部進度追蹤APP。 */
+  ok(!/vTrack/.test(app), "冇內部記錄頁（App.vTrack 已移除）");
+  ok(!/att_/.test(app), "冇出席剔格儲存（att_ 已移除）");
+  ok(/幼童軍進度追蹤系統/.test(app), "手冊有引流大卡去外部進度追蹤系統");
+  ok(!/同步落進度追蹤APP/.test(flowCode), "嚮導唔再有「同步落進度追蹤APP」步驟");
   ok(/相關APP|相關APP/.test(app), "手冊有「相關APP」區");
   ok(/睇最新通告同活動/.test(app), "年度計劃頁有細卡「睇最新通告同活動」");
   ok(/今天／七天／三十天|七天／三十天/.test(app), "通告文案有教時間視窗");

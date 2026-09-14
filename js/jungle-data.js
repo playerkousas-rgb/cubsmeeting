@@ -6,20 +6,20 @@ DATA.jungle = {
     {label:'角色去背圖（11款）',url:'https://drive.google.com/drive/folders/1GAYYbvPU35h0CJ9hdFCL-fMHCBsipMji',status:'已讀檔名，未逐圖視覺核對'},
     {label:'角色原圖及版本（14個檔案）',url:'https://drive.google.com/drive/folders/189SurMtEGDxBxCE3qXCVRqeB4cVlmUqt',status:'已讀檔名，含JPEG／PNG及青年毛吉利版本，未逐圖視覺核對'},
     {label:'森林故事卡牌頁',url:'https://sites.google.com/view/skwai/教材系列/幼童軍/森林故事卡牌',status:'頁面列出12張圖片，尚未讀取圖片中文字'},
-    {label:'角色圖相簿',url:'https://postimg.cc/gallery/NHM4Ldq',status:'已讀11個角色圖連結，未核對原圖清晰度及去背邊缘'}
+    {label:'角色圖相簿',url:'https://postimg.cc/gallery/NHM4Ldq',status:'已讀11個角色圖連結，未核對原圖清晰度及去背邊緣'}
   ],
   characters: [
-    {id:'mowgli',name:'毛吉利',english:'Mowgli',gender:'男孩',visual:'男孩；人類孩子；非童軍制服；簡單森林衣著',kind:'人類孩子',role:'由狼家庭照顧，在森林中學習規律及與朋友相處。',question:'毛吉利是小狼，還是人類孩子？',answer:'是人類孩子；他得到狼家庭照顧及狼群接納。',check:'入狼群情節用幼年版本；青年版本另用於成長故事。'},
-    {id:'raksha',name:'駱石',english:'Raksha',gender:'母狼',visual:'雌性母狼；自然狼形；非人類服裝',kind:'母狼',role:'照顧及保護毛吉利的母狼。',question:'誰在狼家庭中照顧毛吉利？',answer:'父狼和母狼照顧他；母狼名叫駱石。',check:'不要與狼群首領亞基拿混淆。'},
-    {id:'akela',name:'亞基拿',english:'Akela',gender:'雄狼',visual:'雄性狼；狼群首領；自然狼形；非人類服裝',kind:'狼群首領',role:'主持狼群集會並保護毛吉利，不是老虎，也不稱叢林之王。',question:'亞基拿在狼群中負責甚麼？',answer:'他是狼群領袖，在集會中處理狼群事務。',check:'狼的特徵及首領氣質要清楚，不靠皇冠認身份。'},
-    {id:'baloo',name:'白勞',english:'Baloo',gender:'雄性棕熊',visual:'雄性棕熊；自然熊形；非人類服裝',kind:'棕熊',role:'教導毛吉利及小狼森林規律的老師。',question:'誰願意教毛吉利森林規律？',answer:'白勞；他也曾在毛吉利加入狼群時為他說話。',check:'應辨認為棕熊；不要只以電影唱歌角色作設定。'},
-    {id:'bagheera',name:'白基拿',english:'Bagheera',gender:'雄性黑豹',visual:'雄性黑豹；自然黑豹形；非人類服裝',kind:'黑豹',role:'保護及幫助毛吉利，在加入狼群和尋回他的故事中出力。',question:'白基拿是甚麼動物？',answer:'黑豹，不是老虎或狼。',check:'保持黑豹輪廓；不同中文譯名以本教材索引統一。'},
-    {id:'sherekhan',name:'施亞汗',english:'Shere Khan',gender:'雄性老虎',visual:'雄性孟加拉虎；自然虎形；非人類服裝',kind:'老虎',role:'威脅毛吉利的老虎，故事中的衝突角色。',question:'讓毛吉利遇到危險的老虎叫甚麼名字？',answer:'施亞汗。',check:'可以有威脅感，但不用流血、撕咬或過度驚嚇畫面。'},
-    {id:'kaa',name:'卡',english:'Kaa',gender:'大蟒蛇',visual:'大蟒蛇；自然蛇形；非人類服裝',kind:'大蟒蛇',role:'在猴群事件中協助白勞及白基拿救回毛吉利，後來與毛吉利成為朋友。',question:'在這個森林故事中，卡有沒有幫助毛吉利？',answer:'有；不要套用其他電影版本的敵人設定。',check:'不能畫成只想欺騙毛吉利的反派；不演勒頸動作。'},
-    {id:'chil',name:'施露',english:'Chil',gender:'雄性鳶',visual:'鳶；自然鳥形；非人類服裝',kind:'鳶',role:'從空中觀察，在毛吉利被猴群帶走時傳遞求助消息。',question:'誰幫毛吉利把消息帶給朋友？',answer:'施露，是鳶。',check:'不是貓頭鷹或鸚鵡；圖卡標字應寫「鳶」。'},
-    {id:'banderlog',name:'賓廸洛',english:'Bander-log',gender:'猴群',visual:'一群猴子；不是單一猴王；自然猴形；非人類服裝',kind:'猴群',role:'把毛吉利帶到猴子鎮的猴群；不是單一猴王。',question:'賓廸洛是一個名字，還是一群猴子？',answer:'這裏指猴群；可以用多隻猴子表達。',check:'檔名「賓迪洛／賓廸洛」是同一索引；避免加入電影猴王。'},
-    {id:'hathi',name:'哈蒂',english:'Hathi',gender:'雄性大象',visual:'雄性亞洲象；自然象形；非人類服裝',kind:'大象',role:'在旱災時提出水邊停戰，讓動物取水的大象。',question:'哈蒂提出水邊停戰，是為了甚麼？',answer:'讓動物在缺水時可以取水，不在水邊爭鬥。',check:'延伸角色，不硬插入毛吉利初入狼群的場景。'},
-    {id:'tabaqui',name:'戴白祺',english:'Tabaqui',gender:'雄性豺',visual:'雄性豺；自然豺形；非人類服裝',kind:'豺',role:'與施亞汗相關、搬弄是非的角色；討論行為，不把動物種類等同好壞。',question:'聽到未核實的傳言，應該怎樣做？',answer:'先核實，不散播，不用故事角色名稱取笑隊友。',check:'辨認為豺；不要直接稱為狐狸或普通家犬。'}
+    {id:'mowgli',img:'assets/jungle/mowgli.avif',name:'毛吉利',english:'Mowgli',gender:'男孩',visual:'男孩；人類孩子；非童軍制服；簡單森林衣著',kind:'人類孩子',role:'由狼家庭照顧，在森林中學習規律及與朋友相處。',question:'毛吉利是小狼，還是人類孩子？',answer:'是人類孩子；他得到狼家庭照顧及狼群接納。',check:'入狼群情節用幼年版本；青年版本另用於成長故事。'},
+    {id:'raksha',img:'assets/jungle/raksha.avif',name:'駱石',english:'Raksha',gender:'母狼',visual:'雌性母狼；自然狼形；非人類服裝',kind:'母狼',role:'照顧及保護毛吉利的母狼。',question:'誰在狼家庭中照顧毛吉利？',answer:'父狼和母狼照顧他；母狼名叫駱石。',check:'不要與狼群首領亞基拿混淆。'},
+    {id:'akela',img:'assets/jungle/akela.avif',name:'亞基拿',english:'Akela',gender:'雄狼',visual:'雄性狼；狼群首領；自然狼形；非人類服裝',kind:'狼群首領',role:'主持狼群集會並保護毛吉利，不是老虎，也不稱叢林之王。',question:'亞基拿在狼群中負責甚麼？',answer:'他是狼群領袖，在集會中處理狼群事務。',check:'狼的特徵及首領氣質要清楚，不靠皇冠認身份。'},
+    {id:'baloo',img:'assets/jungle/baloo.avif',name:'白勞',english:'Baloo',gender:'雄性棕熊',visual:'雄性棕熊；自然熊形；非人類服裝',kind:'棕熊',role:'教導毛吉利及小狼森林規律的老師。',question:'誰願意教毛吉利森林規律？',answer:'白勞；他也曾在毛吉利加入狼群時為他說話。',check:'應辨認為棕熊；不要只以電影唱歌角色作設定。'},
+    {id:'bagheera',img:'assets/jungle/bagheera.avif',name:'白基拿',english:'Bagheera',gender:'雄性黑豹',visual:'雄性黑豹；自然黑豹形；非人類服裝',kind:'黑豹',role:'保護及幫助毛吉利，在加入狼群和尋回他的故事中出力。',question:'白基拿是甚麼動物？',answer:'黑豹，不是老虎或狼。',check:'保持黑豹輪廓；不同中文譯名以本教材索引統一。'},
+    {id:'sherekhan',img:'assets/jungle/sherekhan.avif',name:'施亞汗',english:'Shere Khan',gender:'雄性老虎',visual:'雄性孟加拉虎；自然虎形；非人類服裝',kind:'老虎',role:'威脅毛吉利的老虎，故事中的衝突角色。',question:'讓毛吉利遇到危險的老虎叫甚麼名字？',answer:'施亞汗。',check:'可以有威脅感，但不用流血、撕咬或過度驚嚇畫面。'},
+    {id:'kaa',img:'assets/jungle/kaa.avif',name:'卡',english:'Kaa',gender:'大蟒蛇',visual:'大蟒蛇；自然蛇形；非人類服裝',kind:'大蟒蛇',role:'在猴群事件中協助白勞及白基拿救回毛吉利，後來與毛吉利成為朋友。',question:'在這個森林故事中，卡有沒有幫助毛吉利？',answer:'有；不要套用其他電影版本的敵人設定。',check:'不能畫成只想欺騙毛吉利的反派；不演勒頸動作。'},
+    {id:'chil',img:'assets/jungle/chil.avif',name:'施露',english:'Chil',gender:'雄性鳶',visual:'鳶；自然鳥形；非人類服裝',kind:'鳶',role:'從空中觀察，在毛吉利被猴群帶走時傳遞求助消息。',question:'誰幫毛吉利把消息帶給朋友？',answer:'施露，是鳶。',check:'不是貓頭鷹或鸚鵡；圖卡標字應寫「鳶」。'},
+    {id:'banderlog',img:'assets/jungle/banderlog.avif',name:'賓廸洛',english:'Bander-log',gender:'猴群',visual:'一群猴子；不是單一猴王；自然猴形；非人類服裝',kind:'猴群',role:'把毛吉利帶到猴子鎮的猴群；不是單一猴王。',question:'賓廸洛是一個名字，還是一群猴子？',answer:'這裏指猴群；可以用多隻猴子表達。',check:'檔名「賓迪洛／賓廸洛」是同一索引；避免加入電影猴王。'},
+    {id:'hathi',img:'assets/jungle/hathi.avif',name:'哈蒂',english:'Hathi',gender:'雄性大象',visual:'雄性亞洲象；自然象形；非人類服裝',kind:'大象',role:'在旱災時提出水邊停戰，讓動物取水的大象。',question:'哈蒂提出水邊停戰，是為了甚麼？',answer:'讓動物在缺水時可以取水，不在水邊爭鬥。',check:'延伸角色，不硬插入毛吉利初入狼群的場景。'},
+    {id:'tabaqui',img:'assets/jungle/tabaqui.avif',name:'戴白祺',english:'Tabaqui',gender:'雄性豺',visual:'雄性豺；自然豺形；非人類服裝',kind:'豺',role:'與施亞汗相關、搬弄是非的角色；討論行為，不把動物種類等同好壞。',question:'聽到未核實的傳言，應該怎樣做？',answer:'先核實，不散播，不用故事角色名稱取笑隊友。',check:'辨認為豺；不要直接稱為狐狸或普通家犬。'}
   ],
   episodes: [
     {id:'welcome',title:'毛吉利加入狼群',refs:['會員章 e(i)','會員章 e(ii)'],characters:['mowgli','raksha','akela','baloo','bagheera','sherekhan'],scenes:[
@@ -37,7 +37,7 @@ DATA.jungle = {
 (function(){
   function reading(ep){return ep.scenes.map(function(s,i){return (i+1)+'｜'+s.title+'：'+s.text;}).join('\n');}
   var a=DATA.jungle.episodes[0],b=DATA.jungle.episodes[1];
-  var first=lesson('c26','森林故事①：毛吉利加入狼群','彈性安排','會員章故事教學',a.refs,'認識故事角色，依次講述毛吉利加入狼群的經過。','每人辨認主要角色及動物，依四段順序重述；說出白勞和白基拿的支持。','本場支援會員章e，不等於全部會員章；角色數目不是自訂正式過關標準。','每次只展示三位角色，允许指認、口述或領袖代記。','比較白勞與白基拿如何提供不同支持，再用自己的話重述。',[
+  var first=lesson('c26','森林故事①：毛吉利加入狼群','彈性安排','會員章故事教學',a.refs,'認識故事角色，依次講述毛吉利加入狼群的經過。','每人辨認主要角色及動物，依四段順序重述；說出白勞和白基拿的支持。','本場支援會員章e，不等於全部會員章；角色數目不是自訂正式過關標準。','每次只展示三位角色，允許指認、口述或領袖代記。','比較白勞與白基拿如何提供不同支持，再用自己的話重述。',[
     activity('先認識六位角色',['用角色文字卡認識毛吉利、駱石、亞基拿、白勞、白基拿及施亞汗。','成員輪流配對名稱與身份；分清狼群首領、棕熊及黑豹。','兩人各說一個角色的作用，不以「好人／壞人」標籤同伴。'],'先講佢係邊個，再講佢幫過甚麼忙。','認識角色名稱與身份，不把毛吉利說成小狼。','不模仿咬、爬或抓人。',['A4紙','鉛筆']),
     activity('四段故事，停一停再問',[reading(a),'每段後依故事頁的提問停一停，先聽成員回答再展開答案。','第四段後請成員說誰照顧、誰支持毛吉利，領袖記錄仍混淆的地方。'],'聽到有人願意幫忙時，留意佢答應做甚麼。','能說出狼家庭照顧、兩位朋友支持及狼群接納的經過。','不展示血腥獵物；解釋故事中的牛不是現實中買朋友的方法。',[]),
     activity('排故事、迎新朋友',['將「被狼家庭照顧／到集會／朋友支持／獲接納」四張文字條打亂。','每人或兩人組排次序，用自己的話講，領袖個別確認理解。','提出一項歡迎新隊員的行動並試說一句友善邀請。'],'新朋友未識唔緊要，我哋可以點幫佢一齊學？','保留個人排序與口述記錄；接受非書寫表達。','不將真實成員扮成被投票排斥的人。',['A4紙','鉛筆'])],[],['圍坐故事區','桌面配對區'],'今次用森林故事學接納與互助，毋須購買卡牌；可用文字卡參與。');

@@ -1,6 +1,9 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import assert from 'node:assert/strict';
+const root=path.join(path.dirname(fileURLToPath(import.meta.url)),'..');
 const mem={}, elements={};
 const el=()=>({innerHTML:'',className:'',style:{},value:'',classList:{toggle(){},add(){},remove(){}},setAttribute(){},removeAttribute(){}});
 const ctx={console,localStorage:{getItem:k=>mem[k]??null,setItem:(k,v)=>mem[k]=String(v)},location:{hash:'#plan'},navigator:{onLine:true},document:{getElementById:id=>elements[id]??=el(),querySelectorAll:()=>[],body:el(),documentElement:el()},setTimeout:()=>{},clearTimeout(){},setInterval:()=>1,clearInterval(){},addEventListener(){},scrollTo(){},print(){}};
@@ -46,7 +49,19 @@ ctx.Jungle.open(0);assert.equal(ctx.Jungle.page,0);ctx.Jungle.move(-1);assert.eq
 ctx.Jungle.move(99);assert.equal(ctx.Jungle.page,3);assert(output.includes('狼家庭照顧他'));
 ctx.Jungle.open(1);assert.equal(ctx.Jungle.page,0);ctx.Jungle.move(3);assert(output.includes('卡'));
 ctx.Jungle.card('kaa');assert(output.includes('幫助毛吉利'));assert.equal(ctx.curTid(),'c07');
-assert(!ctx.Jungle.view().includes('<img'),'unreviewed external images must not silently become dependencies');
+/* 本地 AI 插畫頭像係受審查嘅依賴，准；外連 http 圖唔准。 */
+const jungleView=ctx.Jungle.view();
+assert(!jungleView.includes('src="http'),"jungle view 唔得引用外連 http 圖");
+for(const c of DATA.jungle.characters){
+  if(c.img){assert(c.img.startsWith("assets/jungle/"),"頭像路徑要喺 assets/jungle/：" + c.id);
+    const fp=path.join(root,c.img);assert(fs.existsSync(fp),"頭像檔案要存在：" + c.img);
+    assert(fs.statSync(fp).size<=120*1024,"頭像要 ≤120KB：" + c.img);}
+}
+assert(jungleView.includes("AI 繪製教學示意"),"要標明頭像係 AI 教學示意、非官方原圖");
+const withImg=DATA.jungle.characters.filter(c=>c.img);
+assert.equal(withImg.length,11,"11 個角色全部要有頭像，實際 " + withImg.length);
+ctx.Jungle.card("mowgli");assert(output.includes("character-portrait"),"角色卡要 render 肖像");
+ctx.Jungle.card("hathi");assert(output.includes("character-portrait"),"哈蒂而家有頭像，card 要 render 肖像");
 PackPrint.open('sheet','c26');assert(output.includes('排序並重述'));assert.equal(ctx.curTid(),'c07');
 ctx.location.hash='#prep?tid=c27';App.route();assert.equal(ctx.curTid(),'c27');assert(App.vPrep().includes('2.4.2'));
 console.log('JUNGLE PASS: characters, source-linked scenes, independent reader, lesson routes and worksheets');
