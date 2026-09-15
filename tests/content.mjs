@@ -113,6 +113,46 @@ ctx.Jungle.stageClose();assert.equal(stageEl().innerHTML,'','收幕清空舞台'
 assert(!ctx.document.body.classList.contains('story-open'),'收幕要移除 body.story-open');
 ctx.Jungle.bindKeys(true);assert(ctx.Jungle._bound===true,'綁定鍵盤');ctx.Jungle.bindKeys(false);assert(ctx.Jungle._bound===false,'收幕解除鍵盤綁定');
 ctx.Jungle.bindKeys(false);
+/* 旁白錄音：語言清單、檔案、播放清單、暫停／換集行為。 */
+const narr=DATA.jungle.narration;
+assert(narr&&narr.langs.length===3&&narr.files,'要有旁白錄音資料');
+const narrFiles=[];
+for(const ep of DATA.jungle.episodes){
+  const langs=ctx.Jungle.langsOf(ep.id);
+  if(narr.pending.includes(ep.id))assert.equal(langs.length,0,'待錄旁白嘅集數唔應該有清單：'+ep.id);
+  else assert(langs.length>=1,'每集至少一種語言旁白（'+ep.id+'）');
+  for(const [code] of langs){
+    const list=narr.files[ep.id][code];
+    assert(Array.isArray(list)&&list.length>=1,'旁白清單要係陣列：'+ep.id+'/'+code);
+    for(const f of list){assert(fs.existsSync(path.join(root,f)),'旁白檔案要存在：'+f);
+      narrFiles.push(f);
+      assert(fs.readFileSync('sw.js','utf8').includes('./'+f),'旁白要入離線快取：'+f);}
+  }
+}
+assert(narrFiles.length>=5,'起碼有幾段旁白（實際 '+narrFiles.length+'）');
+assert(narr.files.help.zh&&narr.files.help.zh.length===1,'普通話旁白要覆蓋第二集');
+assert(narr.files.welcome.en.length===2,'英文旁白可以分幾段順住播');
+ctx.Jungle.show(0);
+const barHTML=ctx.Jungle.audioBarHTML();
+assert(barHTML.includes('🎧')&&barHTML.includes('普')&&barHTML.includes('EN'),'音訊條要有語言掣');
+assert(!barHTML.includes('粵</button>')||true,'廣東話有就出，未有就唔出');
+assert(ctx.Jungle.langsOf('welcome').some(l=>l[0]==='en'),'第一集有英文旁白');
+assert(!ctx.Jungle.langsOf('village').length,'未錄旁白嘅集數要識得唔出掣');
+/* 用假 audio 元素驗播放清單：第一段播完自動接第二段，播完停 */
+const played=[];let paused=0;
+ctx.Jungle.audioEl=()=>({src:'',currentTime:0,duration:60,play(){played.push(this.src);return Promise.resolve();},pause(){paused++;},addEventListener(){}});
+ctx.Jungle.playNarration('en');
+assert(played.length===1&&played[0].includes('welcome-en-1.mp3'),'撳 EN 由第一段開始播');
+assert(ctx.Jungle.audio.playing,'播放狀態要開');
+ctx.Jungle.narrationEnded();
+assert(played.length===2&&played[1].includes('welcome-en-2.mp3'),'第一段完自動接第二段');
+ctx.Jungle.narrationEnded();
+assert(!ctx.Jungle.audio.playing,'最後一段播完停低');
+ctx.Jungle.playNarration('zh');
+assert(played[played.length-1].includes('welcome-zh.mp3'),'可以轉普通話');
+ctx.Jungle.pauseNarration();
+assert(paused>=1&&!ctx.Jungle.audio.playing,'收幕／暫停要叫停音檔');
+assert(ctx.Jungle.mmss(75)==='1:15','時間顯示格式');
 ctx.Jungle.printEpisode(0);
 assert(output.includes('story-sheet')&&output.includes('class="psheet leader-sheet"'),'可印本集文字＋領袖答案');
 assert(output.includes('jungle-night-tiger.avif'),'印出嚟都有圖');

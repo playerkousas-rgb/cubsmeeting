@@ -18,6 +18,19 @@ DATA.jungle = {
   /* 投屏講故事：每段一張大圖（img 用 assets/jungle/slides/ 內嘅 AVIF），文字依總會《森林故事》
      內容改寫（《香港童軍》月刊第158–170期版本），省略暴力細節，保留情節次序。
      pendingArt：已安排但未出圖嘅段落（繪圖有每輪上限，分批補）；出圖後由清單移除。 */
+  /* 旁白錄音：每集可有多種語言，每種語言可以分幾段（播放器會自動接落去）。
+     廣東話照用，但廣東話 TTS 讀書面語會生硬，畫面上會提示領袖可以自己講。 */
+  narration: {
+    langs: [['zh','普'],['en','EN'],['yue','粵']],
+    pending: ['village'],
+    files: {
+      welcome: {zh:['assets/jungle/audio/welcome-zh.mp3'], en:['assets/jungle/audio/welcome-en-1.mp3','assets/jungle/audio/welcome-en-2.mp3']},
+      help:    {zh:['assets/jungle/audio/help-zh.mp3']},
+      rules:   {zh:['assets/jungle/audio/rules-zh.mp3'], en:['assets/jungle/audio/rules-en.mp3']},
+      fire:    {zh:['assets/jungle/audio/fire-zh.mp3']},
+      village: {}
+    }
+  },
   pendingArt:['jungle-baloo-lesson','jungle-bees-bat','jungle-hunting-grounds','jungle-kaa-rescue','jungle-forest-rules','jungle-pack-split','jungle-red-flower','jungle-faceoff','jungle-fire-branch','jungle-farewell','jungle-village','jungle-two-homes','jungle-tiger-return','jungle-herd-plan','jungle-carry-on'],
   decks: {
     welcome: {cover:'jungle-wolf-carry', subtitle:'狼家庭收留一個小人兒，狼群大會上有人為他說話。'},

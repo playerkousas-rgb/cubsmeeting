@@ -1,5 +1,5 @@
 /* 🐺 幼童軍團集會助手 — Service Worker (offline first，cache齊) */
-var CACHE = "cubhub-v28-jungle-slides-20260915";
+var CACHE = "cubhub-v29-jungle-narration-20260915";
 var ASSETS = [
   "./", "./index.html", "./manifest.webmanifest", "./css/app.css",
   "./js/data.js", "./js/guide.js", "./js/flow.js", "./js/app.js", "./js/redesign.js", "./js/content.js", "./js/jungle-data.js", "./js/jungle.js", "./js/practical-data.js", "./js/practical.js", "./js/uniform-ceremony.js", "./js/field-visuals.js", "./js/salute-lab.js", "./js/salute-positions.js", "./js/tracking-kit.js", "./js/material-desk.js", "./js/plain-content.js", "./js/worksheet-guides.js", "./js/skill-art.js", "./js/craft-sheets.js", "./js/songbook.js",
@@ -62,6 +62,13 @@ var ASSETS = [
   "./assets/jungle/slides/jungle-water-snake.avif",
   "./assets/jungle/slides/jungle-monkeys.avif",
   "./assets/jungle/slides/jungle-kite-message.avif",
+  "./assets/jungle/audio/welcome-zh.mp3",
+  "./assets/jungle/audio/help-zh.mp3",
+  "./assets/jungle/audio/rules-zh.mp3",
+  "./assets/jungle/audio/fire-zh.mp3",
+  "./assets/jungle/audio/rules-en.mp3",
+  "./assets/jungle/audio/welcome-en-1.mp3",
+  "./assets/jungle/audio/welcome-en-2.mp3",
   "./assets/teaching/right-hand-salute.avif",
   "./icons/icon-192.png", "./icons/icon-512.png",
   "./assets/jungle/mowgli.avif", "./assets/jungle/raksha.avif", "./assets/jungle/akela.avif", "./assets/jungle/baloo.avif",

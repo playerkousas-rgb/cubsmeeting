@@ -58,14 +58,100 @@ var Jungle = {
       '<p class="story-credit">場景圖：AI 生成教學插畫，非童軍總會官方原圖，只作講故事用。故事文字依總會《森林故事》內容改寫，省略暴力細節。</p>'+
       '</div>';
   },
+  /* 舞台分兩層：#story-main 每次換圖重繪；#story-audio 唔會重繪，所以播住旁白換圖唔會斷。 */
   stage:function(){
     var el=document.getElementById('story-stage');
     if(!el){el=document.createElement('div');el.id='story-stage';document.body.appendChild(el);}
     el.className='story-stage-wrap';
-    el.innerHTML=Jungle.stageHTML();
+    if(!Jungle._skeleton||!(el.querySelector&&el.querySelector('#story-main'))){
+      el.innerHTML='<div id="story-main"></div><div id="story-audio" class="story-audio"></div>';
+      Jungle._skeleton=true;
+    }
     document.body.classList.add('story-open');
+    Jungle.renderMain();
+    Jungle.buildAudio();
     return el;
   },
+  renderMain:function(){
+    var html=Jungle.stageHTML();
+    var el=document.getElementById('story-stage');
+    var main=(el&&el.querySelector)?el.querySelector('#story-main'):null;
+    if(main)main.innerHTML=html; else if(el)el.innerHTML=html;
+    return html;
+  },
+  /* ---------- 旁白錄音 ---------- */
+  audio:{ep:-1,lang:'',part:0,playing:false},
+  langsOf:function(id){var f=(DATA.jungle.narration.files[id]||{});return DATA.jungle.narration.langs.filter(function(l){return f[l[0]]&&f[l[0]].length;});},
+  audioEl:function(){return document.getElementById('story-track');},
+  audioBarHTML:function(){
+    var ep=DATA.jungle.episodes[Jungle.stageState.ep], langs=Jungle.langsOf(ep.id);
+    if(!langs.length)return '<span class="story-hint">🎧 本集未附旁白錄音；可以直接照文字講。</span>';
+    return '<span class="story-hint">🎧 旁白</span>'+
+      langs.map(function(l){return '<button class="btn sm story-lang" data-lang="'+l[0]+'" onclick="Jungle.playNarration(\''+l[0]+'\')">'+esc(l[1])+'</button>';}).join('')+
+      '<button class="btn sm gr" id="story-audio-btn" onclick="Jungle.toggleNarration()">▶ 播</button>'+
+      '<input type="range" id="story-audio-seek" min="0" max="100" value="0" oninput="Jungle.seekNarration(this.value)" aria-label="旁白進度">'+
+      '<span class="story-hint" id="story-audio-state">準備好</span>'+
+      '<span class="story-hint">播住都可以照撳圖｜想自己講就唔播</span>';
+  },
+  buildAudio:function(){
+    var bar=document.getElementById('story-audio');
+    if(!bar)return;
+    if(Jungle.audio.ep!==Jungle.stageState.ep){Jungle.audio.ep=Jungle.stageState.ep;Jungle.audio.part=0;Jungle.audio.playing=false;Jungle.audio.lang='';}
+    var langs=Jungle.langsOf(DATA.jungle.episodes[Jungle.stageState.ep].id);
+    if(!Jungle.audio.lang||!langs.some(function(l){return l[0]===Jungle.audio.lang;}))Jungle.audio.lang=langs.length?langs[0][0]:'';
+    bar.innerHTML='<audio id="story-track" preload="metadata"></audio>'+Jungle.audioBarHTML();
+    var el=Jungle.audioEl();
+    if(el&&typeof el.addEventListener==='function'){
+      el.addEventListener('ended',function(){Jungle.narrationEnded();});
+      el.addEventListener('timeupdate',function(){Jungle.markAudio();});
+      el.addEventListener('error',function(){Jungle.audioError();});
+    }
+    Jungle.markAudio();
+  },
+  audioNote:function(msg){var s=document.getElementById('story-audio-state');if(s)s.textContent=msg;},
+  audioError:function(){Jungle.audio.playing=false;Jungle.audioNote('音檔未載入，可能未快取；可以直接照文字講。');Jungle.markAudio();},
+  markAudio:function(){
+    var ep=DATA.jungle.episodes[Jungle.stageState.ep], list=(DATA.jungle.narration.files[ep.id]||{})[Jungle.audio.lang]||[];
+    var bar=document.getElementById('story-audio');
+    if(bar&&bar.querySelectorAll){
+      var chips=bar.querySelectorAll('.story-lang');
+      for(var i=0;i<chips.length;i++){chips[i].classList&&chips[i].classList.toggle&&chips[i].classList.toggle('cur',chips[i].getAttribute&&chips[i].getAttribute('data-lang')===Jungle.audio.lang);}
+    }
+    var btn=document.getElementById('story-audio-btn');
+    if(btn)btn.textContent=Jungle.audio.playing?'⏸ 停':'▶ 播';
+    var st=document.getElementById('story-audio-state');
+    if(!st||!list.length)return;
+    var el=Jungle.audioEl(), label=Jungle.audio.playing?'播放中':'已暫停';
+    var extra=(Jungle.audio.part+1)+'/'+list.length;
+    st.textContent=label+'｜'+extra+(el&&el.duration&&isFinite(el.duration)?'｜'+Jungle.mmss(el.currentTime)+' / '+Jungle.mmss(el.duration):'');
+    var seek=document.getElementById('story-audio-seek');
+    if(seek&&el&&el.duration&&isFinite(el.duration))seek.value=String(Math.round((el.currentTime/el.duration)*100));
+  },
+  mmss:function(t){t=Math.max(0,Math.round(t||0));return Math.floor(t/60)+':'+('0'+(t%60)).slice(-2);},
+  playNarration:function(lang){
+    var ep=DATA.jungle.episodes[Jungle.stageState.ep];
+    var list=(DATA.jungle.narration.files[ep.id]||{})[lang];if(!list||!list.length)return;
+    Jungle.audio.lang=lang;Jungle.audio.part=0;Jungle.audio.ep=Jungle.stageState.ep;
+    var el=Jungle.audioEl();
+    if(!el||typeof el.play!=='function'){Jungle.audioNote('呢部機／呢個環境播唔到；可以直接照文字講。');Jungle.markAudio();return;}
+    el.src=list[0];
+    var p=el.play();if(p&&p.catch)p.catch(function(){Jungle.audioNote('音檔未載入，可能未快取；可以直接照文字講。');});
+    Jungle.audio.playing=true;Jungle.markAudio();
+  },
+  toggleNarration:function(){
+    var el=Jungle.audioEl();
+    if(Jungle.audio.playing){if(el&&typeof el.pause==='function')el.pause();Jungle.audio.playing=false;Jungle.markAudio();return;}
+    if(el&&el.src){if(typeof el.play==='function')el.play();Jungle.audio.playing=true;Jungle.markAudio();return;}
+    Jungle.playNarration(Jungle.audio.lang||((Jungle.langsOf(DATA.jungle.episodes[Jungle.stageState.ep].id)[0]||[])[0]||''));
+  },
+  narrationEnded:function(){
+    var ep=DATA.jungle.episodes[Jungle.stageState.ep];
+    var list=(DATA.jungle.narration.files[ep.id]||{})[Jungle.audio.lang]||[];
+    if(Jungle.audio.part+1<list.length){Jungle.audio.part++;var el=Jungle.audioEl();if(el&&typeof el.play==='function'){el.src=list[Jungle.audio.part];el.play();}Jungle.markAudio();return;}
+    Jungle.audio.playing=false;Jungle.audio.part=0;Jungle.markAudio();Jungle.audioNote('播完；可以再撳「▶ 播」聽多次。');
+  },
+  pauseNarration:function(){var el=Jungle.audioEl();if(el&&typeof el.pause==='function')el.pause();Jungle.audio.playing=false;Jungle.markAudio();},
+  seekNarration:function(v){var el=Jungle.audioEl();if(el&&el.duration&&isFinite(el.duration))el.currentTime=el.duration*(Number(v)/100);},
   show:function(i){
     if(!DATA.jungle.episodes[i])return;
     if(typeof Modal!=='undefined'&&Modal.close)Modal.close();
@@ -75,7 +161,9 @@ var Jungle = {
     Jungle.bindKeys(true);
   },
   stageClose:function(){
+    Jungle.pauseNarration();
     var el=document.getElementById('story-stage');if(el)el.innerHTML='';
+    Jungle._skeleton=false;
     document.body.classList.remove('story-open');
     Jungle.bindKeys(false);
     if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen();
@@ -83,9 +171,9 @@ var Jungle = {
   stageMove:function(d){var all=Jungle.slides(Jungle.stageState.ep);var n=Jungle.stageState.slide+d;
     if(!isFinite(n))return;n=Math.max(0,Math.min(all.length-1,n));
     if(n===Jungle.stageState.slide)return;
-    Jungle.stageState.slide=n;Jungle.page=Math.max(0,n-1);Jungle.stageState.ask=false;Jungle.stage();},
-  episodeStep:function(i){if(!DATA.jungle.episodes[i]||i<0)return;Jungle.stageState={ep:i,slide:0,ask:false};Jungle.episode=i;Jungle.page=0;Jungle.stage();},
-  stageAsk:function(){if(Jungle.stageState.slide===0)return;Jungle.stageState.ask=!Jungle.stageState.ask;Jungle.stage();},
+    Jungle.stageState.slide=n;Jungle.page=Math.max(0,n-1);Jungle.stageState.ask=false;Jungle.renderMain();Jungle.markAudio();},
+  episodeStep:function(i){if(!DATA.jungle.episodes[i]||i<0)return;Jungle.pauseNarration();Jungle.stageState={ep:i,slide:0,ask:false};Jungle.episode=i;Jungle.page=0;Jungle.stage();},
+  stageAsk:function(){if(Jungle.stageState.slide===0)return;Jungle.stageState.ask=!Jungle.stageState.ask;Jungle.renderMain();},
   fontStep:function(d){var el=document.getElementById('story-stage');if(!el)return;
     var cur=parseFloat(el.getAttribute('data-scale')||'1')||1;
     var next=Math.max(0.8,Math.min(1.8,Math.round((cur+d*0.1)*10)/10));
@@ -116,7 +204,7 @@ var Jungle = {
       '<p>文字依總會《森林故事》內容改寫；場景圖為 AI 生成教學插畫，非官方原圖。'+(typeof Jungle.sourceNote==='function'?'':'')+'</p></section>';
   },
   printEpisode:function(i){var ep=DATA.jungle.episodes[i];if(!ep)return;Practical.printModal('森林故事：'+ep.title,Jungle.sheets(i));},
-  view:function(){return '<section class="card"><a class="back" href="#book">‹ 手冊</a><h1>🌳 森林故事</h1><p>先認角色，再講故事，最後連回小隊生活。開「投屏講故事」就可以一路投影、一路講。</p><div class="template-grid">'+DATA.jungle.episodes.map(function(ep,i){return '<article class="template-card"><span class="eyebrow">'+esc(ep.refs.join('／'))+'</span><h3>'+esc(ep.title)+'</h3><p>'+esc((DATA.jungle.decks[ep.id]||{}).subtitle||'')+'</p><p class="mut" style="font-size:12px">'+ep.scenes.length+'段 · 每段一大張圖 · 領袖答案另收</p><div class="quick"><button class="btn gr" onclick="Jungle.show('+i+')">📺 投屏講故事</button><button class="btn" onclick="Jungle.open('+i+')">逐段閱讀</button><button class="btn" onclick="Jungle.printEpisode('+i+')">🖨️ 印文字</button></div></article>';}).join('')+'</div></section><section class="card"><h2>11位角色：認人與配對</h2><p class="mut">撳角色先睇介紹，再展開答案。哈蒂與戴白祺可作延伸，不硬放入每段故事。</p><p class="mut" style="font-size:11px">頭像為 AI 繪製教學示意，非童軍總會官方原圖；角色文字介紹以官方版本為準。</p><div class="template-grid">'+DATA.jungle.characters.map(function(c){return '<button class="btn character-card" onclick="Jungle.card(\''+c.id+'\')">'+(c.img?'<img src="'+c.img+'" alt="" loading="lazy" onerror="this.remove()">':'')+'<b>'+esc(c.name)+'</b><span>'+esc(c.english)+' · '+esc(c.kind)+'</span></button>';}).join('')+'</div></section><details class="card"><summary>故事來源</summary><p>'+esc(DATA.jungle.sourceNote)+'</p><p>投屏圖及角色圖為 AI 生成教學插畫，非總會官方原圖；故事文字依總會《森林故事》內容（《香港童軍》月刊第158–170期版本）改寫，省略暴力細節。</p>'+extBtn(DATA.jungle.source,false,'幼童軍支部：森林故事','角色及情節核對來源')+'<p class="mut">文字內容不依賴外部圖片載入，可離線使用。</p></details>';}
+  view:function(){return '<section class="card"><a class="back" href="#book">‹ 手冊</a><h1>🌳 森林故事</h1><p>先認角色，再講故事，最後連回小隊生活。開「投屏講故事」就可以一路投影、一路講。</p><div class="template-grid">'+DATA.jungle.episodes.map(function(ep,i){return '<article class="template-card"><span class="eyebrow">'+esc(ep.refs.join('／'))+'</span><h3>'+esc(ep.title)+'</h3><p>'+esc((DATA.jungle.decks[ep.id]||{}).subtitle||'')+'</p><p class="mut" style="font-size:12px">'+ep.scenes.length+'段 · 每段一大張圖 · 領袖答案另收'+(Jungle.langsOf(ep.id).length?' · 🎧 旁白：'+Jungle.langsOf(ep.id).map(function(l){return l[1];}).join('／'):'')+'</p><div class="quick"><button class="btn gr" onclick="Jungle.show('+i+')">📺 投屏講故事</button><button class="btn" onclick="Jungle.open('+i+')">逐段閱讀</button><button class="btn" onclick="Jungle.printEpisode('+i+')">🖨️ 印文字</button></div></article>';}).join('')+'</div></section><section class="card"><h2>11位角色：認人與配對</h2><p class="mut">撳角色先睇介紹，再展開答案。哈蒂與戴白祺可作延伸，不硬放入每段故事。</p><p class="mut" style="font-size:11px">頭像為 AI 繪製教學示意，非童軍總會官方原圖；角色文字介紹以官方版本為準。</p><div class="template-grid">'+DATA.jungle.characters.map(function(c){return '<button class="btn character-card" onclick="Jungle.card(\''+c.id+'\')">'+(c.img?'<img src="'+c.img+'" alt="" loading="lazy" onerror="this.remove()">':'')+'<b>'+esc(c.name)+'</b><span>'+esc(c.english)+' · '+esc(c.kind)+'</span></button>';}).join('')+'</div></section><details class="card"><summary>故事來源</summary><p>'+esc(DATA.jungle.sourceNote)+'</p><p>投屏圖及角色圖為 AI 生成教學插畫，非總會官方原圖；故事文字依總會《森林故事》內容（《香港童軍》月刊第158–170期版本）改寫，省略暴力細節。</p>'+extBtn(DATA.jungle.source,false,'幼童軍支部：森林故事','角色及情節核對來源')+'<p class="mut">文字內容不依賴外部圖片載入，可離線使用。</p></details>';}
 };
 (function(){
   var route=App.route;
