@@ -32,31 +32,30 @@ DATA.jungle = {
       help:    {zh:[], en:[], yue:[]},
       rules:   {zh:[], en:[], yue:[]},
       fire:    {zh:[], en:[], yue:[]},
-      village: {zh:[], en:['assets/jungle/audio/village-en-1.mp3','assets/jungle/audio/village-en-2.mp3'], yue:[]}
+      village: {zh:[], en:[], yue:[]}
     }
   },
   pendingArt:[],
   /* 逐段旁白：scene 對應每段（唔計封面），null = 未錄，播放器會提示改用「整集連續播」。
      scenePending 記錄仲未錄完嘅集數／語言，補完之後由清單移除。 */
   sceneAudio: {
-    welcome: {yue:['assets/jungle/audio/scene/welcome-1-yue.mp3','assets/jungle/audio/scene/welcome-2-yue.mp3','assets/jungle/audio/scene/welcome-3-yue.mp3','assets/jungle/audio/scene/welcome-4-yue.mp3','assets/jungle/audio/scene/welcome-5-yue.mp3','assets/jungle/audio/scene/welcome-6-yue.mp3'],
-              zh:['assets/jungle/audio/scene/welcome-1-zh.mp3','assets/jungle/audio/scene/welcome-2-zh.mp3','assets/jungle/audio/scene/welcome-3-zh.mp3','assets/jungle/audio/scene/welcome-4-zh.mp3','assets/jungle/audio/scene/welcome-5-zh.mp3','assets/jungle/audio/scene/welcome-6-zh.mp3'], en:['assets/jungle/audio/scene/welcome-1-en.mp3','assets/jungle/audio/scene/welcome-2-en.mp3','assets/jungle/audio/scene/welcome-3-en.mp3','assets/jungle/audio/scene/welcome-4-en.mp3','assets/jungle/audio/scene/welcome-5-en.mp3','assets/jungle/audio/scene/welcome-6-en.mp3']},
-    help:    {yue:['assets/jungle/audio/scene/help-1-yue.mp3','assets/jungle/audio/scene/help-2-yue.mp3','assets/jungle/audio/scene/help-3-yue.mp3','assets/jungle/audio/scene/help-4-yue.mp3','assets/jungle/audio/scene/help-5-yue.mp3','assets/jungle/audio/scene/help-6-yue.mp3','assets/jungle/audio/scene/help-7-yue.mp3'],
-              zh:['assets/jungle/audio/scene/help-1-zh.mp3','assets/jungle/audio/scene/help-2-zh.mp3','assets/jungle/audio/scene/help-3-zh.mp3','assets/jungle/audio/scene/help-4-zh.mp3','assets/jungle/audio/scene/help-5-zh.mp3','assets/jungle/audio/scene/help-6-zh.mp3','assets/jungle/audio/scene/help-7-zh.mp3'], en:['assets/jungle/audio/scene/help-1-en.mp3','assets/jungle/audio/scene/help-2-en.mp3','assets/jungle/audio/scene/help-3-en.mp3','assets/jungle/audio/scene/help-4-en.mp3','assets/jungle/audio/scene/help-5-en.mp3','assets/jungle/audio/scene/help-6-en.mp3','assets/jungle/audio/scene/help-7-en.mp3']},
+    welcome: {yue:['assets/jungle/audio/scene/welcome-1-yue.mp3','assets/jungle/audio/scene/welcome-2-yue.mp3','assets/jungle/audio/scene/welcome-3-yue.mp3','assets/jungle/audio/scene/welcome-4-yue.mp3','assets/jungle/audio/scene/welcome-5-yue.mp3','assets/jungle/audio/scene/welcome-6-yue.mp3'], zh:['assets/jungle/audio/scene/welcome-1-zh.mp3','assets/jungle/audio/scene/welcome-2-zh.mp3','assets/jungle/audio/scene/welcome-3-zh.mp3','assets/jungle/audio/scene/welcome-4-zh.mp3','assets/jungle/audio/scene/welcome-5-zh.mp3','assets/jungle/audio/scene/welcome-6-zh.mp3'], en:['assets/jungle/audio/scene/welcome-1-en.mp3','assets/jungle/audio/scene/welcome-2-en.mp3','assets/jungle/audio/scene/welcome-3-en.mp3','assets/jungle/audio/scene/welcome-4-en.mp3','assets/jungle/audio/scene/welcome-5-en.mp3','assets/jungle/audio/scene/welcome-6-en.mp3']},
+    help:    {yue:['assets/jungle/audio/scene/help-1-yue.mp3','assets/jungle/audio/scene/help-2-yue.mp3','assets/jungle/audio/scene/help-3-yue.mp3','assets/jungle/audio/scene/help-4-yue.mp3','assets/jungle/audio/scene/help-5-yue.mp3','assets/jungle/audio/scene/help-6-yue.mp3','assets/jungle/audio/scene/help-7-yue.mp3'], zh:['assets/jungle/audio/scene/help-1-zh.mp3','assets/jungle/audio/scene/help-2-zh.mp3','assets/jungle/audio/scene/help-3-zh.mp3','assets/jungle/audio/scene/help-4-zh.mp3','assets/jungle/audio/scene/help-5-zh.mp3','assets/jungle/audio/scene/help-6-zh.mp3','assets/jungle/audio/scene/help-7-zh.mp3'], en:['assets/jungle/audio/scene/help-1-en.mp3','assets/jungle/audio/scene/help-2-en.mp3','assets/jungle/audio/scene/help-3-en.mp3','assets/jungle/audio/scene/help-4-en.mp3','assets/jungle/audio/scene/help-5-en.mp3','assets/jungle/audio/scene/help-6-en.mp3','assets/jungle/audio/scene/help-7-en.mp3']},
     rules:   {yue:['assets/jungle/audio/scene/rules-1-yue.mp3','assets/jungle/audio/scene/rules-2-yue.mp3','assets/jungle/audio/scene/rules-3-yue.mp3','assets/jungle/audio/scene/rules-4-yue.mp3'], zh:['assets/jungle/audio/scene/rules-1-zh.mp3','assets/jungle/audio/scene/rules-2-zh.mp3','assets/jungle/audio/scene/rules-3-zh.mp3','assets/jungle/audio/scene/rules-4-zh.mp3'], en:['assets/jungle/audio/scene/rules-1-en.mp3','assets/jungle/audio/scene/rules-2-en.mp3','assets/jungle/audio/scene/rules-3-en.mp3','assets/jungle/audio/scene/rules-4-en.mp3']},
     fire:    {yue:['assets/jungle/audio/scene/fire-1-yue.mp3','assets/jungle/audio/scene/fire-2-yue.mp3','assets/jungle/audio/scene/fire-3-yue.mp3','assets/jungle/audio/scene/fire-4-yue.mp3','assets/jungle/audio/scene/fire-5-yue.mp3'], zh:['assets/jungle/audio/scene/fire-1-zh.mp3','assets/jungle/audio/scene/fire-2-zh.mp3','assets/jungle/audio/scene/fire-3-zh.mp3','assets/jungle/audio/scene/fire-4-zh.mp3','assets/jungle/audio/scene/fire-5-zh.mp3'], en:['assets/jungle/audio/scene/fire-1-en.mp3','assets/jungle/audio/scene/fire-2-en.mp3','assets/jungle/audio/scene/fire-3-en.mp3','assets/jungle/audio/scene/fire-4-en.mp3','assets/jungle/audio/scene/fire-5-en.mp3']},
-    village: {yue:['assets/jungle/audio/scene/village-1-yue.mp3','assets/jungle/audio/scene/village-2-yue.mp3','assets/jungle/audio/scene/village-3-yue.mp3','assets/jungle/audio/scene/village-4-yue.mp3','assets/jungle/audio/scene/village-5-yue.mp3'], zh:['assets/jungle/audio/scene/village-1-zh.mp3','assets/jungle/audio/scene/village-2-zh.mp3','assets/jungle/audio/scene/village-3-zh.mp3','assets/jungle/audio/scene/village-4-zh.mp3','assets/jungle/audio/scene/village-5-zh.mp3'], en:['assets/jungle/audio/scene/village-1-en.mp3','assets/jungle/audio/scene/village-2-en.mp3','assets/jungle/audio/scene/village-3-en.mp3','assets/jungle/audio/scene/village-4-en.mp3',null]},
+    village: {yue:['assets/jungle/audio/scene/village-1-yue.mp3','assets/jungle/audio/scene/village-2-yue.mp3','assets/jungle/audio/scene/village-3-yue.mp3','assets/jungle/audio/scene/village-4-yue.mp3','assets/jungle/audio/scene/village-5-yue.mp3'], zh:['assets/jungle/audio/scene/village-1-zh.mp3','assets/jungle/audio/scene/village-2-zh.mp3','assets/jungle/audio/scene/village-3-zh.mp3','assets/jungle/audio/scene/village-4-zh.mp3','assets/jungle/audio/scene/village-5-zh.mp3'], en:['assets/jungle/audio/scene/village-1-en.mp3','assets/jungle/audio/scene/village-2-en.mp3','assets/jungle/audio/scene/village-3-en.mp3','assets/jungle/audio/scene/village-4-en.mp3','assets/jungle/audio/scene/village-5-en.mp3']}
   },
-  /* 粵語 27 段全部完成；普通話、英文逐段繼續補。 */
-  scenePending: ['village:en'],
+  scenePending: [],
+  /* 環境音：原創程序合成（tools/make-ambience.mjs），播放器只用細音量墊底 */
+  ambience: {night:'assets/jungle/ambience/jungle-night.mp3', day:'assets/jungle/ambience/jungle-day.mp3', leaves:'assets/jungle/ambience/leaves.mp3', fire:'assets/jungle/ambience/fire-crackle.mp3'},
   /* 環境音：原創程序合成（tools/make-ambience.mjs），細音量墊底，唔會蓋過人聲。 */
   ambience: {night:'assets/jungle/ambience/jungle-night.mp3', day:'assets/jungle/ambience/jungle-day.mp3', leaves:'assets/jungle/ambience/leaves.mp3', fire:'assets/jungle/ambience/fire-crackle.mp3'},
   decks: {
     welcome: {cover:'jungle-wolf-carry', amb:'night', subtitle:'狼家庭收留一個小人兒，狼群大會上有人為他說話。'},
     help:    {cover:'jungle-water-snake', amb:'day', subtitle:'白勞教森林規律：先觀察、先問，遇事識得求助。'},
     rules:   {cover:'jungle-forest-rules', amb:'day', subtitle:'森林規律唔係禁令，而係同人相處嘅方法。'},
-    fire:    {cover:'jungle-red-flower', amb:'fire', subtitle:'一枝紅花、一場特別集會，毛吉利要保護亞基拿。'},
-    village: {cover:'jungle-carry-on', amb:'day', subtitle:'回到人類村莊，毛吉利帶住學過嘅事繼續向前。'}
+    fire:    {cover:'jungle-red-flower', amb:'night', subtitle:'一枝紅花、一場特別集會，毛吉利要保護亞基拿。'},
+    village: {cover:'jungle-carry-on', amb:'leaves', subtitle:'回到人類村莊，毛吉利帶住學過嘅事繼續向前。'}
   },
   episodes: [
     {id:'welcome',title:'毛吉利加入狼群',refs:['會員章 e(i)','會員章 e(ii)'],characters:['mowgli','raksha','akela','baloo','bagheera','sherekhan'],scenes:[

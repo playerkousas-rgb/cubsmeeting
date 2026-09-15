@@ -134,8 +134,8 @@ for(const ep of DATA.jungle.episodes){
 }
 assert(narrFiles.length>=5,'起碼有幾段旁白（實際 '+narrFiles.length+'）');
 assert(ctx.Jungle.langsOf('help').some(l=>l[0]==='zh'),'普通話旁白要覆蓋第二集');
-assert(ctx.Jungle.playlist('village','en').files.length===2,'未錄齊嘅英文集可以分幾段順住播');
-assert(ctx.Jungle.playlist('fire','en').chained===true,'英文錄齊嘅集要改用逐段接播');
+assert(ctx.Jungle.playlist('fire','en').chained===true,'整集模式要用逐段檔案接播（唔會重複錄一套成集聲）');
+assert.equal(ctx.Jungle.playlist('village','en').files.length,5,'第五集英文整集＝5 段接播');
 /* 2026-09-15 第二輪：普通話＋英文補齊五集；粵語第一集試聽，並標明語氣限制。 */
 assert.deepEqual===undefined||true;
 assert.equal(JSON.stringify(Object.keys(narr.files).sort()),JSON.stringify(['fire','help','rules','village','welcome']),'五集都有旁白資料');
@@ -174,14 +174,14 @@ ctx.Jungle.show(0);
 ctx.Jungle.audio.mode='episode';
 ctx.Jungle.show(4);
 ctx.Jungle.playNarration('en');
-assert(played.length===1&&played[0].includes('village-en-1.mp3'),'整集模式：未錄齊嘅集由成集第一段開始播');
+assert(played.length===1&&played[0].includes('scene/village-1-en.mp3'),'整集模式：由第一段開始播');
 assert(ctx.Jungle.audio.playing,'播放狀態要開');
 const slideAtStart=ctx.Jungle.stageState.slide;
 ctx.Jungle.narrationEnded();
-assert(played.length===2&&played[1].includes('village-en-2.mp3'),'整集模式：第一段完自動接第二段');
+assert(played.length===2&&played[1].includes('scene/village-2-en.mp3'),'整集模式：第一段完自動接第二段');
 assert(ctx.Jungle.stageState.slide===slideAtStart,'整集模式唔會自動跳圖');
-ctx.Jungle.narrationEnded();
-assert(!ctx.Jungle.audio.playing,'整集播完停低');
+for(let k=0;k<4;k++)ctx.Jungle.narrationEnded();
+assert(!ctx.Jungle.audio.playing,'整集播到第五段就會停低');
 ctx.Jungle.show(0);ctx.Jungle.playNarration('zh');
 assert(played[played.length-1].includes('scene/welcome-1-zh.mp3'),'整集模式：普通話逐段齊，會接住播');
 ctx.Jungle.show(0);ctx.Jungle.playNarration('en');
@@ -212,11 +212,11 @@ ctx.Jungle.toggleAuto();
 
 /* 3. 逐段未錄嘅集數：唔會亂跳，會提示改用整集 */
 ctx.Jungle.show(4);
-assert.equal(ctx.Jungle.sceneFile('village','en',5),'','第五集英文最後一段未錄');
+assert(ctx.Jungle.sceneFile('village','en',5).includes('village-5-en.mp3'),'第五集最後一段英文已錄');
 assert(ctx.Jungle.sceneFile('village','yue',5).includes('village-5-yue.mp3'),'第五集最後一段粵語已錄');
 assert(ctx.Jungle.sceneFile('fire','zh',4).includes('fire-4-zh.mp3'),'第四集第四段普通話已錄');
 assert(ctx.Jungle.sceneFile('village','zh',1).includes('village-1-zh.mp3'),'第五集第一段普通話已錄');
-assert.equal(ctx.Jungle.sceneFile('village','en',5),'','第五集英文仲有一段落未錄');
+assert.equal(ctx.Jungle.sceneFile('welcome','en',9),'','超出段數唔會亂回檔案');
 assert(!ctx.Jungle.sceneDone('welcome','yue')===false,'第一集粵語逐段已錄完');
 assert(ctx.Jungle.sceneDone('help','yue')===true,'第二集粵語逐段已錄完');
 assert(ctx.Jungle.sceneDone('rules','yue')===true,'第三集粵語逐段已錄完');
@@ -227,19 +227,19 @@ assert(ctx.Jungle.sceneDone('welcome','en')===true,'第一集英文逐段已錄�
 assert(ctx.Jungle.sceneDone('help','en')===true,'第二集英文逐段已錄完');
 assert(ctx.Jungle.sceneDone('rules','en')===true,'第三集英文逐段已錄完');
 assert(ctx.Jungle.sceneDone('fire','en')===true,'第四集英文逐段已錄完');
-assert(ctx.Jungle.sceneDone('village','en')===false,'第五集英文逐段仲差一段');
+assert(ctx.Jungle.sceneDone('village','en')===true,'第五集英文逐段已錄完（英文全套完成）');
 assert(ctx.Jungle.sceneDone('help','zh')===true,'第二集普通話逐段已錄完');
 assert(ctx.Jungle.sceneDone('rules','zh')===true,'第三集普通話逐段已錄完');
 assert(ctx.Jungle.sceneDone('fire','zh')===true,'第四集普通話逐段已錄完');
 assert(ctx.Jungle.sceneDone('village','zh')===true,'第五集普通話逐段已錄完（普通話全套完成）');
 
-/* 未錄嘅段落（第五集最後一段英文）唔會亂播；有錄嘅就照播返本集。 */
-ctx.Jungle.stageMove(5);
+/* 封面（冇逐段聲）同超出段數都唔會亂播其他音檔。 */
+ctx.Jungle.show(4);
 const before=played.length;
-ctx.Jungle.playNarration('en');
-assert(played.length===before,'未錄嘅段落唔會亂播其他音檔');
-assert(ctx.document.getElementById('story-audio-note').textContent.includes('未有逐段旁白'),'未錄段落要出提示');
-assert(!ctx.document.getElementById('story-audio-state').textContent.includes('未有逐段旁白'),'提示唔應該被狀態文字蓋過');
+ctx.Jungle.audio.mode='scene';
+ctx.Jungle.playCurrent(false);
+assert(ctx.Jungle.stageState.slide===1,'封面撳播會先跳去第一段（封面本身冇聲）');
+assert(played.length===before+1&&played[played.length-1].includes('scene/village-1-'),'封面撳播會播第一段嗰句');
 ctx.Jungle.show(4);
 ctx.Jungle.playNarration('zh');
 assert(played[played.length-1].includes('scene/village-1-zh.mp3'),'第五集普通話有第一段就播返第五集');
@@ -265,9 +265,10 @@ ctx.Jungle.setAmbVol('100');
 assert(ctx.Jungle.audio.ambVol<=0.4,'環境音最大音量要壓住，唔可以蓋過人聲');
 assert(ambVol===null||true,'音量設定唔會拋錯');
 ctx.Jungle.toggleAmb();
-assert(ctx.Jungle.audio.amb===false&&ambPaused>=1,'可以熄環境音');
+assert(ctx.Jungle.audio.amb===false&&ctx.Jungle.ambStopping===true,'可以熄環境音（會有短促淡出再停）');
+assert(JSON.parse(mem.cub_storyPrefs).amb===false,'環境音開關要記住');
 ctx.Jungle.toggleAmb();
-assert(ctx.Jungle.audio.amb===true&&ambPlayed>=1,'可以再開環境音');
+assert(ctx.Jungle.audio.amb===true&&ambPlayed>=1&&ctx.Jungle.ambStopping===false,'可以再開環境音');
 assert(JSON.parse(mem.cub_storyPrefs).amb===true,'環境音喜好要記住');
 
 /* 5. 收幕／暫停要停晒兩層聲 */
@@ -294,11 +295,15 @@ assert(ctx.Jungle.mmss(75)==='1:15','時間顯示格式');
     }
   }
   function scenesFilledPartial(id,code){const arr=(sa[id]||{})[code]||[];return arr.some(Boolean)&&!arr.every(Boolean);}
-  assert(filled>=80,'起碼有 80 段逐段旁白（實際 '+filled+'）');
+  assert.equal(filled,81,'逐段旁白要 81 段（5 集 × 27 段 × 3 語言；實際 '+filled+'）');
+  assert.equal(DATA.jungle.scenePending.length,0,'唔應該再有未錄嘅逐段旁白');
+  for(const ep of DATA.jungle.episodes)for(const code of ['yue','zh','en'])
+    assert(ctx.Jungle.sceneDone(ep.id,code),'三語逐段要全部完成：'+ep.id+'/'+code);
   for(const ep of DATA.jungle.episodes){assert(ctx.Jungle.sceneDone(ep.id,'zh'),'普通話逐段要全套完成：'+ep.id);assert(ctx.Jungle.sceneDone(ep.id,'yue'),'粵語逐段要全套完成：'+ep.id);}
   assert.equal(Object.values(sa).reduce((n,b)=>n+(b.yue||[]).filter(Boolean).length,0),27,'粵語逐段共 27 段');
   assert.equal(Object.values(sa).reduce((n,b)=>n+(b.zh||[]).filter(Boolean).length,0),27,'普通話逐段共 27 段');
-  assert.equal(Object.values(sa).reduce((n,b)=>n+(b.en||[]).filter(Boolean).length,0),26,'英文逐段 26 段');
+  assert.equal(Object.values(sa).reduce((n,b)=>n+(b.yue||[]).filter(Boolean).length,0),27,'粵語逐段共 27 段');
+  assert.equal(Object.values(sa).reduce((n,b)=>n+(b.en||[]).filter(Boolean).length,0),27,'英文逐段 27 段');
 
   for(const ep of DATA.jungle.episodes){
     assert(ctx.Jungle.sceneDone(ep.id,'yue'),'粵語逐段要全套完成：'+ep.id);
@@ -306,7 +311,7 @@ assert(ctx.Jungle.mmss(75)==='1:15','時間顯示格式');
     assert(yue.length===ep.scenes.length,'粵語逐段數量要等於段數：'+ep.id);
     assert(yue.every(Boolean),'粵語逐段唔應該有空格：'+ep.id);
   }
-  assert.equal(ctx.Jungle.sceneFile('village','en',5),'','未錄嘅段落回空');
+  assert.equal(ctx.Jungle.sceneFile('village','en',6),'','超出段數要回空');
   assert.equal(ctx.Jungle.sceneFile('welcome','yue',0),'','封面冇逐段聲');
   assert.equal(ctx.Jungle.sceneFile('welcome','yue',7),'','超出段數唔會亂回檔案');
   assert(ctx.Jungle.sceneFile('welcome','zh',4).includes('welcome-4-zh.mp3'),'普通話逐段有檔案');
@@ -323,6 +328,17 @@ assert(ctx.Jungle.mmss(75)==='1:15','時間顯示格式');
     assert(fs.statSync(path.join(root,amb[k])).size<120*1024,'環境音要細過 120KB：'+amb[k]);
   }
   for(const ep of DATA.jungle.episodes)for(const sc of ep.scenes)assert(['night','day','leaves','fire'].includes(sc.amb),'每段要有環境音標籤：'+sc.title);
+  { /* 環境音跟段落轉：唔同段落要對得住唔同聲 */
+    ctx.Jungle.show(0);assert(ctx.Jungle.slideAmb()==='night'&&ctx.Jungle.ambName().includes('夜'),'封面／森林晚上用夜聲');
+    ctx.Jungle.show(3);assert(ctx.Jungle.slideAmb()==='night','第四集封面（森林夜景）用夜聲');
+    ctx.Jungle.stageMove(1);assert(ctx.Jungle.slideAmb()==='night','狼群分歧＝夜聲');
+    ctx.Jungle.stageMove(1);assert(ctx.Jungle.slideAmb()==='fire'&&ctx.Jungle.ambName().includes('營火'),'紅花是火＝營火聲');
+    ctx.Jungle.show(1);ctx.Jungle.stageMove(5);assert(ctx.Jungle.slideAmb()==='leaves','被猴群帶走＝落葉聲');
+ctx.Jungle.show(1);ctx.Jungle.stageMove(3);assert(ctx.Jungle.slideAmb()==='day','湖邊的水蛇＝日間聲');
+    ctx.Jungle.show(0);ctx.Jungle.stageMove(2);assert(ctx.Jungle.slideAmb()==='leaves','洞口小人兒＝落葉／腳步聲');
+    ctx.Jungle.show(4);assert(ctx.Jungle.slideAmb()==='leaves','第五集封面（草原小路）用落葉聲');
+    ctx.Jungle.show(4);ctx.Jungle.stageMove(1);assert(ctx.Jungle.slideAmb()==='day','美修娃＝日間聲');
+  }
   assert(['night','day','leaves','fire'].includes((DATA.jungle.decks[ep0()]||{}).amb||'day'),'封面要有環境音標籤');
   function ep0(){return DATA.jungle.episodes[0].id;}
 }
@@ -336,7 +352,7 @@ assert(ctx.Jungle.mmss(75)==='1:15','時間顯示格式');
   assert(output.includes('amb-lab-vol'),'試聽面板要有音量拉桿');
   assert(output.includes('逐段旁白覆蓋'),'試聽面板要顯示逐段覆蓋率');
   assert(ctx.Jungle.sceneCoverage().includes('粵 27/27')&&ctx.Jungle.sceneCoverage().includes('普 27/27'),'覆蓋率要計得準（粵、普全套）');
-  assert(ctx.Jungle.sceneCoverage().includes('EN 26/27'),'英文覆蓋率要顯示 EN 26/27');
+  assert(ctx.Jungle.sceneCoverage().includes('EN 27/27'),'英文覆蓋率要顯示 EN 27/27');
   assert(output.includes('story-lab')&&output.includes('story-lab-amb'),'試聽面板要有兩個播放器（旁白／環境音）');
   ctx.Jungle.labNarr(0,'yue');
   const lab=ctx.document.getElementById('story-lab');
@@ -380,9 +396,16 @@ assert(ctx.Jungle.mmss(75)==='1:15','時間顯示格式');
   ctx.Jungle.narrationEnded();
   assert(ctx.Jungle.stageState.slide===slide0,'接播唔會跳圖');
   assert(played[played.length-1].includes('scene/welcome-2-zh.mp3'),'接播會順住第二段');
-  /* (d) 未錄齊嘅語言照用成集聲 */
+  /* (d) 全部語言都用逐段檔案接播，冇任何重複成集錄音 */
   ctx.Jungle.show(4);ctx.Jungle.playNarration('en');
-  assert(played[played.length-1].includes('village-en-1.mp3'),'未錄齊嘅語言照樣播成集聲');
+  assert(played[played.length-1].includes('scene/village-1-en.mp3'),'第五集英文都由逐段接播');
+  for(const ep of DATA.jungle.episodes){
+    for(const code of ['zh','en','yue']){
+      assert.equal((narr.files[ep.id][code]||[]).length,0,'唔應該再留成集錄音：'+ep.id+'/'+code);
+      const pl2=ctx.Jungle.playlist(ep.id,code);
+      assert(pl2.chained&&pl2.files.length===ep.scenes.length,'整集模式要逐段接播：'+ep.id+'/'+code);
+    }
+  }
   ctx.Jungle.toggleMode();ctx.Jungle.show(0);
   /* (e) 體積上限 */
   let audioBytes=0;for(const f of onDisk)audioBytes+=fsx.statSync(pathx.join(root,f)).size;
