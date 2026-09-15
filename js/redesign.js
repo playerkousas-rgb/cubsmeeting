@@ -266,13 +266,7 @@
       library += '</div></details>';
     });
     library += '</div>';
-    /* 按集會快速跳轉：畀想直接跟集會走嘅領袖 */
-    var quickJump = '<details class="material-by-meeting"><summary>📅 按集會找工作紙（'+DATA.meetings.length+'場）</summary><div class="meeting-grid">';
-    DATA.meetings.forEach(function(m,i){
-      quickJump += '<button class="meeting-jump" onclick="PackPrint.open(\'sheet\',\''+m.tid+'\')"><span class="jno">'+String(i+1).padStart(2,'0')+'</span><b>'+esc(m.n)+'</b><small>'+esc(m.badge)+'</small></button>';
-    });
-    quickJump += '</div></details>';
-    return '<section class="card"><a class="back" href="#plan">‹ 返回目錄</a><h2>✂️ 素材庫＋歌曲</h2><p class="mut">領袖搵素材嘅地方：揀你想做咩，搵合適嘅工作紙同教材。逐張預覽及列印，唔使跟集會編號。</p><div class="subtabs compact-tabs"><button class="subtab cur" onclick="App.showMiniTab(this,\'library\')">✂️ 素材庫</button><button class="subtab" onclick="App.showMiniTab(this,\'songs\')">🎵 歌曲</button></div><div id="mini-library" class="mini-pane">'+quickJump+library+'</div><div id="mini-songs" class="hidden mini-pane">'+songs+'</div></section>';
+    return '<section class="card"><a class="back" href="#plan">‹ 返回目錄</a><h2>✂️ 素材庫＋歌曲</h2><p class="mut">領袖搵素材嘅地方：揀你想做咩，搵合適嘅工作紙同教材。逐張預覽及列印，唔使跟集會編號。</p><div class="subtabs compact-tabs"><button class="subtab cur" onclick="App.showMiniTab(this,\'library\')">✂️ 素材庫</button><button class="subtab" onclick="App.showMiniTab(this,\'songs\')">🎵 歌曲</button></div><div id="mini-library" class="mini-pane">'+library+'</div><div id="mini-songs" class="hidden mini-pane">'+songs+'</div></section>';
   };
   App.showMiniTab = function(btn, key){
     var root=btn.closest('.card'); if(!root)return;
