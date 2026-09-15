@@ -54,7 +54,7 @@
     Modal.open('<h3>🖨️ '+esc(m.n)+'</h3><p class="mut">A4直向，預覽後列印；取消列印不會自動標完成。</p><div class="quick"><button class="btn gr" onclick="PackPrint.doit()">列印</button><button class="btn" onclick="PackPrint.confirmDone()">我已印好今場教材</button></div><div id="printarea">'+html+'</div>');
     document.body.classList.add('print-pack');
   };
-  PackPrint.doit=function(){window.print();};
+  PackPrint.doit=function(){return PrintScope.print();};
   PackPrint.confirmDone=function(){if(PackPrint.activeTid===curTid()){Flow.mark('print');toast('✓ 已記低今場教材印好');}else toast('呢張唔屬於今場，準備進度保持不變');};
   // Skill cards stay grounded in authored steps, not keyword-generated medical/ritual advice.
   var render=Lead.render;

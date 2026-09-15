@@ -1,6 +1,6 @@
 /* Illustrated salute lesson: no personal assessment or automatic awards. */
 var SaluteLab = {
- image:'assets/teaching/right-hand-salute.jpg',
+ image:'assets/teaching/right-hand-salute.avif',
  reader:{index:0,reveal:false},
  questions:[
   {q:'正式宣誓或覆誓，領袖請大家作宣誓手號。用哪一種禮？手在哪裏？',a:'半禮：用右手三指手號，手在肩膊高度、手指向上。半禮只用於宣誓或覆誓。'},

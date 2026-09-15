@@ -27,12 +27,12 @@ d.DATA.meetings.forEach((m) => {
   const sum = m.segs.reduce((a, s) => a + (s.m || 0), 0);
   ok(sum === m.mins, `${m.tid} 時間加總 ${sum}=${m.mins} ${sum === m.mins ? "啱" : "錯"}`);
 });
-/* 3. 每個活動有圖有口令 */
+/* 3. 每個活動有表示圖示與口令；icon／placeholder 不算步驟圖（真圖覆蓋由 browser-app-review 檢查）。 */
 d.DATA.meetings.forEach((m) => {
   m.segs.forEach((s) => {
     const hasImg = !!(s.svg || s.ic);
     const hasSay = !!(s.script && s.script.length >= 4);
-    ok(hasImg && hasSay, `${m.tid}「${s.n}」有圖(${hasImg})有口令(${hasSay})`);
+    ok(hasImg && hasSay, `${m.tid}「${s.n}」有表示圖示(${hasImg}，不等於步驟圖)有口令(${hasSay})`);
     ok(!!(s.rhythm && s.rhythm.length >= 4), `${m.tid}「${s.n}」有節奏`);
     ok(!!(s.safety && s.safety.length >= 4), `${m.tid}「${s.n}」有安全提示`);
   });

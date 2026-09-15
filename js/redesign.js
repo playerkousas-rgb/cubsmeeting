@@ -38,7 +38,7 @@
     {id:'print', icon:'✂️', title:'工作紙＋歌曲', desc:'小分頁·即印即用', color:'#FF6F00', img:'assets/manual/craft.avif', hint:'合併'},
     {id:'play', icon:'🎮', title:'活動', desc:'遊戲·技能·帶領卡', color:'#1565C0', img:'assets/manual/games.avif', hint:'即開即用'},
     {id:'badge', icon:'🏅', title:'活動章', desc:'分類·內容·考核建議', color:'#6A1B9A', img:'assets/manual/songs.avif', hint:'逐章查看'},
-    {id:'jungle', icon:'🌳', title:'森林故事', desc:'11角色·2故事·逐段帶', color:'#2E7D32', img:'', hint:'可直接播放'},
+    {id:'jungle', icon:'🌳', title:'森林故事', desc:'11角色·5故事·逐段帶', color:'#2E7D32', img:'', hint:'逐段閱讀'},
     {id:'tools', icon:'🎲', title:'快鍵', desc:'安靜·集合·計分·倒數', color:'#4E342E', img:'assets/manual/safety.avif', hint:'必備'}
   ];
 
@@ -88,6 +88,15 @@
     return base;
   };
 
+  App.handbookImage = function(id,alt){
+    return '<figure class="handbook-figure"><img src="assets/manual/details/'+id+'.avif" alt="'+esc(alt)+'" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><figcaption hidden>圖片未能載入，請按下方文字帶領。</figcaption></figure>';
+  };
+  App.clearLocal = function(){
+    if(!confirm('清除本APP的集會與準備記錄？此動作不能復原。'))return;
+    Object.keys(localStorage).filter(function(k){return k.indexOf('cub_')===0;}).forEach(function(k){localStorage.removeItem(k);});
+    location.reload();
+  };
+
   App.vBook = function(){
     var subs = [
       {id:'core',label:'誓詞·規律'},
@@ -102,29 +111,24 @@
     var cur = (location.hash.split('sub=')[1]||'core').split('&')[0];
     var badgeUrl = (typeof EXTERNAL !== "undefined") ? EXTERNAL.badge : "https://cubsbadge.vercel.app/";
     var circUrl = (typeof EXTERNAL !== "undefined") ? EXTERNAL.circulars : "https://scout-circulars.vercel.app/";
-    var origHtml = '';
-    try { if(typeof oldBook==='function') origHtml = oldBook(); } catch(e){ origHtml=''; }
     function tabContent(){
       if(cur==='core'){
-        /* 預設顯示完整手冊核心：誓詞、規律、銘言、團呼、小隊制、禮儀，加獎章路線及物資庫 */
-        return (origHtml ? origHtml : '<div class="info-section"><h3>🤝 誓詞</h3><p style="font-size:14px;line-height:2">'+DATA.facts.promise.map(esc).join('<br>')+'</p><h3>📏 規律</h3><p>'+esc(DATA.facts.law)+'</p><h3>💪 銘言</h3><p>'+esc(DATA.facts.motto)+'</p></div>');
+        var hc=Store.get('headcount',24);
+        return '<div class="info-section"><h3>🤝 誓詞</h3><p>'+DATA.facts.promise.map(esc).join('<br>')+'</p><h3>📏 規律</h3><p>'+esc(DATA.facts.law)+'</p><h3>💪 銘言</h3><p>'+esc(DATA.facts.motto)+'</p><p class="mut">正式原文不縮寫；團呼／大聲呼叫請用上方分頁。</p></div>'+
+          '<details class="handbook-more"><summary>獎章路線與適用綱要</summary><p>'+esc(DATA.badges.map(function(b){return b.n;}).join(' → '))+'</p><p>完成活動不等於獲章；個人考驗按適用綱要確認。</p>'+extBtn(DATA.source.url,false,'查看訓練綱要','正式要求以適用版本為準')+'</details>'+
+          '<details class="handbook-more"><summary>物資庫：按人數計算</summary><label>人數 <input type="range" min="6" max="48" value="'+hc+'" oninput="App.setHC(this.value)"> <b id="hcN">'+hc+'</b> 人</label><ul id="matlist">'+App.matList(hc)+'</ul><button class="btn" onclick="Bag.open()">只看今場執袋清單</button></details>'+
+          '<details class="handbook-more"><summary>相關APP與本機設定</summary>'+extBtn(badgeUrl,false,'進度追蹤APP','個人獎章記錄')+extBtn(circUrl,false,'通告圖書館','查通告與活動')+'<p>記錄保存在這部裝置；離線仍可用教材。</p><button class="btn" onclick="App.clearLocal()">清除本APP本機記錄</button></details>';
       }
-      if(cur==='six') return '<div class="info-section"><h3>🌈 六色分工</h3><div style="border-radius:10px;overflow:hidden;max-height:150px;margin-bottom:8px"><img src="assets/manual/details/six-colors.avif" style="width:100%;height:auto" onerror="this.parentElement.style.display=\'none\'"></div><p style="font-size:13px;line-height:1.8">棕·紅·黃·綠·藍·白，每色一隊，隊長帶頭，唔係靠嗌大聲。隊長=服務，唔係管人。</p></div>';
-      if(cur==='roles') return '<div class="info-section"><h3>👥 領袖4角色</h3><div style="border-radius:10px;overflow:hidden;max-height:150px;margin-bottom:8px"><img src="assets/manual/details/leader-roles.avif" style="width:100%;height:auto" onerror="this.parentElement.style.display=\'none\'"></div><p style="font-size:13px;line-height:1.8">Akela(總領袖)·Baloo(活動)·Bagheera(技能)·Kaa(安全)。4人輪流，唔使一個做晒。</p></div>';
-      if(cur==='sixer') return '<div class="info-section"><h3>⭐ 隊長訓練卡</h3><div style="border-radius:10px;overflow:hidden;max-height:150px;margin-bottom:8px"><img src="assets/manual/details/sixer-training.avif" style="width:100%;height:auto" onerror="this.parentElement.style.display=\'none\'"></div><p style="font-size:13px;line-height:1.8">大童教細童，3步：示範→陪做→放手。隊長任務卡：點名、帶遊戲、執拾，唔係罰人。</p></div>';
-      if(cur==='calls') return '<div class="info-section"><h3>🐺 團呼手號</h3><div style="border-radius:10px;overflow:hidden;max-height:150px;margin-bottom:8px"><img src="assets/manual/details/pack-call-hands.avif" style="width:100%;height:auto" onerror="this.parentElement.style.display=\'none\'"></div><p style="font-size:13px;line-height:1.8">雙手放頭做狼耳，Pack Pack Pack，Akela we\'ll do our best! 手勢簡單，唔使跳。</p></div>';
-      if(cur==='uniform'){
-        return '<div class="info-section"><h3>👕 制服（無肩章）</h3><p style="font-size:12px;line-height:2">左胸袋中：會員章/和平使者章<br>左胸袋上：L1-L5進度章<br>右袖：活動章<br>左袖上：急救章<br><b>無肩章</b>（幼童軍無肩章，小隊色用隊旗/隊牌展示）</p><div class="btns"><button class="btn sm" onclick="Uniform.open()">開制服教學包</button><button class="btn sm ghost" onclick="FieldVisuals.reference()">官方款式圖</button></div></div>';
-      }
-      if(cur==='ceremony'){
-        return '<div class="info-section"><h3>🎪 儀式禮儀（3指敬禮）</h3><div style="border-radius:10px;overflow:hidden;max-height:150px;margin-bottom:8px"><img src="assets/manual/details/flag-steps.avif" style="width:100%;height:auto" onerror="this.style.display=\'none\'"></div><p style="font-size:12px;line-height:2">旗禮5步：立正→旗手出旗→3指敬禮→禮畢→團呼<br>宣誓5步：企旗前半禮→問→答→頒章→歡呼<br>敬禮：童軍幼童軍都用3指，拇指按小指，代表3條誓詞。</p><div class="btns"><button class="btn sm" onclick="Ceremony.open(\'howl\')">開團呼逐步卡</button><button class="btn sm ghost" onclick="Ceremony.open(\'commands\')">六個口令</button></div></div>';
-      }
-      if(cur==='apps'){
-        return '<div class="info-section"><h3>🔗 相關APP / 物資庫 / 大聲呼叫</h3><p style="font-size:13px;line-height:1.8">相關APP：一站式獎章追蹤、物資庫（集會物資清單、借用）、大聲呼叫（集合用語、安靜訊號）。</p><div class="btns" style="margin-top:8px">'+extBtn(badgeUrl,false,'🏅 進度追蹤APP','vercel.app')+extBtn(circUrl,false,'📨 通告圖書館','vercel.app')+'<a class="extcard" href="https://cubsbadge.vercel.app/" target="_blank" rel="noopener"><div class="exleft"><div class="extitle">🏅 cubsbadge 物資庫</div><div class="exnote">vercel.app · 物資庫</div></div><div class="extgo">↗</div></a><a class="extcard" href="https://scout-circulars.vercel.app/" target="_blank" rel="noopener"><div class="exleft"><div class="extitle">📨 scout-circulars 大聲呼叫</div><div class="exnote">vercel.app · 大聲呼叫</div></div><div class="extgo">↗</div></a></div></div>';
-      }
-      return '<div class="info-section"><h3>📖 手冊總覽</h3><p class="mut">制服、儀式、六色、領袖角色、隊長訓練、團呼，全部喺呢度。</p></div>';
+      if(cur==='six') return '<div class="info-section"><h3>🌈 六色小隊</h3>'+App.handbookImage('six-colors','六色小隊的教學插畫；不是制服或徽章位置圖')+'<p>'+esc(DATA.facts.six)+'</p><p class="mut">插畫只用來認顏色，不代表制服款式或必須六隊。</p></div>';
+      if(cur==='roles') return '<div class="info-section"><h3>👥 領袖分工</h3>'+App.handbookImage('leader-roles','設計體驗、安全守護、價值引導、放手嘗試四項教學分工')+'<p>先分好四件事：帶活動、示範、照顧安全、觀察支援。</p><p class="mut">這是教學分工建議；由負責領袖按人手安排，不把森林角色名字當成固定職務。</p></div>';
+      if(cur==='sixer') return '<div class="info-section"><h3>⭐ 隊長帶新隊員</h3>'+App.handbookImage('sixer-training','隊長示範和陪伴新隊員的教學插畫')+'<ol><li>先示範。</li><li>陪他做一次。</li><li>放手讓他試。</li></ol><p>隊長幫忙，不責罵、不代做；安全由成人負責。</p></div>';
+      if(cur==='calls') return '<div class="info-section"><h3>🐺 團呼：先看隊形</h3>'+FieldVisuals.formationSVG()+'<p>先定位，再按已核的團呼逐步卡排練；不使用舊「狼耳」手號圖。</p><div class="quick"><button class="btn" onclick="Ceremony.open(\'howl\')">開團呼逐步卡</button><button class="btn" onclick="FieldVisuals.formation()">隊形與安全安排</button></div></div>';
+      if(cur==='uniform') return '<div class="info-section"><h3>👕 制服：先看款式</h3>'+FieldVisuals.referenceHTML()+'<p>左右以穿著者為準。位置請用已核的六區圖，不沿用舊 L1–L5 位置簡表。</p><div class="quick"><button class="btn" onclick="Uniform.open()">開制服教學包</button><button class="btn" onclick="FieldVisuals.reference()">官方款式圖</button></div></div>';
+      if(cur==='ceremony') return '<div class="info-section"><h3>🎪 儀式：每次跟一個步驟</h3><p>團呼、展旗、宣誓各有不同程序，不合併成一套「五步」。</p>'+Ceremony.panel()+'</div>';
+      if(cur==='apps') return '<div class="info-section"><h3>🔗 相關APP</h3>'+extBtn(badgeUrl,false,'進度追蹤APP','個人獎章記錄')+extBtn(circUrl,false,'通告圖書館','通告與活動資料')+'<h3>本APP即用工具</h3><div class="quick"><button class="btn" onclick="Bag.open()">今場物資庫／執袋</button><a class="btn" href="#tools">集合與安靜訊號</a></div></div>';
+      return '<p>請選上方手冊分頁。</p>';
     }
-    var core = '<section class="card handbook"><a class="back" href="#plan">‹ 返回目錄</a><span class="eyebrow">手冊＝幼童軍核心</span><h1>📖 手冊</h1><p class="mut">撳標籤，直接去要找的內容。</p><div class="subtabs">'+subs.map(function(s){return '<button class="subtab '+(cur===s.id?'cur':'')+'" onclick="location.hash=\'#book?sub='+s.id+'\'">'+s.label+'</button>';}).join('')+'</div>'+tabContent()+'<div class="handbook-links"><a class="pill" href="https://cubsbadge.vercel.app/" target="_blank" rel="noopener">🏅 進度追蹤 APP</a><a class="pill" href="https://scout-circulars.vercel.app/" target="_blank" rel="noopener">📨 通告圖書館</a><span class="mut">物資庫／大聲呼叫：用相關 APP 即開</span></div></section>';
+    var core = '<section class="card handbook"><a class="back" href="#plan">‹ 返回目錄</a><span class="eyebrow">手冊＝幼童軍核心</span><h1>📖 手冊</h1><p class="mut">撳標籤，直接去要找的內容。</p><div class="subtabs">'+subs.map(function(s){return '<button class="subtab '+(cur===s.id?'cur':'')+'" onclick="location.hash=\'#book?sub='+s.id+'\'">'+s.label+'</button>';}).join('')+'</div>'+tabContent()+'<div class="handbook-links"><a class="pill" href="https://cubsbadge.vercel.app/" target="_blank" rel="noopener">🏅 進度追蹤 APP</a><a class="pill" href="https://scout-circulars.vercel.app/" target="_blank" rel="noopener">📨 通告圖書館</a></div></section>';
     /* 教材工具：由各 plugin 註冊，分頁收埋，唔再一路疊落手冊底 */
     var tools = (App.bookPanels && App.bookPanels.length) ? App.bookPanels : [];
     var toolsHtml = '';
@@ -185,10 +189,11 @@
       m.segs.forEach(function(s,i){
         if (i === 0 || i === m.segs.length - 1) return; // 略過集合／回顧例行段
         var art = (typeof SkillArt!=='undefined' && SkillArt.thumb) ? SkillArt.thumb(m.tid,i) : '';
+        var support = typeof SkillArt!=='undefined' && SkillArt.support ? SkillArt.support(m.tid,i) : null;
         cards.push('<div class="activity-card lib-card'+(art?' has-art':'')+'">'+
           (art || '<div class="lib-emoji">'+(s.ic||'📋')+'</div>')+
           '<h3>'+esc(s.n)+'</h3><p class="mut" style="font-size:12px">'+s.m+'分鐘 · '+esc(m.n)+'</p>'+
-          (s.art?'<span class="lib-tag"> 有圖解</span>':'<span class="lib-tag plain">文字卡</span>')+
+          (s.art?'<span class="lib-tag">步驟圖解</span>':support?'<span class="lib-tag">'+esc(support.label)+'</span>':'<span class="lib-tag plain">文字卡・未有步驟圖</span>')+
           '<div class="quick lib-btns"><button class="btn sm" onclick="App.activity(\''+m.tid+'\','+i+')">▶ 即開帶領卡</button>'+
           ((typeof SkillArt!=='undefined' && SkillArt.print)?'<button class="btn sm ghost" onclick="SkillArt.print(\''+m.tid+'\','+i+')">🖨️ 只印呢張</button>':'')+'</div></div>');
       });
@@ -198,7 +203,7 @@
   App.vLibrary = function (skills) {
     var title = '🎮 活動・技能帶領卡';
     var jungleCard = '<section class="card"><h2>🌳 想加一段故事？</h2><a class="btn" href="#jungle">森林故事・角色卡 →</a></section>';
-    return jungleCard+'<section class="card"><a class="back" href="#plan" style="text-decoration:none;color:var(--ord)">‹ 返回</a><h2>'+title+'</h2><p class="mut">撳分頁切換：<b>活動</b>＝遊戲、情境、分享、故事、手工；<b>技能</b>＝結繩、急救、指南針、煮食、追蹤、遠足等。有圖解嘅卡會先畀你圖：點企、點做、小心乜；開卡後可單印一張A4圖解卡（點哪張印哪張）。</p><div class="subtabs"><button class="subtab'+(skills?'':' cur')+'" onclick="App.showLibraryTab(this,\'activity\')">🎮 活動</button><button class="subtab'+(skills?' cur':'')+'" onclick="App.showLibraryTab(this,\'skill\')">🛠️ 技能</button></div><div id="lib-activity" class="manual-grid lib-grid'+(skills?' hidden':'')+'">'+App.libraryCards('activity')+'</div><div id="lib-skill" class="manual-grid lib-grid'+(skills?'':' hidden')+'">'+App.libraryCards('skill')+'</div></section>';
+    return jungleCard+'<section class="card"><a class="back" href="#plan" style="text-decoration:none;color:var(--ord)">‹ 返回</a><h2>'+title+'</h2><p class="mut">先看圖，再跟住做。安全提醒必讀；詳細帶法可展開。🖨️ 只印所選一張。</p><div class="subtabs"><button class="subtab'+(skills?'':' cur')+'" onclick="App.showLibraryTab(this,\'activity\')">🎮 活動</button><button class="subtab'+(skills?' cur':'')+'" onclick="App.showLibraryTab(this,\'skill\')">🛠️ 技能</button></div><div id="lib-activity" class="manual-grid lib-grid'+(skills?' hidden':'')+'">'+App.libraryCards('activity')+'</div><div id="lib-skill" class="manual-grid lib-grid'+(skills?'':' hidden')+'">'+App.libraryCards('skill')+'</div></section>';
   };
   App.showLibraryTab = function (btn, key) {
     var root = btn.closest('.card'); if (!root) return;
@@ -523,7 +528,7 @@
         if(typeof App.vMeetList!=='undefined') return App.vMeetList();
         return App.vPlan();
       },
-      lead: function(){ return (typeof oldLead!=='undefined' && oldLead) ? oldLead() : (typeof App.vLead!=='undefined' ? App.vLead() : '<section class="card"><h2>帶領</h2></section>'); },
+      lead: function(){ return App.vLead(); },
       book: App.vBook,
       uniform: App.vUniform,
       ceremony: App.vCeremony,
@@ -581,6 +586,7 @@
       var fb = document.getElementById('flowbar');
       if(fb && !Flow.on()){ fb.className=''; fb.innerHTML=''; }
     }
+    if(tab==='lead' && typeof Lead!=='undefined') Lead.mount();
     if(tab==='teams' && typeof Lead!=='undefined' && Lead.renderScore) Lead.renderScore();
     window.scrollTo(0,0);
   };

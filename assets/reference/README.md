@@ -12,3 +12,7 @@ Page: https://www.scout.org.hk/tc/youth-members/cub-scouts/index.html?sid=2
 Acquired via image search, then checked against the official page captions and visually inspected. Unrelated Scout/Venture Scout results were rejected. Resampled proportionately to 1400px high and JPEG quality 0.86 using a browser canvas, without redrawing, recolouring, cropping or changing any insignia. Files are below 120KB each and precached for offline reference.
 
 Usage: clothing-style observation only. The images are NOT evidence of current shoulder insignia, complete 2026 core-badge placement, scale, sewing measurements, or every correct scarf detail. Uniform handbook and effective amendments remain the source for those rules. The app displays this limitation and source attribution on screen and print. Source artwork rights remain with its provider; the site's Scout System copyright does not claim ownership of these images. No open licence is asserted.
+
+## 2026-09-14 whole-app review
+
+The app and offline cache now use `cub-uniform-boy.avif` and `cub-uniform-girl.avif`. They are re-encodings of the reviewed JPEGs at the same pixel dimensions (Sharp AVIF quality 65, 4:4:4). No cropping, redrawing or changes to the clothing/insignia. The JPEGs remain source records only and are no longer precached or used by the UI. Reproduce with `node tools/encode-reference-avif.mjs` (optional Sharp dependency). Source attribution and limits above still apply.

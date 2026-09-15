@@ -10,3 +10,7 @@ https://prog.scouting.org.hk/cub/wp-content/uploads/2021/03/cub-scout-training-s
 Text was read in full and the generated image was visually reviewed: exactly three upright adjoining fingers (index, middle, ring); little finger folded; thumb presses little finger; palm faces viewer; thumb originates on viewer-right, representing the saluting person's right hand. This is a visual/content check, not official approval or field validation. The app and printed leader guide disclose AI assistance and source/version limits. The full-body pose and 2026 chapter-five crosscheck remain outstanding.
 
 Processing: removed empty white margins (relative crop x=.245, y=.03, width=.51, height=.94), resized to 290×800 and JPEG quality .84. No mirrored hand or altered fingers. Large intermediate PNG is excluded in `.cache`; delivered JPEG is under 120KB and precached.
+
+## 2026-09-14 whole-app review
+
+The app and offline cache now use `right-hand-salute.avif`, re-encoded from the reviewed JPEG at the same dimensions, without mirroring or changing fingers. AVIF quality 65, 4:4:4; reproduce using `tools/encode-reference-avif.mjs`. The JPEG remains the source record, not a browser asset. AI provenance still applies. The historical outstanding-text note above is superseded by the 2026 chapter-five checks recorded in `docs/formal-materials-audit.md`; the illustration remains a hand-only diagram, not a certified full-body demonstration.
