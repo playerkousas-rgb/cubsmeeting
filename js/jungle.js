@@ -418,16 +418,55 @@ var Jungle = {
       return l[1]+' '+done+'/'+total;
     }).join('、');
   },
-  sheets:function(i){
-    var ep=DATA.jungle.episodes[i];if(!ep)return '';
-    return '<section class="psheet story-sheet"><h2>🌳 '+esc(ep.title)+'｜故事文字</h2><p class="mut">'+esc((DATA.jungle.decks[ep.id]||{}).subtitle||'')+'</p>'+ep.scenes.map(function(s,k){
-      return '<div class="story-page"><h3>'+(k+1)+' · '+esc(s.title)+'</h3>'+(Jungle.artReady(s.img)?'<img class="story-photo" src="'+Jungle.slideSrc(s.img)+'" alt="'+esc(s.title)+'">':'')+'<p>'+esc(s.text)+'</p></div>';}).join('')+'</section>'+
-      '<section class="psheet leader-sheet"><h2>領袖問答及帶領提示</h2>'+ep.scenes.map(function(s,k){
-        return '<p><b>'+(k+1)+' '+esc(s.title)+'</b><br>問：'+esc(s.question)+'<br>答：'+esc(s.answer)+'<br>現實生活：'+esc(s.lesson)+'</p>';}).join('')+
-      '<p>文字依總會《森林故事》內容改寫；場景圖為 AI 生成教學插畫，非官方原圖。'+(typeof Jungle.sourceNote==='function'?'':'')+'</p></section>';
+  /* 列印選項：只印圖／圖＋故事文字／圖＋旁白稿／只印旁白稿，另可揀要唔要領袖問答頁。 */
+  printModes:{image:'🖼️ 只印圖', story:'📖 圖＋故事文字＋問題', script:'🗣️ 圖＋旁白稿', text:'📝 只印旁白稿'},
+  printOptions:function(i){
+    var ep=DATA.jungle.episodes[i];if(!ep)return;
+    var p=Jungle.printPref();
+    var langs=Jungle.langsOf(ep.id).map(function(l){return l[1];});
+    Modal.open('<h2>🖨️ 列印《'+esc(ep.title)+'》</h2><p class="mut">共 '+ep.scenes.length+' 段。旁白稿＝照讀用嘅文字，同錄音版本同一段內容。'+(langs.length?'🎧 本集旁白：'+langs.join('／')+'（可以先播再派圖）。':'')+'</p>'+
+      Object.keys(Jungle.printModes).map(function(m){
+        return '<div class="amb-row"><button class="btn '+(p.mode===m?'gr':'')+'" onclick="Jungle.printEpisode('+i+',\''+m+'\')">'+Jungle.printModes[m]+'</button>'+
+          '<span class="mut">'+esc({image:'每段一大圖，冇文字（投影用／派發）',story:'原本列印：大圖＋故事文字＋領袖問答',script:'大圖＋旁白稿（照讀），唔印問題',text:'冇圖，只有旁白稿（慳紙，領袖自己講）'}[m])+'</span></div>';}).join('')+
+      '<h3>附加</h3><div class="amb-row"><label><input type="checkbox" id="print-answers"'+(p.answers?' checked':'')+' onchange="Jungle.printPrefSet(\'answers\',this.checked)"> 加領袖問答頁（問／答／現實生活）</label>'+
+      '<label><input type="checkbox" id="print-cast"'+(p.cast?' checked':'')+' onchange="Jungle.printPrefSet(\'cast\',this.checked)"> 每段列出場角色</label></div>'+
+      '<p class="mut">選項會記住（本機）。想印邊段？投屏時都可以用同一份圖。</p>'+
+      '<div class="quick"><button class="btn" onclick="Modal.close()">收起</button></div>');
   },
-  printEpisode:function(i){var ep=DATA.jungle.episodes[i];if(!ep)return;Practical.printModal('森林故事：'+ep.title,Jungle.sheets(i));},
-  view:function(){return '<section class="card"><a class="back" href="#book">‹ 手冊</a><h1>🌳 森林故事</h1><p>先認角色，再講故事，最後連回小隊生活。開「投屏講故事」就可以一路投影、一路講。</p><div class="quick" style="margin:8px 0"><button class="btn" onclick="Jungle.audioLab()">🎚️ 試聽旁白／環境音</button></div><div class="template-grid">'+DATA.jungle.episodes.map(function(ep,i){return '<article class="template-card"><span class="eyebrow">'+esc(ep.refs.join('／'))+'</span><h3>'+esc(ep.title)+'</h3><p>'+esc((DATA.jungle.decks[ep.id]||{}).subtitle||'')+'</p><p class="mut" style="font-size:12px">'+ep.scenes.length+'段 · 每段一大張圖 · 領袖答案另收'+(Jungle.langsOf(ep.id).length?' · 🎧 旁白：'+Jungle.langsOf(ep.id).map(function(l){return l[1];}).join('／'):'')+'</p><div class="quick"><button class="btn gr" onclick="Jungle.show('+i+')">📺 投屏講故事</button><button class="btn" onclick="Jungle.open('+i+')">逐段閱讀</button><button class="btn" onclick="Jungle.printEpisode('+i+')">🖨️ 印文字</button></div></article>';}).join('')+'</div></section><section class="card"><h2>11位角色：認人與配對</h2><p class="mut">撳角色先睇介紹，再展開答案。哈蒂與戴白祺可作延伸，不硬放入每段故事。</p><p class="mut" style="font-size:11px">頭像為 AI 繪製教學示意，非童軍總會官方原圖；角色文字介紹以官方版本為準。</p><div class="template-grid">'+DATA.jungle.characters.map(function(c){return '<button class="btn character-card" onclick="Jungle.card(\''+c.id+'\')">'+(c.img?'<img src="'+c.img+'" alt="" loading="lazy" onerror="this.remove()">':'')+'<b>'+esc(c.name)+'</b><span>'+esc(c.english)+' · '+esc(c.kind)+'</span></button>';}).join('')+'</div></section><details class="card"><summary>故事來源</summary><p>'+esc(DATA.jungle.sourceNote)+'</p><p>投屏圖及角色圖為 AI 生成教學插畫，非總會官方原圖；故事文字依總會《森林故事》內容（《香港童軍》月刊第158–170期版本）改寫，省略暴力細節。</p>'+extBtn(DATA.jungle.source,false,'幼童軍支部：森林故事','角色及情節核對來源')+'<p class="mut">文字內容不依賴外部圖片載入，可離線使用。</p></details>';}
+  printPref:function(){
+    if(!Jungle._printPref){
+      var p=null;try{p=Store.get('storyPrint',null);}catch(e){p=null;}
+      p=p||{};
+      Jungle._printPref={mode:Jungle.printModes[p.mode]?p.mode:'story',answers:p.answers!==false,cast:p.cast===true};
+    }
+    return Jungle._printPref;
+  },
+  printPrefSet:function(k,v){var p=Jungle.printPref();p[k]=v;try{Store.set('storyPrint',p);}catch(e){}},
+  sheets:function(i,opts){
+    var ep=DATA.jungle.episodes[i];if(!ep)return '';
+    var pref=Jungle.printPref();
+    var mode=(opts&&opts.mode)||pref.mode, answers=(opts&&opts.answers!==undefined)?opts.answers:pref.answers, cast=(opts&&opts.cast!==undefined)?opts.cast:pref.cast;
+    var title={image:'場景圖',story:'故事文字',script:'旁白稿（照讀）',text:'旁白稿（照讀）'}[mode]||'故事文字';
+    var body=ep.scenes.map(function(s,k){
+      var img=(mode!=='text'&&Jungle.artReady(s.img))?'<img class="story-photo" src="'+Jungle.slideSrc(s.img)+'" alt="'+esc(s.title)+'">':'';
+      var castLine=cast?'<p class="mut">出場：'+s.cast.map(function(id){var c=DATA.jungle.characters.find(function(c){return c.id===id;});return c?esc(c.name):'';}).join('、')+'</p>':'';
+      var text=(mode==='image')?'':'<p'+(mode==='script'?' class="story-text"':'')+'>'+esc(s.text)+'</p>';
+      var q=(mode==='story')?'<p><b>停一停，問一問：</b>'+esc(s.question)+'</p>':'';
+      return '<div class="story-page"><h3>'+(k+1)+' · '+esc(s.title)+'</h3>'+img+castLine+text+q+'</div>';
+    }).join('');
+    var head='<section class="psheet story-sheet"><h2>🌳 '+esc(ep.title)+'｜'+title+'</h2><p class="mut">'+esc((DATA.jungle.decks[ep.id]||{}).subtitle||'')+'</p>';
+    var out=head+body+'<p class="mut">文字依總會《森林故事》內容（《香港童軍》月刊第158–170期版本）改寫；場景圖為 AI 生成教學插畫，非官方原圖。旁白錄音與此稿同一段內容，用講故事語氣讀出。</p></section>';
+    if(answers&&mode!=='image')out+='<section class="psheet leader-sheet"><h2>領袖問答及帶領提示</h2>'+ep.scenes.map(function(s,k){
+      return '<p><b>'+(k+1)+' '+esc(s.title)+'</b><br>問：'+esc(s.question)+'<br>答：'+esc(s.answer)+'<br>現實生活：'+esc(s.lesson)+'</p>';}).join('')+
+      '<p class="mut">領袖可先播逐段旁白（🎧），再問問題；圖、字、問題次序可以按小隊情況調整。</p></section>';
+    return out;
+  },
+  printEpisode:function(i,mode,opts){
+    var ep=DATA.jungle.episodes[i];if(!ep)return;
+    if(mode&&Jungle.printModes[mode])Jungle.printPrefSet('mode',mode);
+    Practical.printModal('森林故事：'+ep.title,Jungle.sheets(i,opts));
+  },
+  view:function(){return '<section class="card"><a class="back" href="#book">‹ 手冊</a><h1>🌳 森林故事</h1><p>先認角色，再講故事，最後連回小隊生活。開「投屏講故事」就可以一路投影、一路講。</p><div class="quick" style="margin:8px 0"><button class="btn" onclick="Jungle.audioLab()">🎚️ 試聽旁白／環境音</button></div><div class="template-grid">'+DATA.jungle.episodes.map(function(ep,i){return '<article class="template-card"><span class="eyebrow">'+esc(ep.refs.join('／'))+'</span><h3>'+esc(ep.title)+'</h3><p>'+esc((DATA.jungle.decks[ep.id]||{}).subtitle||'')+'</p><p class="mut" style="font-size:12px">'+ep.scenes.length+'段 · 每段一大張圖 · 領袖答案另收'+(Jungle.langsOf(ep.id).length?' · 🎧 旁白：'+Jungle.langsOf(ep.id).map(function(l){return l[1];}).join('／'):'')+'</p><div class="quick"><button class="btn gr" onclick="Jungle.show('+i+')">📺 投屏講故事</button><button class="btn" onclick="Jungle.open('+i+')">逐段閱讀</button><button class="btn" onclick="Jungle.printOptions('+i+')">🖨️ 列印</button></div></article>';}).join('')+'</div></section><section class="card"><h2>11位角色：認人與配對</h2><p class="mut">撳角色先睇介紹，再展開答案。哈蒂與戴白祺可作延伸，不硬放入每段故事。</p><p class="mut" style="font-size:11px">頭像為 AI 繪製教學示意，非童軍總會官方原圖；角色文字介紹以官方版本為準。</p><div class="template-grid">'+DATA.jungle.characters.map(function(c){return '<button class="btn character-card" onclick="Jungle.card(\''+c.id+'\')">'+(c.img?'<img src="'+c.img+'" alt="" loading="lazy" onerror="this.remove()">':'')+'<b>'+esc(c.name)+'</b><span>'+esc(c.english)+' · '+esc(c.kind)+'</span></button>';}).join('')+'</div></section><details class="card"><summary>故事來源</summary><p>'+esc(DATA.jungle.sourceNote)+'</p><p>投屏圖及角色圖為 AI 生成教學插畫，非總會官方原圖；故事文字依總會《森林故事》內容（《香港童軍》月刊第158–170期版本）改寫，省略暴力細節。</p>'+extBtn(DATA.jungle.source,false,'幼童軍支部：森林故事','角色及情節核對來源')+'<p class="mut">文字內容不依賴外部圖片載入，可離線使用。</p></details>';}
 };
 (function(){
   var route=App.route;

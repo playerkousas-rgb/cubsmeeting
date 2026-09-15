@@ -409,9 +409,40 @@ assert(ctx.Jungle.mmss(75)==='1:15','時間顯示格式');
   assert(ctx.document.getElementById('pack-state').textContent.includes('下載中'),'下載時要顯示進度');
   ctx.Jungle.show(0);
 }
+/* 10. 列印選項：只印圖／圖＋文字／圖＋旁白稿／只印旁白稿 */
+{
+  ctx.Jungle.printOptions(0);
+  assert(output.includes('🖨️ 列印《'),'要有列印選項面板');
+  for(const m of Object.values(ctx.Jungle.printModes))assert(output.includes(m),'列印面板要列出：'+m);
+  assert(output.includes('print-answers')&&output.includes('print-cast'),'要有附加選項（領袖問答／出場角色）');
+  assert(output.includes('本集旁白'),'列印面板要顯示本集有邊幾種旁白語音');
+  ctx.Jungle.printPrefSet('mode','story');ctx.Jungle.printPrefSet('answers',true);ctx.Jungle.printPrefSet('cast',false);
+  ctx.Jungle.printEpisode(0);
+  assert(output.includes('story-sheet')&&output.includes('class="psheet leader-sheet"'),'可印本集文字＋領袖答案');
+  assert(output.includes('jungle-night-tiger.avif'),'印出嚟都有圖');
+  /* 只印圖：有大圖、冇內文、冇領袖問答頁 */
+  const img=ctx.Jungle.sheets(0,{mode:'image'});
+  assert(img.includes('story-photo')&&img.includes('jungle-night-tiger.avif'),'只印圖要有大圖');
+  assert(!img.includes('停一停，問一問'),'只印圖唔應該有問題');
+  assert(!img.includes('leader-sheet'),'只印圖唔應該有領袖問答頁');
+  assert(!img.includes(DATA.jungle.episodes[0].scenes[0].text.slice(0,12)),'只印圖唔應該有故事文字');
+  /* 圖＋旁白稿：有圖、有文字、冇問題 */
+  const scr=ctx.Jungle.sheets(0,{mode:'script',cast:true,answers:true});
+  assert(scr.includes('旁白稿')&&scr.includes('story-photo'),'旁白稿模式要有圖＋稿');
+  assert(scr.includes(DATA.jungle.episodes[0].scenes[0].text.slice(0,12)),'旁白稿要有故事文字');
+  assert(!scr.includes('停一停，問一問'),'旁白稿模式唔印問題');
+  assert(scr.includes('出場：'),'揀咗出場角色就要印');
+  /* 只印旁白稿：慳紙，冇圖 */
+  const txt=ctx.Jungle.sheets(0,{mode:'text'});
+  assert(!txt.includes('story-photo'),'只印旁白稿唔應該有圖');
+  assert(txt.includes(DATA.jungle.episodes[0].scenes[0].text.slice(0,12)),'只印旁白稿要有文字');
+  /* 選項會記住 */
+  ctx.Jungle.printEpisode(0,'script');
+  assert(JSON.parse(mem.cub_storyPrint||'{}').mode==='script','列印選項要記住（本機偏好）');
+  assert(ctx.Jungle.sheets(0).includes('旁白稿'),'下次列印會用返記住嘅模式');
+  ctx.Jungle.printPrefSet('mode','story');
+}
 ctx.Jungle.printEpisode(0);
-assert(output.includes('story-sheet')&&output.includes('class="psheet leader-sheet"'),'可印本集文字＋領袖答案');
-assert(output.includes('jungle-night-tiger.avif'),'印出嚟都有圖');
 assert.equal(ctx.PackPrint.activeTid,null,'印故事唔會當印出隊包');
 const withImg=DATA.jungle.characters.filter(c=>c.img);
 assert.equal(withImg.length,11,"11 個角色全部要有頭像，實際 " + withImg.length);
