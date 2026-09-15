@@ -32,7 +32,7 @@ const sb = {
 };
 sb.window = sb; sb.globalThis = sb;
 vm.createContext(sb);
-for (const f of ["js/data.js", "js/jungle-data.js", "js/practical-data.js", "js/guide.js", "js/flow.js", "js/app.js", "js/redesign.js", "js/content.js", "js/jungle.js", "js/practical.js", "js/uniform-ceremony.js", "js/field-visuals.js", "js/salute-lab.js", "js/salute-positions.js", "js/tracking-kit.js", "js/material-desk.js", "js/plain-content.js", "js/worksheet-guides.js", "js/skill-art.js", "js/songbook.js"]) {
+for (const f of ["js/data.js", "js/jungle-data.js", "js/practical-data.js", "js/guide.js", "js/flow.js", "js/app.js", "js/redesign.js", "js/content.js", "js/jungle.js", "js/practical.js", "js/uniform-ceremony.js", "js/field-visuals.js", "js/salute-lab.js", "js/salute-positions.js", "js/tracking-kit.js", "js/material-desk.js", "js/plain-content.js", "js/worksheet-guides.js", "js/skill-art.js", "js/craft-sheets.js", "js/songbook.js"]) {
   vm.runInContext(read(f), sb, { filename: f });
 }
 const Q = (s) => vm.runInContext(s, sb);
@@ -42,7 +42,7 @@ const ok = (c, msg) => { console.log((c ? "✓ " : "✗ FAIL ") + msg); if (!c) 
 
 /* 1. 下方導覽逐粒撳：路由開到 + 真係渲染到對應版面 */
 const expect = {
-  "#print":  ["素材庫＋歌曲", 'id="mini-library"', 'id="mini-songs"'],
+  "#print":  ["素材庫", 'id="mini-worksheets"', 'id="mini-sheets"', 'id="mini-songs"'],
   "#play":   ["活動・技能帶領卡", "森林故事・角色卡"],
   "#badge":  ["活動章工具書", "badge-group-grid"],
   "#jungle": ["森林故事"],
@@ -78,7 +78,7 @@ ok(!/#song/.test(bot), "#song 唔再係固定下方導覽掣");
 for (const legacy of ["#song", "#songs", "#craft"]) {
   Q(`location.hash='${legacy}'; App.route()`);
   ok(Q("App.tab") === "print", `舊 ${legacy} → 轉入工作紙＋歌曲頁（App.tab='${Q("App.tab")}'）`);
-  ok(view.innerHTML.includes("素材庫＋歌曲"), `舊 ${legacy} → 渲染到合併頁，冇孤兒版`);
+  ok(view.innerHTML.includes("素材庫"), `舊 ${legacy} → 渲染到素材庫，冇孤兒版`);
 }
 
 /* 3. 拆咗記錄頁之後，#track 唔可以變死胡同；改名單要有新入口 */
@@ -93,21 +93,26 @@ for (const legacy of ["#song", "#songs", "#craft"]) {
   ok(!/App\.editRoster|App\.saveAtt/.test(Q("App.vMeetDetail(curMeet())")), "詳細教案頁唔再有記出席卡");
 }
 
-/* 4. 合併頁兩個小分頁真係切換到（真 App.showMiniTab） */
+/* 4. 素材庫三個小分頁真係切換到（真 App.showMiniTab） */
 {
   const mkPane = (startHidden) => {
     const pane = { hidden: startHidden, classList: {} };
     pane.classList.toggle = (c, on) => { if (c === "hidden") pane.hidden = on; };
     return pane;
   };
-  const ws = mkPane(false), sg = mkPane(true);
-  const tabs = [{ classList: { add() {}, remove() {} } }, { classList: { add() {}, remove() {} } }];
-  const card = { querySelectorAll: () => tabs, querySelector: (s) => (s === "#mini-library" ? ws : sg) };
+  const panes = { "#mini-worksheets": mkPane(false), "#mini-sheets": mkPane(true), "#mini-songs": mkPane(true) };
+  const tabs = [0, 1, 2].map(() => ({ classList: { add() {}, remove() {} } }));
+  const card = { querySelectorAll: () => tabs, querySelector: (s) => panes[s] || null };
   const mkBtn = () => ({ closest: () => card, classList: { add() {}, remove() {} } });
+  const shown = () => Object.keys(panes).filter((k) => !panes[k].hidden);
+  Q("App.showMiniTab")(mkBtn(), "sheets");
+  ok(shown().join() === "#mini-sheets", "撳「圖紙」→ 只顯示圖紙分頁");
   Q("App.showMiniTab")(mkBtn(), "songs");
-  ok(ws.hidden === true && sg.hidden === false, "撳「歌曲」小分頁 → 素材庫收起、歌曲顯示");
+  ok(shown().join() === "#mini-songs", "撳「歌曲」→ 只顯示歌曲分頁");
+  Q("App.showMiniTab")(mkBtn(), "worksheets");
+  ok(shown().join() === "#mini-worksheets", "撳「工作紙」→ 只顯示工作紙分頁");
   Q("App.showMiniTab")(mkBtn(), "library");
-  ok(ws.hidden === false && sg.hidden === true, "撳「素材庫」小分頁 → 歌曲收起、素材庫顯示");
+  ok(shown().join() === "#mini-worksheets", "舊 'library' 掣名照落入工作紙分頁（唔會白屏）");
 }
 
 console.log(fail === 0 ? "\nNAV PASS" : `\nNAV FAIL (${fail})`);

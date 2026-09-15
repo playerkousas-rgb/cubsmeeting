@@ -23,7 +23,7 @@ const sb = {
 };
 sb.window = sb; sb.globalThis = sb;
 vm.createContext(sb);
-for (const f of ["js/data.js", "js/jungle-data.js", "js/practical-data.js", "js/guide.js", "js/flow.js", "js/app.js", "js/redesign.js", "js/content.js", "js/jungle.js", "js/practical.js", "js/uniform-ceremony.js", "js/field-visuals.js", "js/salute-lab.js", "js/salute-positions.js", "js/tracking-kit.js", "js/material-desk.js", "js/plain-content.js", "js/worksheet-guides.js", "js/skill-art.js", "js/songbook.js"]) {
+for (const f of ["js/data.js", "js/jungle-data.js", "js/practical-data.js", "js/guide.js", "js/flow.js", "js/app.js", "js/redesign.js", "js/content.js", "js/jungle.js", "js/practical.js", "js/uniform-ceremony.js", "js/field-visuals.js", "js/salute-lab.js", "js/salute-positions.js", "js/tracking-kit.js", "js/material-desk.js", "js/plain-content.js", "js/worksheet-guides.js", "js/skill-art.js", "js/craft-sheets.js", "js/songbook.js"]) {
   vm.runInContext(fs.readFileSync(path.join(root, f), "utf8"), sb, { filename: f });
 }
 const Q = (s) => vm.runInContext(s, sb);
@@ -44,16 +44,34 @@ const Q = (s) => vm.runInContext(s, sb);
   ok(/addEventListener\("beforeprint"/.test(app) && /addEventListener\("afterprint"/.test(app), "beforeprint 隔離目標、afterprint 還原");
 }
 
-/* 2. 工作紙＋歌曲實裝 */
+/* 2. 素材庫三個分頁實裝 */
 {
   const p = Q("App.vPrint()");
   const sheets = (p.match(/PackPrint\.open\('sheet'/g) || []).length;
-  ok(sheets >= 25, `素材庫有${sheets}張逐張列印入口（至少25場）`);
-  ok(p.includes('material-library'), "素材庫有分類結構");
+  ok(sheets >= 25, `素材庫工作紙分頁有${sheets}張逐張列印入口（至少25場）`);
+  ok(p.includes('id="mini-worksheets"') && p.includes('sheet-entry'), "工作紙分頁係真實索引");
+  ok(p.includes('id="mini-sheets"') && p.includes('craft-card'), "圖紙分頁有手工卡（Craft）");
+  ok(p.includes('id="mini-sheets"') && p.includes('sheet-print-grid'), "圖紙分頁有剪卡／題紙列印掣");
   ok(p.includes('id="mini-songs"') && p.includes("Songbook.open("), "歌曲分頁係真實歌卡（Songbook.open）");
   ok(!/onclick="toast\('🎵|onclick="toast\('📣|onclick="toast\('🔥/.test(p), "歌曲分頁冇再用死掣 toast 扮實裝");
-  ok(Q("App.vSongs()") === p && Q("App.vSong()") === p, "舊 #songs／#song 路由仍指同一合併頁");
+  ok(Q("App.vSongs()") === p && Q("App.vSong()") === p, "舊 #songs／#song 路由仍指同一素材庫");
   ok(Q("typeof Content!=='undefined' && typeof Content.worksheetIndex==='function'"), "Content.worksheetIndex 存在（#sheets 仍可用）");
+  const craft = Q("Craft.items");
+  ok(craft.length >= 4, `圖紙有 ${craft.length} 個小手工`);
+  craft.forEach((c) => {
+    ok(c.mats.length >= 3 && c.steps.length >= 3 && !!c.safety && !!c.leader, `${c.id} 有物料／步驟／安全／領袖提示`);
+    ok(fs.existsSync(path.join(root, c.img)) || c.img.includes('assets/skills/'), `${c.id} 用現有圖，唔會開新圖檔`);
+  });
+  const sheet = Q("Craft.sheet('bracelet')");
+  ok((sheet.match(/class="psheet/g) || []).length === 1, "手工圖紙係單張A4");
+  ok(sheet.includes('唔當考驗完成'), "圖紙寫明唔當考驗完成");
+  ok(Q("Craft.get('nope')") === undefined && Q("Craft.sheet('nope')") === '', "唔存在嘅手工唔會出空紙");
+  Q("var __cap='';Modal.open=function(h){__cap=h;};");
+  Q("Craft.open('bracelet')");const opened = Q("__cap");
+  ok(opened.includes('物料') && opened.includes('做法') && opened.includes('⛑️') && opened.includes('領袖提示'), "手工卡有物料／做法／安全／領袖提示");
+  ok(opened.includes("Craft.print('bracelet')"), "手工卡可以直接印嗰張圖紙");
+  Q("__cap='';Craft.open('nope')");ok(Q("__cap") === '', "唔存在嘅手工唔會開彈窗");
+  Q("__cap='';Craft.print('nope')");ok(Q("__cap") === '', "唔存在嘅手工唔會叫列印");
 }
 
 /* 3. Songbook 內容與界線 */

@@ -103,6 +103,22 @@ assert(fieldParts[0].includes('uniform-reference-sheet'));assert(fieldParts[0].i
 assert(!fieldParts[1].includes('uniform-reference-sheet'));assert(!fieldParts[1].includes('role-cards'));
 assert.equal((ctx.Uniform.sheets(false).match(/class="psheet/g)||[]).length,1);
 assert(FieldVisuals.sourceNote('howl').includes('2025比賽表'));assert.equal(FieldVisuals.sourceNote('invalid'),'');
+/* 官方圖／真實相片：只用官方或政府來源；唔准自繪制服 */
+assert.equal(FieldVisuals.official.length,2);
+for(const o of FieldVisuals.official){assert(fs.existsSync(o.file),o.id+' file');assert(fs.statSync(o.file).size<120*1024,o.id+' size');assert(fs.readFileSync('sw.js','utf8').includes(o.file),o.id+' precached');assert(o.original.startsWith('https://'),o.id+' original url');assert(o.page.url.startsWith('https://'),o.id+' page url');assert(o.alt.length>25&&o.limit.length>20&&o.use.length>15,o.id+' photo/limit copy');assert(!/自繪|AI/.test(o.credit),o.id+' credit must be a real source, not own artwork');}
+const officialFigure=FieldVisuals.officialFigure('badgemap');
+assert(officialFigure.includes('cub-badge-map-2025.avif')&&officialFigure.includes('香港童軍總會'), '官方圖卡連檔名同出處');
+assert(officialFigure.includes('唔等於車縫尺寸'), '官方圖卡寫明唔等於車縫尺寸');
+assert(FieldVisuals.officialFigure('nope')==='', '唔存在的圖唔會渲染空圖');
+html='';
+FieldVisuals.officialZoom('badgemap');assert(html.includes('cub-badge-map-2025.avif')&&html.includes('唔等於車縫尺寸'), '放大圖同樣帶出處同限制');
+html='';FieldVisuals.officialZoom('nope');assert.equal(html,'', '唔存在的圖唔會開模態');
+FieldVisuals.printOfficial();assert.equal(ctx.PackPrint.activeTid,null);assert(html.includes('leader-sheet'), '官方圖只用領袖紙印');
+assert(App.vUniform().includes('cub-badge-map-2025.avif'), '制服頁貼官方位置圖');
+assert(App.vCeremony().includes('rally-flag-party-2025.avif'), '儀式頁貼真實大會操相片');
+html='';Uniform.open();assert(html.includes('cub-badge-map-2025.avif'), '制服教學包入面有官方圖');
+assert(!Uniform.sheets(false).includes('cub-badge-map-2025.avif'), '成員題紙唔貼官方位置圖（會漏答案）');
+assert(Uniform.sheets(true).includes('cub-badge-map-2025.avif'), '領袖紙有官方位置圖核對');
 assert.equal(JSON.stringify(mem),fieldBefore);assert.equal(ctx.curTid(),fieldTid);
 console.log('FIELD VISUALS PASS: credited local images, cache/size checks, original formation and role cards, teacher-only insertion, zoom/invalid id, independent print and state isolation.');
 

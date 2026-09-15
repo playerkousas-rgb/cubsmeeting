@@ -20,7 +20,7 @@ const sb = {
 };
 sb.window = sb; sb.globalThis = sb;
 vm.createContext(sb);
-for (const f of ["js/data.js", "js/jungle-data.js", "js/practical-data.js", "js/guide.js", "js/flow.js", "js/app.js", "js/redesign.js", "js/content.js", "js/jungle.js", "js/practical.js", "js/uniform-ceremony.js", "js/field-visuals.js", "js/salute-lab.js", "js/salute-positions.js", "js/tracking-kit.js", "js/material-desk.js", "js/plain-content.js", "js/worksheet-guides.js", "js/skill-art.js", "js/songbook.js"]) {
+for (const f of ["js/data.js", "js/jungle-data.js", "js/practical-data.js", "js/guide.js", "js/flow.js", "js/app.js", "js/redesign.js", "js/content.js", "js/jungle.js", "js/practical.js", "js/uniform-ceremony.js", "js/field-visuals.js", "js/salute-lab.js", "js/salute-positions.js", "js/tracking-kit.js", "js/material-desk.js", "js/plain-content.js", "js/worksheet-guides.js", "js/skill-art.js", "js/craft-sheets.js", "js/songbook.js"]) {
   vm.runInContext(fs.readFileSync(path.join(root, f), "utf8"), sb, { filename: f });
 }
 const Q = (s) => vm.runInContext(s, sb);
@@ -442,16 +442,16 @@ for (const route of ['print','play','badge','jungle','tools']) {
 }
 ok(Q("App.vBadge()").includes('活動章工具書'), '#badge 開到 App.vBadge() 活動章工具書');
 ok(Q("App.vBadge()").includes('badge-group-grid'), '活動章頁有官方組別分類');
-/* 舊 #song / #songs 唔再有自己嘅主導覽掣：一律轉入「工作紙＋歌曲」合併頁 */
+/* 舊 #song / #songs 唔再有自己嘅主導覽掣：一律轉入「素材庫」 */
 for (const legacy of ['song','songs','craft']) {
   Q("location.hash='#" + legacy + "'; App.route()");
-  ok(Q("App.tab") === 'print', '舊 #' + legacy + ' 轉入工作紙＋歌曲頁');
+  ok(Q("App.tab") === 'print', '舊 #' + legacy + ' 轉入素材庫');
 }
 {
   const p = Q("App.vPrint()");
-  ok(p.includes('素材庫＋歌曲'), '合併頁標題係「素材庫＋歌曲」');
-  ok(p.includes("App.showMiniTab(this,'library')") && p.includes("App.showMiniTab(this,'songs')"), '合併頁有素材庫／歌曲兩個小分頁掣');
-  ok(p.includes('id="mini-library"') && p.includes('id="mini-songs"'), '兩個小分頁內容區都存在');
+  ok(p.includes('素材庫') && !p.includes('素材庫＋歌曲'), '頁面叫「素材庫」，冇再叫「素材庫＋歌曲」');
+  ok(["worksheets","sheets","songs"].every(function(k){return p.includes("App.showMiniTab(this,'"+k+"')");}), '素材庫有工作紙／圖紙／歌曲三個分頁掣');
+  ok(['mini-worksheets','mini-sheets','mini-songs'].every(function(k){return p.includes('id="'+k+'"');}), '三個分頁內容區都存在');
   ok(Q("App.vSongs()") === p && Q("App.vSong()") === p, '舊歌頁函數同一個合併頁（唔會開到孤兒版）');
 }
 for (const expr of ['App.vPrep()', 'App.vSheets()', 'App.vLibrary(true)', 'App.vLibrary(false)', 'App.vTools(true)', 'App.vTools(false)']) {
