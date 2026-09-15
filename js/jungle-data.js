@@ -22,22 +22,24 @@ DATA.jungle = {
      廣東話照用，但廣東話 TTS 讀書面語會生硬，畫面上會提示領袖可以自己講。 */
   narration: {
     langs: [['zh','普'],['en','EN'],['yue','粵']],
-    pending: ['village'],
+    pending: [],
+    /* 粵語版係試聽：系統粵語聲音會把旁白讀成書面語，語氣較生硬，領袖自己講通常更自然。 */
+    langNotes: {yue:'粵語版本係系統合成試聽，語氣可能偏生硬；想更自然可以由領袖自己照文字講。'},
     files: {
-      welcome: {zh:['assets/jungle/audio/welcome-zh.mp3'], en:['assets/jungle/audio/welcome-en-1.mp3','assets/jungle/audio/welcome-en-2.mp3']},
-      help:    {zh:['assets/jungle/audio/help-zh.mp3']},
+      welcome: {zh:['assets/jungle/audio/welcome-zh.mp3'], en:['assets/jungle/audio/welcome-en-1.mp3','assets/jungle/audio/welcome-en-2.mp3'], yue:['assets/jungle/audio/welcome-yue.mp3']},
+      help:    {zh:['assets/jungle/audio/help-zh.mp3'], en:['assets/jungle/audio/help-en-1.mp3','assets/jungle/audio/help-en-2.mp3']},
       rules:   {zh:['assets/jungle/audio/rules-zh.mp3'], en:['assets/jungle/audio/rules-en.mp3']},
-      fire:    {zh:['assets/jungle/audio/fire-zh.mp3']},
-      village: {}
+      fire:    {zh:['assets/jungle/audio/fire-zh.mp3'], en:['assets/jungle/audio/fire-en-1.mp3','assets/jungle/audio/fire-en-2.mp3']},
+      village: {zh:['assets/jungle/audio/village-zh-1.mp3','assets/jungle/audio/village-zh-2.mp3'], en:['assets/jungle/audio/village-en-1.mp3','assets/jungle/audio/village-en-2.mp3']}
     }
   },
-  pendingArt:['jungle-baloo-lesson','jungle-bees-bat','jungle-hunting-grounds','jungle-kaa-rescue','jungle-forest-rules','jungle-pack-split','jungle-red-flower','jungle-faceoff','jungle-fire-branch','jungle-farewell','jungle-village','jungle-two-homes','jungle-tiger-return','jungle-herd-plan','jungle-carry-on'],
+  pendingArt:[],
   decks: {
     welcome: {cover:'jungle-wolf-carry', subtitle:'狼家庭收留一個小人兒，狼群大會上有人為他說話。'},
     help:    {cover:'jungle-water-snake', subtitle:'白勞教森林規律：先觀察、先問，遇事識得求助。'},
-    rules:   {cover:'jungle-council', subtitle:'森林規律唔係禁令，而係同人相處嘅方法。'},
-    fire:    {cover:'jungle-faceoff', subtitle:'一枝紅花、一場特別集會，毛吉利要保護亞基拿。'},
-    village: {cover:'jungle-village', subtitle:'回到人類村莊，毛吉利帶住學過嘅事繼續向前。'}
+    rules:   {cover:'jungle-forest-rules', subtitle:'森林規律唔係禁令，而係同人相處嘅方法。'},
+    fire:    {cover:'jungle-red-flower', subtitle:'一枝紅花、一場特別集會，毛吉利要保護亞基拿。'},
+    village: {cover:'jungle-carry-on', subtitle:'回到人類村莊，毛吉利帶住學過嘅事繼續向前。'}
   },
   episodes: [
     {id:'welcome',title:'毛吉利加入狼群',refs:['會員章 e(i)','會員章 e(ii)'],characters:['mowgli','raksha','akela','baloo','bagheera','sherekhan'],scenes:[

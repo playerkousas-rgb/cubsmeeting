@@ -103,7 +103,9 @@ ctx.Jungle.episodeStep(4);assert.equal(ctx.Jungle.stageState.ep,4);assert(stageE
 ctx.Jungle.episodeStep(9);assert.equal(ctx.Jungle.stageState.ep,4,'跳去唔存在集數唔會出事');
 ctx.Jungle.fontStep(1);assert(stageEl().style&&typeof stageEl().style.setProperty==='function','放大字唔會拋錯');
 ctx.Jungle.stageMove(1);
-assert(stageEl().innerHTML.includes('story-cast')&&stageEl().innerHTML.includes('製作中'),'未出圖嘅段落用角色卡＋講明製作中');
+assert.equal(DATA.jungle.pendingArt.length,0,'場景圖已經全部出齊');
+assert(stageEl().innerHTML.includes('story-photo')&&stageEl().innerHTML.includes('jungle-village.avif'),'第五集第 2 段用新出嘅大圖');
+assert(!stageEl().innerHTML.includes('製作中'),'圖齊咗就唔會再出「製作中」提示');
 ctx.Jungle.episodeStep(0);ctx.Jungle.stageMove(1);
 assert(stageEl().innerHTML.includes('story-photo')&&stageEl().innerHTML.includes('jungle-night-tiger.avif'),'已出圖嘅段落用大圖');
 ctx.Jungle.bindKeys(true);const slideBefore=ctx.Jungle.stageState.slide;ctx.Jungle.keys({key:'ArrowRight',preventDefault(){}});assert(ctx.Jungle.stageState.slide===slideBefore+1,'鍵盤 → 可以翻頁');
@@ -132,12 +134,26 @@ for(const ep of DATA.jungle.episodes){
 assert(narrFiles.length>=5,'起碼有幾段旁白（實際 '+narrFiles.length+'）');
 assert(narr.files.help.zh&&narr.files.help.zh.length===1,'普通話旁白要覆蓋第二集');
 assert(narr.files.welcome.en.length===2,'英文旁白可以分幾段順住播');
+/* 2026-09-15 第二輪：普通話＋英文補齊五集；粵語第一集試聽，並標明語氣限制。 */
+assert.deepEqual===undefined||true;
+assert.equal(JSON.stringify(Object.keys(narr.files).sort()),JSON.stringify(['fire','help','rules','village','welcome']),'五集都有旁白資料');
+for(const [ep,byLang] of Object.entries(narr.files)){
+  assert(byLang.zh&&byLang.zh.length>=1,ep+' 要有普通話旁白');
+  assert(byLang.en&&byLang.en.length>=1,ep+' 要有英文旁白');
+}
+assert(narr.files.welcome.yue&&narr.files.welcome.yue.length===1,'粵語第一集試聽');
+assert(narr.langNotes&&narr.langNotes.yue.includes('生硬'),'粵語要標明語氣限制');
+assert.equal(narr.pending.length,0,'旁白唔應該再有待錄項');
+assert.equal(DATA.jungle.pendingArt.length,0,'場景圖要全部出齊');
 ctx.Jungle.show(0);
 const barHTML=ctx.Jungle.audioBarHTML();
 assert(barHTML.includes('🎧')&&barHTML.includes('普')&&barHTML.includes('EN'),'音訊條要有語言掣');
 assert(!barHTML.includes('粵</button>')||true,'廣東話有就出，未有就唔出');
 assert(ctx.Jungle.langsOf('welcome').some(l=>l[0]==='en'),'第一集有英文旁白');
-assert(!ctx.Jungle.langsOf('village').length,'未錄旁白嘅集數要識得唔出掣');
+assert.equal(ctx.Jungle.langsOf('village').length,2,'第五集有普通話同英文');
+assert(ctx.Jungle.langsOf('rules').length===2,'第三集有普通話同英文');
+assert(ctx.Jungle.langNote('yue').includes('生硬')&&ctx.Jungle.langNote('zh')==='','粵語提示只喺粵語出現');
+
 /* 用假 audio 元素驗播放清單：第一段播完自動接第二段，播完停 */
 const played=[];let paused=0;
 ctx.Jungle.audioEl=()=>({src:'',currentTime:0,duration:60,play(){played.push(this.src);return Promise.resolve();},pause(){paused++;},addEventListener(){}});

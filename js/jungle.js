@@ -83,6 +83,7 @@ var Jungle = {
   audio:{ep:-1,lang:'',part:0,playing:false},
   langsOf:function(id){var f=(DATA.jungle.narration.files[id]||{});return DATA.jungle.narration.langs.filter(function(l){return f[l[0]]&&f[l[0]].length;});},
   audioEl:function(){return document.getElementById('story-track');},
+  langNote:function(lang){var n=(DATA.jungle.narration.langNotes||{})[lang];return n||'';},
   audioBarHTML:function(){
     var ep=DATA.jungle.episodes[Jungle.stageState.ep], langs=Jungle.langsOf(ep.id);
     if(!langs.length)return '<span class="story-hint">🎧 本集未附旁白錄音；可以直接照文字講。</span>';
@@ -91,7 +92,8 @@ var Jungle = {
       '<button class="btn sm gr" id="story-audio-btn" onclick="Jungle.toggleNarration()">▶ 播</button>'+
       '<input type="range" id="story-audio-seek" min="0" max="100" value="0" oninput="Jungle.seekNarration(this.value)" aria-label="旁白進度">'+
       '<span class="story-hint" id="story-audio-state">準備好</span>'+
-      '<span class="story-hint">播住都可以照撳圖｜想自己講就唔播</span>';
+      '<span class="story-hint">播住都可以照撳圖｜想自己講就唔播</span>'+
+      (Jungle.langNote(Jungle.audio.lang)?'<span class="story-hint story-langnote">'+esc(Jungle.langNote(Jungle.audio.lang))+'</span>':'');
   },
   buildAudio:function(){
     var bar=document.getElementById('story-audio');
