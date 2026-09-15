@@ -141,17 +141,20 @@ for(const [ep,byLang] of Object.entries(narr.files)){
   assert(byLang.zh&&byLang.zh.length>=1,ep+' 要有普通話旁白');
   assert(byLang.en&&byLang.en.length>=1,ep+' 要有英文旁白');
 }
-assert(narr.files.welcome.yue&&narr.files.welcome.yue.length===1,'粵語第一集試聽');
+assert(narr.files.welcome.yue&&narr.files.welcome.yue.length===1,'粵語第一集');
+for(const [ep,byLang] of Object.entries(narr.files))assert(byLang.yue&&byLang.yue.length>=1,ep+' 要有粵語旁白');
 assert(narr.langNotes&&narr.langNotes.yue.includes('生硬'),'粵語要標明語氣限制');
 assert.equal(narr.pending.length,0,'旁白唔應該再有待錄項');
 assert.equal(DATA.jungle.pendingArt.length,0,'場景圖要全部出齊');
 ctx.Jungle.show(0);
 const barHTML=ctx.Jungle.audioBarHTML();
 assert(barHTML.includes('🎧')&&barHTML.includes('普')&&barHTML.includes('EN'),'音訊條要有語言掣');
-assert(!barHTML.includes('粵</button>')||true,'廣東話有就出，未有就唔出');
+assert(barHTML.includes('粵'),'粵語掣要出（五集都有粵語旁白）');
 assert(ctx.Jungle.langsOf('welcome').some(l=>l[0]==='en'),'第一集有英文旁白');
-assert.equal(ctx.Jungle.langsOf('village').length,2,'第五集有普通話同英文');
-assert(ctx.Jungle.langsOf('rules').length===2,'第三集有普通話同英文');
+assert.equal(ctx.Jungle.langsOf('village').length,3,'第五集有普通話、英文同粵語');
+assert(ctx.Jungle.langsOf('rules').length===3,'第三集有三種語言');
+ctx.Jungle.show(1);assert(ctx.Jungle.langsOf('help').length===3,'第二集有三種語言');
+ctx.Jungle.show(0);
 assert(ctx.Jungle.langNote('yue').includes('生硬')&&ctx.Jungle.langNote('zh')==='','粵語提示只喺粵語出現');
 
 /* 用假 audio 元素驗播放清單：第一段播完自動接第二段，播完停 */
@@ -166,6 +169,13 @@ ctx.Jungle.narrationEnded();
 assert(!ctx.Jungle.audio.playing,'最後一段播完停低');
 ctx.Jungle.playNarration('zh');
 assert(played[played.length-1].includes('welcome-zh.mp3'),'可以轉普通話');
+ctx.Jungle.playNarration('yue');
+assert(played[played.length-1].includes('welcome-yue.mp3'),'可以轉粵語');
+ctx.Jungle.show(4);ctx.Jungle.playNarration('yue');
+assert(played[played.length-1].includes('village-yue-1.mp3'),'第五集粵語由第一段開始');
+ctx.Jungle.narrationEnded();
+assert(played[played.length-1].includes('village-yue-2.mp3'),'第五集粵語第二段自動接播');
+ctx.Jungle.show(0);
 ctx.Jungle.pauseNarration();
 assert(paused>=1&&!ctx.Jungle.audio.playing,'收幕／暫停要叫停音檔');
 assert(ctx.Jungle.mmss(75)==='1:15','時間顯示格式');

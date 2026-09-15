@@ -23,14 +23,14 @@ DATA.jungle = {
   narration: {
     langs: [['zh','普'],['en','EN'],['yue','粵']],
     pending: [],
-    /* 粵語版係試聽：系統粵語聲音會把旁白讀成書面語，語氣較生硬，領袖自己講通常更自然。 */
-    langNotes: {yue:'粵語版本係系統合成試聽，語氣可能偏生硬；想更自然可以由領袖自己照文字講。'},
+    /* 粵語版係系統合成聲音：句子已經寫成口語，但語氣可能仍然偏生硬；領袖自己講通常最自然。 */
+    langNotes: {yue:'粵語版本係系統合成聲音，語氣可能偏生硬；想更自然可以由領袖自己照文字講。'},
     files: {
       welcome: {zh:['assets/jungle/audio/welcome-zh.mp3'], en:['assets/jungle/audio/welcome-en-1.mp3','assets/jungle/audio/welcome-en-2.mp3'], yue:['assets/jungle/audio/welcome-yue.mp3']},
-      help:    {zh:['assets/jungle/audio/help-zh.mp3'], en:['assets/jungle/audio/help-en-1.mp3','assets/jungle/audio/help-en-2.mp3']},
-      rules:   {zh:['assets/jungle/audio/rules-zh.mp3'], en:['assets/jungle/audio/rules-en.mp3']},
-      fire:    {zh:['assets/jungle/audio/fire-zh.mp3'], en:['assets/jungle/audio/fire-en-1.mp3','assets/jungle/audio/fire-en-2.mp3']},
-      village: {zh:['assets/jungle/audio/village-zh-1.mp3','assets/jungle/audio/village-zh-2.mp3'], en:['assets/jungle/audio/village-en-1.mp3','assets/jungle/audio/village-en-2.mp3']}
+      help:    {zh:['assets/jungle/audio/help-zh.mp3'], en:['assets/jungle/audio/help-en-1.mp3','assets/jungle/audio/help-en-2.mp3'], yue:['assets/jungle/audio/help-yue-1.mp3','assets/jungle/audio/help-yue-2.mp3']},
+      rules:   {zh:['assets/jungle/audio/rules-zh.mp3'], en:['assets/jungle/audio/rules-en.mp3'], yue:['assets/jungle/audio/rules-yue.mp3']},
+      fire:    {zh:['assets/jungle/audio/fire-zh.mp3'], en:['assets/jungle/audio/fire-en-1.mp3','assets/jungle/audio/fire-en-2.mp3'], yue:['assets/jungle/audio/fire-yue-1.mp3','assets/jungle/audio/fire-yue-2.mp3']},
+      village: {zh:['assets/jungle/audio/village-zh-1.mp3','assets/jungle/audio/village-zh-2.mp3'], en:['assets/jungle/audio/village-en-1.mp3','assets/jungle/audio/village-en-2.mp3'], yue:['assets/jungle/audio/village-yue-1.mp3','assets/jungle/audio/village-yue-2.mp3']}
     }
   },
   pendingArt:[],
