@@ -206,8 +206,12 @@ ctx.Jungle.toggleAuto();
 /* 3. 逐段未錄嘅集數：唔會亂跳，會提示改用整集 */
 ctx.Jungle.show(4);
 assert.equal(ctx.Jungle.sceneFile('village','yue',1),'','第五集未錄逐段旁白');
+assert(ctx.Jungle.sceneFile('fire','yue',3).includes('fire-3-yue.mp3'),'第四集第三段有逐段旁白');
+assert.equal(ctx.Jungle.sceneFile('fire','yue',4),'','第四集第四段未錄');
 assert(!ctx.Jungle.sceneDone('welcome','yue')===false,'第一集粵語逐段已錄完');
-assert(ctx.Jungle.sceneDone('help','yue')===false,'第二集粵語逐段只錄到一半');
+assert(ctx.Jungle.sceneDone('help','yue')===true,'第二集粵語逐段已錄完');
+assert(ctx.Jungle.sceneDone('rules','yue')===true,'第三集粵語逐段已錄完');
+assert(ctx.Jungle.sceneDone('fire','yue')===false,'第四集粵語逐段只錄到一半');
 ctx.Jungle.playNarration('yue');
 assert(played.every(x=>!x.includes('village')),'未錄逐段就唔會亂播其他集音檔');
 
@@ -278,6 +282,26 @@ assert(ctx.Jungle.mmss(75)==='1:15','時間顯示格式');
   for(const ep of DATA.jungle.episodes)for(const sc of ep.scenes)assert(['night','day','leaves','fire'].includes(sc.amb),'每段要有環境音標籤：'+sc.title);
   assert(['night','day','leaves','fire'].includes((DATA.jungle.decks[ep0()]||{}).amb||'day'),'封面要有環境音標籤');
   function ep0(){return DATA.jungle.episodes[0].id;}
+}
+/* 8. 試聽面板：唔開投屏都聽到旁白同環境音 */
+{
+  ctx.Jungle.show(0);
+  ctx.Jungle.audioLab();
+  assert(output.includes('🎚️ 試聽：旁白＋環境音'),'森林故事頁要有試聽入口');
+  for(const ep of DATA.jungle.episodes)assert(output.includes(ep.title),'試聽面板要列出每集：'+ep.title);
+  assert(output.includes('🔁 連播'),'環境音要有連播試聽');
+  assert(output.includes('amb-lab-vol'),'試聽面板要有音量拉桿');
+  assert(output.includes('story-lab')&&output.includes('story-lab-amb'),'試聽面板要有兩個播放器（旁白／環境音）');
+  ctx.Jungle.labNarr(0,'yue');
+  const lab=ctx.document.getElementById('story-lab');
+  assert(lab.src.includes('scene/welcome-1-yue.mp3'),'試聽旁白會用逐段第一段');
+  ctx.Jungle.labNarr(2,'yue');
+  assert(ctx.document.getElementById('story-lab').src.includes('scene/rules-1-yue.mp3'),'試聽第三集用該集第一段');
+  ctx.Jungle.ambPlayLab('fire');
+  assert(ctx.document.getElementById('story-lab-amb').src.includes('fire-crackle.mp3'),'試聽環境音會揀啱檔案');
+  ctx.Jungle.ambPlayLab('night');
+  assert(ctx.document.getElementById('story-lab-amb').src.includes('jungle-night.mp3')&&ctx.document.getElementById('story-lab-amb').loop===true,'環境音試聽要 loop');
+  ctx.Jungle.show(0);
 }
 ctx.Jungle.printEpisode(0);
 assert(output.includes('story-sheet')&&output.includes('class="psheet leader-sheet"'),'可印本集文字＋領袖答案');

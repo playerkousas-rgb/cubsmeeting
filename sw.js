@@ -1,5 +1,5 @@
 /* 🐺 幼童軍團集會助手 — Service Worker (offline first，cache齊) */
-var CACHE = "cubhub-v32-scene-audio-ambience-20260915";
+var CACHE = "cubhub-v33-scene-yue-batch2-20260915";
 var ASSETS = [
   "./", "./index.html", "./manifest.webmanifest", "./css/app.css",
   "./js/data.js", "./js/guide.js", "./js/flow.js", "./js/app.js", "./js/redesign.js", "./js/content.js", "./js/jungle-data.js", "./js/jungle.js", "./js/practical-data.js", "./js/practical.js", "./js/uniform-ceremony.js", "./js/field-visuals.js", "./js/salute-lab.js", "./js/salute-positions.js", "./js/tracking-kit.js", "./js/material-desk.js", "./js/plain-content.js", "./js/worksheet-guides.js", "./js/skill-art.js", "./js/craft-sheets.js", "./js/songbook.js",
@@ -114,6 +114,16 @@ var ASSETS = [
   "./assets/jungle/audio/scene/help-2-yue.mp3",
   "./assets/jungle/audio/scene/help-3-yue.mp3",
   "./assets/jungle/audio/scene/help-4-yue.mp3",
+  "./assets/jungle/audio/scene/help-5-yue.mp3",
+  "./assets/jungle/audio/scene/help-6-yue.mp3",
+  "./assets/jungle/audio/scene/help-7-yue.mp3",
+  "./assets/jungle/audio/scene/rules-1-yue.mp3",
+  "./assets/jungle/audio/scene/rules-2-yue.mp3",
+  "./assets/jungle/audio/scene/rules-3-yue.mp3",
+  "./assets/jungle/audio/scene/rules-4-yue.mp3",
+  "./assets/jungle/audio/scene/fire-1-yue.mp3",
+  "./assets/jungle/audio/scene/fire-2-yue.mp3",
+  "./assets/jungle/audio/scene/fire-3-yue.mp3",
   "./assets/teaching/right-hand-salute.avif",
   "./icons/icon-192.png", "./icons/icon-512.png",
   "./assets/jungle/mowgli.avif", "./assets/jungle/raksha.avif", "./assets/jungle/akela.avif", "./assets/jungle/baloo.avif",

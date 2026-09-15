@@ -39,13 +39,13 @@ DATA.jungle = {
   sceneAudio: {
     welcome: {yue:['assets/jungle/audio/scene/welcome-1-yue.mp3','assets/jungle/audio/scene/welcome-2-yue.mp3','assets/jungle/audio/scene/welcome-3-yue.mp3','assets/jungle/audio/scene/welcome-4-yue.mp3','assets/jungle/audio/scene/welcome-5-yue.mp3','assets/jungle/audio/scene/welcome-6-yue.mp3'],
               zh:[null,null,null,null,null,null], en:[null,null,null,null,null,null]},
-    help:    {yue:['assets/jungle/audio/scene/help-1-yue.mp3','assets/jungle/audio/scene/help-2-yue.mp3','assets/jungle/audio/scene/help-3-yue.mp3','assets/jungle/audio/scene/help-4-yue.mp3',null,null,null],
+    help:    {yue:['assets/jungle/audio/scene/help-1-yue.mp3','assets/jungle/audio/scene/help-2-yue.mp3','assets/jungle/audio/scene/help-3-yue.mp3','assets/jungle/audio/scene/help-4-yue.mp3','assets/jungle/audio/scene/help-5-yue.mp3','assets/jungle/audio/scene/help-6-yue.mp3','assets/jungle/audio/scene/help-7-yue.mp3'],
               zh:[null,null,null,null,null,null,null], en:[null,null,null,null,null,null,null]},
-    rules:   {yue:[null,null,null,null], zh:[null,null,null,null], en:[null,null,null,null]},
-    fire:    {yue:[null,null,null,null,null], zh:[null,null,null,null,null], en:[null,null,null,null,null]},
+    rules:   {yue:['assets/jungle/audio/scene/rules-1-yue.mp3','assets/jungle/audio/scene/rules-2-yue.mp3','assets/jungle/audio/scene/rules-3-yue.mp3','assets/jungle/audio/scene/rules-4-yue.mp3'], zh:[null,null,null,null], en:[null,null,null,null]},
+    fire:    {yue:['assets/jungle/audio/scene/fire-1-yue.mp3','assets/jungle/audio/scene/fire-2-yue.mp3','assets/jungle/audio/scene/fire-3-yue.mp3',null,null], zh:[null,null,null,null,null], en:[null,null,null,null,null]},
     village: {yue:[null,null,null,null,null], zh:[null,null,null,null,null], en:[null,null,null,null,null]}
   },
-  scenePending: ['welcome:zh','welcome:en','help:yue','help:zh','help:en','rules:yue','rules:zh','rules:en','fire:yue','fire:zh','fire:en','village:yue','village:zh','village:en'],
+  scenePending: ['welcome:zh','welcome:en','help:zh','help:en','rules:zh','rules:en','fire:yue','fire:zh','fire:en','village:yue','village:zh','village:en'],
   /* 環境音：原創程序合成（tools/make-ambience.mjs），細音量墊底，唔會蓋過人聲。 */
   ambience: {night:'assets/jungle/ambience/jungle-night.mp3', day:'assets/jungle/ambience/jungle-day.mp3', leaves:'assets/jungle/ambience/leaves.mp3', fire:'assets/jungle/ambience/fire-crackle.mp3'},
   decks: {
