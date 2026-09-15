@@ -99,10 +99,11 @@ var Songbook = {
   panel: function () {
     var h = '<h3>🎵 歌曲・帶動唱</h3><p class="mut">撳歌名開跟唱卡：逐句回声、動作提示、可單印一張A4歌紙。傳統歌非綱要考核內容；正式文字另開儀式卡。</p>';
     h += '<div class="song-grid">' + Songbook.songs.map(function (s) {
+      var hasMelody = !!(SongPlayer.melodies && SongPlayer.melodies[s.id]);
       return '<button class="song-card' + (s.kind === 'original' ? ' own' : '') + '" onclick="Songbook.open(\'' + s.id + '\')">' +
         '<b>' + (s.kind === 'original' ? '📣 ' : '🎵 ') + esc(s.title) + '</b>' +
         '<small>' + esc(s.use) + '</small>' +
-        '<span class="song-kind">' + (s.kind === 'original' ? '自編口號' : '傳統・公有領域旋律') + '</span></button>';
+        '<span class="song-kind">' + (s.kind === 'original' ? '自編口號' : '傳統・公有領域旋律') + (hasMelody ? ' · 🎶有旋律' : '') + '</span></button>';
     }).join('') + '</div>';
     h += '<h3>📣 正式文字（照讀・唔改寫）</h3><div class="song-grid">' + Songbook.formal.map(function (f) {
       return '<button class="song-card formal" onclick="' + f.open + '"><b>📜 ' + esc(f.title) + '</b><small>' + esc(f.desc) + '</small><span class="song-kind">已核原文</span></button>';
@@ -119,7 +120,9 @@ var Songbook = {
       '<div class="song-lines">' + s.lines.map(function (l) { return Songbook.lineHtml(l, false); }).join('') + '</div>' +
       '<details open><summary>動作提示</summary><p>' + esc(s.actions) + '</p></details>' +
       '<details><summary>點帶（領袖）</summary><ol>' + s.lead.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ol></details>' +
-      '<div class="quick"><button class="btn gr" onclick="Songbook.sing(\'' + id + '\')">▶ 圍圈跟唱</button>' +
+      '<div class="quick">' +
+      (SongPlayer.melodies[id] ? '<button class="btn song-play-btn" style="background:#E65100;color:#fff" onclick="SongPlayer.playing?SongPlayer.stop():SongPlayer.play(\'' + id + '\')">🎶 播旋律</button>' : '') +
+      '<button class="btn gr" onclick="Songbook.sing(\'' + id + '\')">▶ 圍圈跟唱</button>' +
       '<button class="btn" onclick="Songbook.print(\'' + id + '\')">🖨️ 印呢首A4歌紙</button>' +
       '<button class="btn ghost" onclick="Modal.close()">關閉</button></div>');
   },
@@ -132,7 +135,9 @@ var Songbook = {
       '<p class="mut">句 ' + Math.min(r.index + 1, s.lines.length) + '／' + s.lines.length + '｜' + (l[0] === '領' ? '領袖唱呢句，成員聽' : l[0] === '眾' ? '成員跟唱' : '全員齊唱') + '</p>' +
       (done ? '<div class="song-now done"><b>🎉 唱完！</b><p>' + esc(s.actions) + '</p></div>'
         : '<div class="song-now">' + Songbook.lineHtml(l, true) + '</div>') +
-      '<div class="quick"><button class="btn" onclick="Songbook.move(-1)"' + (r.index === 0 ? ' disabled' : '') + '>‹ 上一句</button>' +
+      '<div class="quick">' +
+      (SongPlayer.melodies[id] ? '<button class="btn song-play-btn" style="background:#E65100;color:#fff" onclick="SongPlayer.playing?SongPlayer.stop():SongPlayer.play(\'' + id + '\')">' + (SongPlayer.playing ? '⏹ 停止旋律' : '🎶 播旋律') + '</button>' : '') +
+      '<button class="btn" onclick="Songbook.move(-1)"' + (r.index === 0 ? ' disabled' : '') + '>‹ 上一句</button>' +
       '<button class="btn gr" onclick="Songbook.move(1)">' + (done ? '↺ 重頭唱' : '下一句 ›') + '</button>' +
       '<button class="btn" onclick="Lead.beep(880,0.12)">👏 拍手拍子</button>' +
       '<button class="btn ghost" onclick="Songbook.open(\'' + id + '\')">返歌卡</button></div>');
@@ -162,5 +167,145 @@ var Songbook = {
   printAll: function () {
     var html = Songbook.songs.map(function (s) { return Songbook.sheet(s.id); }).join('');
     Practical.printModal('今晚歌單（' + Songbook.songs.length + '首）', html);
+  }
+};
+
+/* 🎶 SongPlayer — Web Audio API 旋律播放：用簡單合成器播出歌曲主旋律。
+   每首歌定義一組音符（MIDI 音高＋時值），播放時可暫停／重播。
+   配合領唱語音（generate_speech 生成嘅 mp3）使用效果更好。 */
+var SongPlayer = {
+  ctx: null,
+  playing: false,
+  timers: [],
+  gainNode: null,
+  /* 旋律定義：[midiNote, durationInBeats] — 0 表示休止 */
+  melodies: {
+    'campfire-burning': {
+      tempo: 120,
+      notes: [
+        [60,1],[62,1],[64,1],[60,1],[60,1],[62,1],[64,1],[60,1],
+        [64,1],[65,1],[67,2],[64,1],[65,1],[67,2],
+        [67,0.5],[69,0.5],[67,0.5],[65,0.5],[64,1],[60,1],
+        [67,0.5],[69,0.5],[67,0.5],[65,0.5],[64,1],[60,1],
+        [60,1],[55,1],[60,2],[60,1],[55,1],[60,2]
+      ]
+    },
+    'together': {
+      tempo: 110,
+      notes: [
+        [60,1],[62,1],[64,0.5],[65,0.5],[64,1],[62,0.5],[60,0.5],
+        [62,1],[64,0.5],[62,0.5],[60,2],
+        [60,1],[64,1],[65,0.5],[67,0.5],[65,0.5],[64,0.5],
+        [62,1],[64,0.5],[62,0.5],[60,2],
+        [65,1],[67,1],[69,1],[67,1],[65,1],[64,1],
+        [62,1],[64,0.5],[62,0.5],[60,2]
+      ]
+    },
+    'wolf-tail': {
+      tempo: 130,
+      notes: [
+        [64,1],[64,0.5],[65,0.5],[67,1],[67,1],
+        [65,1],[65,0.5],[64,0.5],[62,1],[62,1],
+        [60,1],[62,1],[64,1],[65,1],
+        [64,1],[62,1],[60,2]
+      ]
+    },
+    'kumbayah': {
+      tempo: 80,
+      notes: [
+        [60,1.5],[64,0.5],[67,1],[64,1],
+        [60,1.5],[64,0.5],[67,2],
+        [60,1.5],[64,0.5],[67,1],[64,1],
+        [60,1.5],[64,0.5],[67,2],
+        [72,1],[67,1],[64,1],[60,1],
+        [60,1.5],[64,0.5],[67,2]
+      ]
+    },
+    'shalom': {
+      tempo: 90,
+      notes: [
+        [67,1],[65,1],[64,1],[62,1],
+        [67,1],[65,1],[64,1],[62,1],
+        [60,1],[64,1],[60,2],
+        [65,1],[67,1],[64,1],[62,1],
+        [60,1],[64,1],[60,2]
+      ]
+    },
+    'parting': {
+      tempo: 70,
+      notes: [
+        [60,1],[64,2],[65,1],[67,2],[65,1],
+        [64,1],[62,1],[60,1],[62,1],
+        [64,2],[62,1],[60,1],
+        [64,1],[62,1],[60,1],[55,1],[60,3]
+      ]
+    }
+  },
+  midiToFreq: function (midi) { return 440 * Math.pow(2, (midi - 69) / 12); },
+  init: function () {
+    if (!SongPlayer.ctx) {
+      try { SongPlayer.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return false; }
+    }
+    if (SongPlayer.ctx.state === 'suspended') SongPlayer.ctx.resume();
+    return true;
+  },
+  play: function (id) {
+    if (!SongPlayer.init()) { toast('瀏覽器唔支援音效'); return; }
+    SongPlayer.stop();
+    var melody = SongPlayer.melodies[id];
+    if (!melody) { toast('呢首歌未有旋律，跟唱卡照用'); return; }
+    SongPlayer.playing = true;
+    var beatMs = 60000 / melody.tempo;
+    var ctx = SongPlayer.ctx;
+    var gain = ctx.createGain();
+    gain.gain.value = 0.3;
+    gain.connect(ctx.destination);
+    SongPlayer.gainNode = gain;
+    var time = ctx.currentTime + 0.1;
+    melody.notes.forEach(function (n) {
+      if (n[0] > 0 && n[1] > 0) {
+        var osc = ctx.createOscillator();
+        var noteGain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = SongPlayer.midiToFreq(n[0]);
+        /* 加一個柔和嘅二次諧波令聲音溫暖 */
+        var osc2 = ctx.createOscillator();
+        osc2.type = 'sine';
+        osc2.frequency.value = SongPlayer.midiToFreq(n[0]) * 2;
+        var g2 = ctx.createGain();
+        g2.gain.value = 0.08;
+        osc2.connect(g2);
+        g2.connect(noteGain);
+        var dur = n[1] * beatMs / 1000;
+        noteGain.gain.setValueAtTime(0, time);
+        noteGain.gain.linearRampToValueAtTime(0.4, time + 0.03);
+        noteGain.gain.linearRampToValueAtTime(0.25, time + dur * 0.5);
+        noteGain.gain.linearRampToValueAtTime(0, time + dur);
+        osc.connect(noteGain);
+        noteGain.connect(gain);
+        osc.start(time);
+        osc.stop(time + dur + 0.05);
+        osc2.start(time);
+        osc2.stop(time + dur + 0.05);
+      }
+      time += n[1] * beatMs / 1000;
+    });
+    var totalMs = (time - ctx.currentTime) * 1000;
+    var endTimer = setTimeout(function () { SongPlayer.playing = false; SongPlayer.updateUI(); }, totalMs);
+    SongPlayer.timers.push(endTimer);
+    SongPlayer.updateUI();
+  },
+  stop: function () {
+    SongPlayer.timers.forEach(function (t) { clearTimeout(t); });
+    SongPlayer.timers = [];
+    if (SongPlayer.gainNode) { try { SongPlayer.gainNode.gain.value = 0; } catch(e){} }
+    SongPlayer.playing = false;
+    SongPlayer.updateUI();
+  },
+  updateUI: function () {
+    var btns = document.querySelectorAll('.song-play-btn');
+    btns.forEach(function (b) {
+      b.textContent = SongPlayer.playing ? '⏹ 停止旋律' : '🎶 播旋律';
+    });
   }
 };

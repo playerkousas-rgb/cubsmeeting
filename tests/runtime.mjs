@@ -449,9 +449,9 @@ for (const legacy of ['song','songs','craft']) {
 }
 {
   const p = Q("App.vPrint()");
-  ok(p.includes('工作紙＋歌曲'), '合併頁標題係「工作紙＋歌曲」');
-  ok(p.includes("App.showMiniTab(this,'worksheets')") && p.includes("App.showMiniTab(this,'songs')"), '合併頁有工作紙／歌曲兩個小分頁掣');
-  ok(p.includes('id="mini-worksheets"') && p.includes('id="mini-songs"'), '兩個小分頁內容區都存在');
+  ok(p.includes('素材庫＋歌曲'), '合併頁標題係「素材庫＋歌曲」');
+  ok(p.includes("App.showMiniTab(this,'library')") && p.includes("App.showMiniTab(this,'songs')"), '合併頁有素材庫／歌曲兩個小分頁掣');
+  ok(p.includes('id="mini-library"') && p.includes('id="mini-songs"'), '兩個小分頁內容區都存在');
   ok(Q("App.vSongs()") === p && Q("App.vSong()") === p, '舊歌頁函數同一個合併頁（唔會開到孤兒版）');
 }
 for (const expr of ['App.vPrep()', 'App.vSheets()', 'App.vLibrary(true)', 'App.vLibrary(false)', 'App.vTools(true)', 'App.vTools(false)']) {
