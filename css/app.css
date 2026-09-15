@@ -2452,3 +2452,115 @@ body.offline .extcard{opacity:.55}
 }
 .lib-btns { margin: 2px 0 0; }
 .lib-btns .btn { flex: 1 1 auto; }
+
+/* 圖解先行；長帶法留在可展開的文字版本，安全不收合。 */
+.skill-instructions { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 10px; }
+.skill-instructions summary { cursor: pointer; font-weight: 700; }
+.skill-image-error { padding: 12px; background: #fff3e0; color: #6d4c41; }
+.skill-art[hidden] { display: none !important; }
+.ldia .skill-art { max-width: 640px; margin: 0 auto; }
+.skill-pan-hint { display: none; }
+.skill-zoomwrap { overflow-x: auto; }
+.skill-zoomwrap .skill-art { min-width: 1000px; max-width: none; }
+@media screen and (max-width: 599px) {
+  .lib-grid { grid-template-columns: 1fr; }
+  .skill-pan-hint { display: block; color: var(--mute); margin-top: 5px; }
+}
+@media print {
+  /* beforeprint 沿目前教材向上隔離，連不在 modal-content 的額外掣也不出紙。 */
+  [data-print-exclude] { display: none !important; }
+  details:not([open]), .skill-instructions, .skill-reader > details { display: none !important; }
+  /* 螢幕的 100dvh 加紙邊／首段 margin 會推出額外空白頁。 */
+  html, body { min-height: 0 !important; height: auto !important; background: #fff !important; }
+  #modal, #modal .mbox, #modal .modal-content, #printarea {
+    height: auto !important; min-height: 0 !important; max-height: none !important;
+    overflow: visible !important; transform: none !important;
+  }
+  #modal .mbox { display: block !important; }
+  #modal .modal-content > :first-child, #printarea > :first-child { margin-top: 0 !important; }
+  #modal .modal-content > :last-child, #printarea > :last-child { margin-bottom: 0 !important; }
+  .skill-sheet { font-size: 11pt; line-height: 1.45; }
+  .skill-sheet h2 { margin: 0 0 3mm; font-size: 17pt; }
+  .skill-sheet h3 { margin: 3mm 0 1mm; font-size: 12pt; }
+  .skill-sheet p { margin: 2mm 0; }
+  .skill-sheet .skill-art { object-fit: contain; }
+  .skill-sheet .p-foot { font-size: 9pt; }
+  .skill-pan-hint { display: none !important; }
+  .skill-zoomwrap { overflow: visible !important; border: 0; padding: 0; }
+  .skill-zoomwrap .skill-art { min-width: 0; object-fit: contain; }
+}
+
+/* Whole-app review: readable figures and one clearly separated sheet per handout. */
+.handbook-more { margin: 12px 0; padding: 10px 0; border-top: 1px solid var(--line); }
+.handbook-more summary { cursor: pointer; font-weight: 700; }
+.handbook-figure { margin: 12px 0; }
+.handbook-figure img { display: block; width: 100%; max-height: 300px; object-fit: contain; }
+.story-cast { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 12px 0; }
+.story-cast figure { width: 90px; margin: 0; text-align: center; }
+.story-cast img { display: block; width: 90px; height: 90px; object-fit: contain; border-radius: 12px; }
+.story-cast figcaption { font-size: 13px; }
+.story-cast small { display: block; }
+.writing-space { min-height: 22mm; border-bottom: 1px dashed #aaa; }
+.writing-prompt { margin: 5mm 0; break-inside: avoid; }
+.print-card-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 5mm; }
+.print-card-grid article { border: 1px dashed #999; padding: 4mm; min-height: 40mm; }
+@media print {
+  #printarea > .psheet { break-after: page; page-break-after: always; margin: 0; }
+  #printarea > .psheet:last-child { break-after: auto; page-break-after: auto; }
+  .psheet { font-size: 11pt; line-height: 1.45; }
+  .psheet h2 { font-size: 17pt; margin: 0 0 3mm; }
+  .psheet h3 { font-size: 12pt; margin: 3mm 0 1mm; }
+  .psheet p { margin: 2mm 0; }
+  .psheet li { margin-bottom: 1mm; }
+  .psheet h2, .psheet h3 { break-after: avoid; }
+  .tracking-guide { font-size: 10pt; line-height: 1.4; }
+  .tracking-guide .tracking-key-grid { gap: 2mm; }
+  .tracking-guide .reference-credit { font-size: 9pt; line-height: 1.4; }
+  .tracking-guide ol { margin: 2mm 0; padding-left: 5mm; }
+  .story-cast { break-inside: avoid; }
+  .story-cast img { width: 20mm; height: 20mm; }
+  .story-cast figure { width: 22mm; }
+}
+.reference-thumb .story-cast { gap: 4px; margin: 4px; }
+.reference-thumb .story-cast figure, .reference-thumb .story-cast img { width: 48px; }
+.reference-thumb .story-cast img { height: 48px; }
+.reference-thumb .story-cast figcaption { font-size: 11px; }
+.reference-thumb > img { height: 130px; object-fit: contain; }
+.skill-reference .uniform-reference-grid img { height: 220px; }
+@media print {
+  .skill-reference .uniform-reference-grid img { height: 55mm; }
+  .skill-sheet .story-cast img { width: 17mm; height: 17mm; }
+}
+@media print {
+  .subtabs, .handbook-links, .back, .ltimer, #leadstage button { display: none !important; }
+  #leadstage .leadcard { background: #fff; color: #111; font-size: 11pt; line-height: 1.45; padding: 0; }
+  #leadstage .lhead { font-size: 16pt; }
+  #leadstage .lsay { font-size: 12pt; }
+  #leadstage .skill-art { max-height: 85mm; object-fit: contain; }
+}
+
+/* Illustration + editable short captions; geometry stays sharp as SVG. */
+.skill-cues { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; list-style: none; padding: 0; margin: 10px 0; counter-reset: skill-cue; }
+.skill-cues li { counter-increment: skill-cue; border-radius: 10px; background: #f5f4eb; padding: 10px; font-size: 14px; line-height: 1.5; }
+.skill-cues li::before { content: counter(skill-cue); display: block; color: #c65105; font-weight: 800; margin-bottom: 3px; }
+.skill-art-credit { margin: 6px 0; font-size: 11px; color: var(--mute); }
+@media screen and (max-width: 599px) {
+  .skill-cues { grid-template-columns: 1fr; gap: 5px; }
+  .skill-cues li { padding: 7px 10px; }
+  .skill-cues li::before { display: inline-block; margin: 0 8px 0 0; }
+}
+@media print {
+  .skill-cues { gap: 2mm; margin: 2mm 0; break-inside: avoid; }
+  .skill-cues li { padding: 2mm; font-size: 10pt; }
+  .skill-art-credit { font-size: 8pt; }
+}
+
+/* Exact formal wording remains selectable HTML, separate from the AI learning scene. */
+.skill-formal-copy { border: 1px solid #d8cfc0; border-radius: 10px; padding: 10px 14px; margin: 10px 0; background: #fffdf8; color: #3a4537; font-size: 14px; }
+.skill-formal-copy ol { margin: 6px 0; padding-left: 1.5em; line-height: 1.6; }
+.skill-formal-copy small { display: block; font-size: 11px; color: #6d6455; }
+@media print {
+  .skill-formal-copy { break-inside: avoid; padding: 2mm 3mm; margin: 2mm 0; font-size: 10pt; }
+  .skill-formal-copy ol { margin: 1mm 0; }
+  .skill-formal-copy small { font-size: 8pt; }
+}

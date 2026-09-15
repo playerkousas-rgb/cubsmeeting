@@ -12,7 +12,10 @@
     "test:audit": "node tests/audit.mjs",
     "test:content": "node tests/content.mjs",
     "test:practical": "node tests/practical.mjs",
-    "test:browser": "node tests/browser-practical.mjs"
+    "test:browser": "node tests/browser-practical.mjs",
+    "test:browser:print": "node tests/browser-print-scope.mjs",
+    "test:browser:review": "node tests/browser-app-review.mjs",
+    "test:browser:all": "npm run test:browser && npm run test:browser:print && npm run test:browser:review"
   },
   "devDependencies": {
     "playwright": "^1.63.0"

@@ -14,25 +14,52 @@ var Modal = {
   open: function (html) { var m = document.getElementById("modal"); if (!m) return; m.innerHTML = '<div class="mbox" role="dialog" aria-modal="true" onclick="if(event.target===this)Modal.close()"><button class="mx" onclick="Modal.close()" aria-label="關閉">✕</button><div class="modal-content">' + html + "</div></div>"; m.className = "on"; if (document.body && document.body.classList) document.body.classList.add("modal-open"); },
   close: function () { var m = document.getElementById("modal"); if (m) { m.className = ""; m.innerHTML = ""; } if (document.body && document.body.classList) document.body.classList.remove("modal-open"); }
 };
-/* 列印跟住「你眼前嗰項」走：列印前暫開收埋嘅 details，印完還原。
-   印邊度由 CSS 決定：print-pack→#printarea；modal-open→彈窗內容；否則當前畫面。 */
+/* 列印只留目前目標的祖先路徑；不用 visibility:hidden（會留下空白頁）。
+   不自動展開 details：收合的其他教材／領袖補充不應突然出紙。 */
+var PrintScope = {
+  excluded: [],
+  target: function () {
+    var modal = document.querySelector && document.querySelector('#modal.on .modal-content');
+    if (modal) return modal.querySelector('#printarea') || modal;
+    var stage = document.getElementById('leadstage');
+    return typeof App !== 'undefined' && App.tab === 'lead' && stage ? stage : document.getElementById('view');
+  },
+  restore: function () {
+    PrintScope.excluded.forEach(function (el) { el.removeAttribute('data-print-exclude'); });
+    PrintScope.excluded = [];
+  },
+  prepare: function () {
+    PrintScope.restore();
+    var node = PrintScope.target();
+    if (!node) return;
+    while (node && node !== document.body) {
+      var parent = node.parentElement;
+      if (!parent) break;
+      Array.prototype.forEach.call(parent.children, function (sibling) {
+        if (sibling !== node && !sibling.hasAttribute('data-print-exclude')) {
+          sibling.setAttribute('data-print-exclude', '');
+          PrintScope.excluded.push(sibling);
+        }
+      });
+      node = parent;
+    }
+  },
+  /* AVIF 解碼完才叫列印；載入失敗時保留替代文字及文字帶法。 */
+  print: function () {
+    var root = PrintScope.target();
+    var images = root && root.querySelectorAll ? Array.prototype.slice.call(root.querySelectorAll('img')) : [];
+    return Promise.all(images.map(function (img) {
+      img.loading = 'eager';
+      return img.decode ? img.decode().catch(function () {}) : Promise.resolve();
+    })).then(function () {
+      // 等圖期間若已關閉或換卡，不能意外印下一項。
+      if (root && root === PrintScope.target()) window.print();
+    });
+  }
+};
 if (typeof window !== "undefined" && window.addEventListener) {
-  var printOpened = [];
-  window.addEventListener("beforeprint", function () {
-    var root = null;
-    try {
-      if (document.body.classList.contains("print-pack")) root = document.getElementById("printarea");
-      else if (document.body.classList.contains("modal-open")) root = document.querySelector("#modal .modal-content");
-      else root = document.getElementById("view");
-    } catch (e) { root = null; }
-    if (!root || !root.querySelectorAll) return;
-    printOpened = Array.prototype.slice.call(root.querySelectorAll("details:not([open])"));
-    printOpened.forEach(function (d) { d.setAttribute("open", ""); d.setAttribute("data-print-opened", "1"); });
-  });
-  window.addEventListener("afterprint", function () {
-    printOpened.forEach(function (d) { if (d.getAttribute("data-print-opened")) { d.removeAttribute("open"); d.removeAttribute("data-print-opened"); } });
-    printOpened = [];
-  });
+  window.addEventListener("beforeprint", PrintScope.prepare);
+  window.addEventListener("afterprint", PrintScope.restore);
 }
 /* 外部APP：全部新分頁＋離線變灰 */
 function extBtn(url, big, title, desc) {
@@ -44,7 +71,7 @@ function extBtn(url, big, title, desc) {
 function handleOffline() {
   var off = (typeof navigator !== "undefined" && navigator.onLine === false);
   try { if (document.body && document.body.classList) document.body.classList.toggle("offline", !!off); } catch (e) {}
-  document.querySelectorAll("a.extcard, a.external-link, a.pill").forEach(function (a) {
+  document.querySelectorAll('a[href^="https://"], a[href^="http://"]').forEach(function (a) {
     if (off) { a.classList.add("off"); a.setAttribute("aria-disabled", "true"); a.onclick = function () { toast("📴 而家離線，要上網先用得"); return false; }; }
     else { a.classList.remove("off"); a.removeAttribute("aria-disabled"); a.onclick = null; }
   });
@@ -230,7 +257,7 @@ var App = {
       '<button class="btn ghost" onclick="Lead.whistle()">🤫 5秒安靜</button>' +
       '<button class="btn ghost" onclick="Lead.horn()">🎺 吹哨</button></div>' +
       '<div id="leadscore"></div><div id="leadstage"></div>' +
-      '<p class="mut">跟綠色領袖卡做：每段有圖、有口令、有節奏、有安全。做完一段撳「✓ 做完」，自動跳下一段。</p></section>';
+      '<p class="mut">每段有口令、步驟及安全提醒；有圖的節先看圖。做完撳「✓ 做完」，跳下一段。</p></section>';
   },
 
   /* ---------- 名單（只為打印份數及抽籤點名，唔做出席紀錄） ---------- */
@@ -383,7 +410,7 @@ var PackPrint = {
 /* ---------- 投影帶領：大字計時音效計分抽籤 ---------- */
 var Lead = {
   idx: 0, secs: 0, timer: null, scores: { "紅隊": 0, "黃隊": 0, "藍隊": 0, "綠隊": 0 },
-  mount: function () { Lead.idx = 0; Lead.render(); Lead.renderScore(); },
+  mount: function () { Lead.stopTimer(); Lead.idx = 0; Lead.render(); Lead.renderScore(); },
   full: function () {
     var el = document.documentElement;
     try { if (el.requestFullscreen) el.requestFullscreen(); else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen(); } catch (e) {}

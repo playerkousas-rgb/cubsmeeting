@@ -95,7 +95,7 @@ const fieldBefore=JSON.stringify(mem),fieldTid=ctx.curTid();
 assert.equal(FieldVisuals.refs.length,2);
 for(const r of FieldVisuals.refs){assert(fs.existsSync(r.file));assert(fs.statSync(r.file).size<120*1024);assert(fs.readFileSync('sw.js','utf8').includes(r.file));assert(r.original.startsWith('https://www.scout.org.hk/uploads/member/Cub_'));assert(r.alt.includes('幼童軍'));}
 FieldVisuals.reference();assert(html.includes('圖片：香港童軍總會'));assert(html.includes('放大男款圖'));assert(html.includes('放大女款圖'));
-FieldVisuals.zoom('girl');assert(html.includes('cub-uniform-girl.jpg'));FieldVisuals.zoom('bad');
+FieldVisuals.zoom('girl');assert(html.includes('cub-uniform-girl.avif'));FieldVisuals.zoom('bad');
 FieldVisuals.formation();assert(html.includes('A 亞基拿'));assert(html.includes('值日小隊長'));assert(html.includes('不是正式尺寸圖'));
 for(const fn of ['printReference','printFormation']){FieldVisuals[fn]();assert.equal(ctx.PackPrint.activeTid,null);assert(!html.includes('已完成考驗'));}
 const fieldPacket=SessionPack.build(Practical.meeting('c04'),2,true),fieldParts=fieldPacket.split('以下才派給成員');
