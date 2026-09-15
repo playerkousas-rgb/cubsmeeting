@@ -77,10 +77,6 @@ var ASSETS = [
   "./assets/jungle/slides/jungle-tiger-return.avif",
   "./assets/jungle/slides/jungle-herd-plan.avif",
   "./assets/jungle/slides/jungle-carry-on.avif",
-  "./assets/jungle/ambience/jungle-night.mp3",
-  "./assets/jungle/ambience/jungle-day.mp3",
-  "./assets/jungle/ambience/leaves.mp3",
-  "./assets/jungle/ambience/fire-crackle.mp3",
   "./assets/teaching/right-hand-salute.avif",
   "./icons/icon-192.png", "./icons/icon-512.png",
   "./assets/jungle/mowgli.avif", "./assets/jungle/raksha.avif", "./assets/jungle/akela.avif", "./assets/jungle/baloo.avif",
@@ -94,7 +90,7 @@ self.addEventListener("activate", function (e) {
     return Promise.all(ks.filter(function (k) { return k !== CACHE; }).map(function (k) { return caches.delete(k); }));
   }).then(function () { return self.clients.claim(); }));
 });
-/* 語音檔唔預先塞入安裝包（唔想 app 一裝就成 10MB）：
+/* 聲音檔（旁白＋環境音）唔預先塞入安裝包（唔想 app 一裝就成 10MB；唔聽聲嘅人完全唔會下載）：
    第一次播／撳「下載離線語音包」時才存落快取，之後冇網都播到。
    媒體請求多數帶 Range header，206 回應唔可以入 cache，所以另外用一個無 Range 嘅請求存檔。 */
 var AUDIO_RE = /\/assets\/jungle\/(audio|ambience)\//;

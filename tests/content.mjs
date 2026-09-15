@@ -318,13 +318,17 @@ assert(ctx.Jungle.mmss(75)==='1:15','時間顯示格式');
   assert.equal(ctx.Jungle.sceneFile('welcome','zh',1).includes('welcome-1-zh.mp3'),true,'第一段普通話仍然在');
   assert.equal(ctx.Jungle.sceneFile('nope','yue',1),'','唔存在嘅集唔會爆');
 }
-/* 7. 環境音：檔案齊、已入快取、音量上限 */
+/* 7. 環境音：檔案齊、包在離線語音包內、唔預先塞入安裝包、音量上限 */
 {
   const amb=DATA.jungle.ambience;
+  const pack=ctx.Jungle.audioPackList();
+  const swNow=fs.readFileSync('sw.js','utf8');
+  const precacheHas=(f)=>{const pc=(swNow.match(/ASSETS = \[([\s\S]*?)\];/)||[])[1]||'';return pc.includes('./'+f);};
   for(const k of ['night','day','leaves','fire']){
     assert(amb[k],'要有環境音：'+k);
     assert(fs.existsSync(path.join(root,amb[k])),'環境音檔案要存在：'+amb[k]);
-    assert(fs.readFileSync('sw.js','utf8').includes('./'+amb[k]),'環境音細細隻，要入安裝包（快取）');
+    assert(pack.includes(amb[k]),'環境音要包括在離線語音包內');
+    assert(!precacheHas(amb[k]),'環境音都唔應該預先塞入安裝包（唔聽聲就完全唔下載）');
     assert(fs.statSync(path.join(root,amb[k])).size<120*1024,'環境音要細過 120KB：'+amb[k]);
   }
   for(const ep of DATA.jungle.episodes)for(const sc of ep.scenes)assert(['night','day','leaves','fire'].includes(sc.amb),'每段要有環境音標籤：'+sc.title);
@@ -413,12 +417,13 @@ ctx.Jungle.show(1);ctx.Jungle.stageMove(3);assert(ctx.Jungle.slideAmb()==='day',
   for(const f of onDisk)assert(fsx.statSync(pathx.join(root,f)).size<800*1024,'單個語音檔唔應該大過 800KB：'+f);
   let slideBytes=0;for(const f of fsx.readdirSync(pathx.join(root,'assets/jungle/slides')))slideBytes+=fsx.statSync(pathx.join(root,'assets/jungle/slides/'+f)).size;
   assert(slideBytes<3*1048576,'場景圖總量要細過 3MB（實際 '+(slideBytes/1048576).toFixed(1)+'MB）');
-  /* (f) 安裝包唔包 audio（只有細細隻環境音） */
+  /* (f) 安裝包完全唔包聲音檔（旁白＋環境音都係要用時才下載） */
   const swSrc=fsx.readFileSync('sw.js','utf8');
+  const precacheHas=(p)=>{const pc=(swSrc.match(/ASSETS = \[([\s\S]*?)\];/)||[])[1]||'';return pc.includes('./'+p);};
   const precache=(swSrc.match(/ASSETS = \[([\s\S]*?)\];/)||[])[1]||'';
   assert(!/\/assets\/jungle\/audio\//.test(precache),'安裝包唔應該塞成 10MB 語音檔');
-  assert(/\/assets\/jungle\/ambience\//.test(precache),'環境音（細檔）可以入安裝包');
-  assert(/AUDIO_RE/.test(swSrc),'Service Worker 要為語音檔做即時快取');
+  assert(swSrc.includes('AUDIO_RE'),'旁白同環境音都用同一套即時快取');
+  assert(/AUDIO_RE/.test(swSrc),'Service Worker 要為聲音檔做即時快取');
   assert(swSrc.includes('AUDIO_RE.test')&&swSrc.includes('(audio|ambience)'),'即時快取要涵蓋旁白同環境音');
   assert(swSrc.includes('has("range")'),'要處理媒體 Range 請求，否則快取唔到');
   assert(pack.length>=40,'離線語音包要包括全部旁白／逐段／環境音（實際 '+pack.length+'）');
