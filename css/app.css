@@ -2698,3 +2698,26 @@ body.story-open .story-stage-wrap{display:block}
 }
 .amb-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 0;border-bottom:1px dashed rgba(255,255,255,.12)}
 .amb-row .mut{font-size:12px}
+
+/* 📝 試卷庫＋🧵跟做紙（2026-09-15） */
+.exam-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin:10px 0}
+.exam-card{border:1.5px solid var(--line);border-radius:14px;background:#fff;padding:11px;display:flex;flex-direction:column;gap:5px}
+.exam-card b{font-size:.92rem;color:#1565c0}
+.exam-card small{font-size:.74rem;color:var(--mute)}
+.exam-qlist{margin:6px 0;padding-left:22px}
+.exam-qlist>li{margin-bottom:10px}
+.exam-opts{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:4px}
+.exam-opt{font-size:.9em}
+.exam-tf{white-space:nowrap}
+.exam-match{display:flex;gap:24px;margin:6px 0}
+.exam-match .exam-col ol,.exam-match .exam-col ul{margin:4px 0;padding-left:22px}
+.exam-match .exam-col li{margin-bottom:8px}
+.exam-key{background:#e8f5e9;border-radius:8px;padding:6px 9px;margin-top:5px}
+.writing-space.tall{min-height:30mm}
+.craft-record{border-collapse:collapse;width:100%;margin:6px 0}
+.craft-record th,.craft-record td{border:1px solid #c9bda6;padding:5px 8px;text-align:left;font-size:.86rem}
+.craft-record th{background:#faf6ec;width:8em}
+.craft-follow{list-style:none;padding-left:0}
+.craft-follow li{margin-bottom:5px}
+.craft-blank.tall{min-height:130px}
+@media print{.exam-grid{display:none}.exam-key{border:1px solid #888}}

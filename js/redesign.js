@@ -228,9 +228,9 @@
      實裝版：工作紙分頁用真實27張索引（逐張預覽／列印＋領袖參考），
      歌曲分頁用 Songbook（跟唱卡＋A4歌紙），冇再係死掣 toast。 */
   /* 素材庫：三個分頁共用一份來源。
-     工作紙＝成員答問題（Content.worksheetIndex，27張逐張可印）；
-     圖紙＝做小手工同剪卡（Craft ＋ 已實裝嘅剪卡／題紙）；
-     歌曲＝Songbook 跟唱卡。全部即開即印，唔跟集會編號。 */
+     工作紙＝獨立試卷庫（ExamPapers，唔跟集會編號，逐份可印）；
+     圖紙＝成員跟做模板（Craft，印出嚟派）＋剪卡題紙；
+     歌曲＝Songbook 跟唱卡。全部即開即印。 */
   App.sheetPrintButtons = function(){
     var rows = [
       ['✂️ 追蹤符號六張剪卡（共用）', "TrackingKit.print('cards')"],
@@ -251,10 +251,9 @@
       : '<p class="mut">歌曲模組未載入：重新整理一次。</p>';
     var worksheets = (typeof Content!=='undefined' && Content.worksheetIndex)
       ? Content.worksheetIndex()
-      : '<p class="mut">文字工作紙載入中。</p>';
-    var worksheets = (typeof Content!=='undefined' && Content.worksheetIndex) ? Content.worksheetIndex() : library;
+      : '<p class="mut">試卷庫載入中：重新整理一次。</p>';
     var sheets = ((typeof Craft!=='undefined' && Craft.panel) ? Craft.panel() : '<p class="mut">圖紙載入中。</p>') + App.sheetPrintButtons();
-    return '<section class="card"><a class="back" href="#plan">‹ 返回目錄</a><h2>✂️ 素材庫</h2><p class="mut">集會中途即開即印。三個分頁：工作紙（成員答問題）、圖紙（做小手工同剪卡）、歌曲。</p><div class="subtabs compact-tabs"><button class="subtab cur" onclick="App.showMiniTab(this,\'worksheets\')">📝 工作紙</button><button class="subtab" onclick="App.showMiniTab(this,\'sheets\')">✂️ 圖紙</button><button class="subtab" onclick="App.showMiniTab(this,\'songs\')">🎵 歌曲</button></div><div id="mini-worksheets" class="mini-pane">'+worksheets+'</div><div id="mini-sheets" class="hidden mini-pane">'+sheets+'</div><div id="mini-songs" class="hidden mini-pane">'+songs+'</div></section>';
+    return '<section class="card"><a class="back" href="#plan">‹ 返回目錄</a><h2>✂️ 素材庫</h2><p class="mut">集會中途即開即印。三個分頁：工作紙（獨立試卷庫）、圖紙（成員跟做模板＋剪卡）、歌曲。</p><div class="subtabs compact-tabs"><button class="subtab cur" onclick="App.showMiniTab(this,\'worksheets\')">📝 工作紙</button><button class="subtab" onclick="App.showMiniTab(this,\'sheets\')">✂️ 圖紙</button><button class="subtab" onclick="App.showMiniTab(this,\'songs\')">🎵 歌曲</button></div><div id="mini-worksheets" class="mini-pane">'+worksheets+'</div><div id="mini-sheets" class="hidden mini-pane">'+sheets+'</div><div id="mini-songs" class="hidden mini-pane">'+songs+'</div></section>';
   };
   App.showMiniTab = function(btn, key){
     if(key==='library') key='worksheets';

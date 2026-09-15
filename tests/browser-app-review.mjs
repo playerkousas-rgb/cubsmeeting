@@ -133,7 +133,8 @@ try{
   }
   await route('#book?sub=uniform');await inspect('offline/uniform');
   await page.evaluate(()=>Jungle.open(0));await inspect('offline/story','#modal');
-  await route('#print');await page.locator('#mini-worksheets .sheet-entry').first().locator('summary').click();
+  await route('#print');await page.locator('#mini-worksheets .exam-card').first().getByRole('button',{name:'預覽'}).click();
+  assert((await page.locator('#modal').innerText()).includes('選擇題'),'exam paper preview works offline');await page.locator('.mx').click();
   assert.equal(await page.locator('#topnav .external-link').getAttribute('aria-disabled'),'true','official external link disabled offline');
   assert.equal(await page.locator('#view a.back').getAttribute('aria-disabled'),null,'internal links still work offline');
   await page.context().setOffline(false);

@@ -111,10 +111,19 @@ try {
   await page.emulateMedia({media:null});
   assert.equal(await page.locator('#modal details').getAttribute('open'),null);
   await page.locator('.mx').click();
-  // No modal: do not expand every worksheet in the index on Ctrl+P.
+  // Exam papers print one sheet each; key stays separate.
+  await page.evaluate(()=>ExamPapers.print('promise-law'));
+  assert.equal(await page.locator('#printarea .exam-sheet').count(),1,'single exam paper prints one sheet');
+  assert.equal(await page.locator('#printarea .exam-key').count(),0,'member paper carries no answers');
+  await page.locator('.mx').click();
+  await page.evaluate(()=>ExamPapers.printKey('promise-law'));
+  assert((await page.locator('#printarea').innerText()).includes('唔派畀成員'),'key warns not to hand out');
+  await page.locator('.mx').click();
+  // No modal: exam index cards stay put on Ctrl+P.
   await page.goto(base+'/#print');
   await page.evaluate(()=>dispatchEvent(new Event('beforeprint')));
-  assert.equal(await page.locator('.sheet-entry[open]').count(),0);
+  assert.equal(await page.locator('#mini-worksheets .exam-card').count(),8);
+  assert.equal(await page.locator('#mini-worksheets details[open]').count(),0);
   await page.evaluate(()=>dispatchEvent(new Event('afterprint')));
   const assets=await page.evaluate(()=>[...new Set(Object.values(SkillArt.map))].map(id=>SkillArt.media(id).src).filter(Boolean));
   await page.context().setOffline(true);

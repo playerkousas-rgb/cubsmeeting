@@ -190,15 +190,19 @@ await page.getByRole('button',{name:'開制服教學包',exact:true}).click();
  await context.setOffline(true);await page.reload();await page.waitForFunction(()=>typeof PlainContent==='object');await page.evaluate(()=>App.activity('c24',3));assert((await page.locator('#modal').innerText()).includes('同一週做三次安全任務'));await page.locator('.mx').click();await context.setOffline(false);
  assert.equal(await page.evaluate(()=>curTid()),'c24');assert.equal(await page.evaluate(()=>localStorage.getItem('cub_flow')),copyFlow);
  console.log('PLAIN CONTENT BROWSER PASS: spoken steps visible on mobile and offline, medical timing/symptoms retained, unchanged selected meeting and preparation.');
- await page.goto(base+'/#sheets');await page.waitForFunction(()=>document.getElementById('view').innerText.includes('文字工作紙'));
- assert.equal(await page.locator('.sheet-entry button[onclick^="WorksheetGuide.open"]').count(),25);
- await page.locator('.sheet-entry').first().locator('summary').click();await page.locator('.sheet-entry').first().getByRole('button',{name:'領袖參考答案與提示'}).click();
- assert.equal(await page.locator('.worksheet-response').count(),3);assert(await page.getByText('唔叫大家照抄',{exact:false}).count());assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.locator('.mx').click();
+ await page.goto(base+'/#sheets');await page.waitForFunction(()=>document.getElementById('view').innerText.includes('試卷・問題卷'));
+ assert.equal(await page.locator('.exam-card').count(),8);
+ await page.locator('.exam-card').first().getByRole('button',{name:'預覽'}).click();
+ assert((await page.locator('#modal').innerText()).includes('選擇題'));
+ await page.locator('#modal').getByRole('button',{name:'領袖答案預覽',exact:true}).click();
+ assert((await page.locator('#modal').innerText()).includes('答案'));
+ assert((await page.evaluate(()=>Practical.summary(Practical.meeting('c01')))).includes("WorksheetGuide.open('c01')"),'per-meeting reflection guide stays in meeting flow');
+ assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.locator('.mx').click();
  await context.setOffline(true);await page.reload();await page.waitForFunction(()=>typeof WorksheetGuide==='object');await page.evaluate(()=>WorksheetGuide.open('c24'));assert((await page.locator('#modal').innerText()).includes('不以同一集會做三次代替一週'));await context.setOffline(false);await page.locator('.mx').click();
  if(process.env.TEST_FONT_CSS)await page.addStyleTag({content:fs.readFileSync(process.env.TEST_FONT_CSS,'utf8')});
  for(const tid of await page.evaluate(()=>Object.keys(WorksheetGuide.data))){await page.evaluate(tid=>WorksheetGuide.print(tid),tid);await page.evaluate(()=>document.fonts.ready);pdf=await page.pdf({format:'A4',preferCSSPageSize:true});assert.equal((pdf.toString('latin1').match(/\/Type \/Page\b/g)||[]).length,1,tid+' worksheet guide fits one A4');await page.locator('.mx').click();}
  assert.equal(await page.evaluate(()=>curTid()),'c24');assert.equal(await page.evaluate(()=>localStorage.getItem('cub_flow')),beforePack);
- console.log('WORKSHEET GUIDES BROWSER PASS: 25 worksheet entry buttons, three aligned responses, mobile/offline use, 25 standalone A4 guide pages and state isolation.');
+ console.log('EXAM PAPERS BROWSER PASS: 8 standalone papers, member/key preview, per-meeting guides stay in meeting flow, mobile/offline use, 25 standalone A4 guide pages and state isolation.');
  // Updated formal text must be available offline, not only in source notes.
  await context.setOffline(true);await page.reload();await page.waitForFunction(()=>typeof Ceremony==='object');
  await page.evaluate(()=>{Ceremony.open('salutes');Ceremony.move(1);});

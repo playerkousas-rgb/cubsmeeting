@@ -34,10 +34,9 @@ var WorksheetGuide = {
  open:function(tid){var d=WorksheetGuide.get(tid);if(!d)return;Modal.open('<h2>工作紙點帶｜'+esc(d.meeting.n)+'</h2>'+WorksheetGuide.content(tid)+'<button class="btn" onclick="WorksheetGuide.print(\''+tid+'\')">只印這張領袖參考</button>');},
  print:function(tid){var html=WorksheetGuide.sheet(tid);if(html)Practical.printModal('工作紙領袖參考',html);}
 };
-(function(){var build=SessionPack.build,summary=Practical.summary,sheets=App.vSheets;
+(function(){var build=SessionPack.build,summary=Practical.summary;
+ /* 集會反思紙保留喺出隊包：跟嗰場集會印（成員反思紙＋領袖參考）。
+    獨立試卷庫（ExamPapers）唔跟集會，由 Content.worksheetIndex 指向。 */
  SessionPack.build=function(m,n,children){var html=build(m,n,children);if(!html)return html;var extra=WorksheetGuide.sheet(m.tid),marker='<section class="psheet divider">';return extra?(html.includes(marker)?html.replace(marker,extra+marker):html+extra):html;};
  Practical.summary=function(m){return summary(m)+(WorksheetGuide.get(m.tid)?'<div class="quick"><button class="btn" onclick="WorksheetGuide.open(\''+m.tid+'\')">工作紙：點答・點提示</button></div>':'');};
- App.vSheets=function(){var html=sheets();DATA.meetings.forEach(function(m){if(!WorksheetGuide.get(m.tid))return;var button='<button class="btn" onclick="PackPrint.open(\'sheet\',\''+m.tid+'\')">預覽及列印呢張</button>';html=html.replace(button,button+'<button class="btn" onclick="WorksheetGuide.open(\''+m.tid+'\')">領袖參考答案與提示</button>');});return html;};
- /* 「工作紙＋歌曲」頁嘅工作紙分頁用呢個：base＋領袖參考鈕，唔疊教材工作台面板。 */
- if(typeof Content!=='undefined'&&Content.worksheetBase){Content.worksheetIndex=function(){var html=Content.worksheetBase();DATA.meetings.forEach(function(m){if(!WorksheetGuide.get(m.tid))return;var button='<button class="btn" onclick="PackPrint.open(\'sheet\',\''+m.tid+'\')">預覽及列印呢張</button>';html=html.replace(button,button+'<button class="btn" onclick="WorksheetGuide.open(\''+m.tid+'\')">領袖參考答案與提示</button>');});return html;};}
 })();
