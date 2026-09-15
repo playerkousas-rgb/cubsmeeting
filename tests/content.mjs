@@ -213,7 +213,9 @@ assert(ctx.Jungle.sceneDone('help','yue')===true,'第二集粵語逐段已錄完
 assert(ctx.Jungle.sceneDone('rules','yue')===true,'第三集粵語逐段已錄完');
 assert(ctx.Jungle.sceneDone('fire','yue')===true,'第四集粵語逐段已錄完');
 assert(ctx.Jungle.sceneDone('village','yue')===true,'第五集粵語逐段已錄完');
-assert(ctx.Jungle.sceneDone('welcome','zh')===false,'普通話逐段仲未錄完');
+assert(ctx.Jungle.sceneDone('welcome','zh')===true,'第一集普通話逐段已錄完');
+assert(ctx.Jungle.sceneDone('help','zh')===true,'第二集普通話逐段已錄完');
+assert(ctx.Jungle.sceneDone('rules','zh')===false,'第三集普通話逐段仲未錄完');
 const before=played.length;
 ctx.Jungle.playNarration('zh');
 assert(played.length===before,'未錄逐段就唔會亂播其他集音檔');
@@ -272,8 +274,9 @@ assert(ctx.Jungle.mmss(75)==='1:15','時間顯示格式');
     }
   }
   function scenesFilledPartial(id,code){const arr=(sa[id]||{})[code]||[];return arr.some(Boolean)&&!arr.every(Boolean);}
-  assert(filled>=30,'起碼有 30 段逐段旁白（實際 '+filled+'）');
+  assert(filled>=40,'起碼有 40 段逐段旁白（實際 '+filled+'）');
   assert.equal(Object.values(sa).reduce((n,b)=>n+(b.yue||[]).filter(Boolean).length,0),27,'粵語逐段共 27 段');
+  assert.equal(Object.values(sa).reduce((n,b)=>n+(b.zh||[]).filter(Boolean).length,0),13,'普通話逐段 13 段');
   for(const ep of DATA.jungle.episodes){
     assert(ctx.Jungle.sceneDone(ep.id,'yue'),'粵語逐段要全套完成：'+ep.id);
     const yue=(sa[ep.id].yue||[]);
@@ -282,9 +285,9 @@ assert(ctx.Jungle.mmss(75)==='1:15','時間顯示格式');
   }
   assert(ctx.Jungle.sceneFile('welcome','yue',1).includes('welcome-1-yue.mp3'),'sceneFile 對得住第一段');
   assert.equal(ctx.Jungle.sceneFile('welcome','yue',0),'','封面冇逐段聲');
-  assert.equal(ctx.Jungle.sceneFile('help','zh',1),'','未錄嘅語言唔會亂回檔案');
-  assert(ctx.Jungle.sceneFile('welcome','zh',1).includes('welcome-1-zh.mp3'),'普通話逐段開始有檔案');
-  assert.equal(ctx.Jungle.sceneFile('welcome','zh',4),'','未錄嘅段落要回空（唔會亂咁回一個檔）');
+  assert.equal(ctx.Jungle.sceneFile('rules','zh',1),'','未錄嘅語言唔會亂回檔案');
+  assert(ctx.Jungle.sceneFile('welcome','zh',4).includes('welcome-4-zh.mp3'),'普通話逐段有檔案');
+  assert.equal(ctx.Jungle.sceneFile('welcome','zh',1).includes('welcome-1-zh.mp3'),true,'第一段普通話仍然在');
   assert.equal(ctx.Jungle.sceneFile('nope','yue',1),'','唔存在嘅集唔會爆');
 }
 /* 7. 環境音：檔案齊、已入快取、音量上限 */
