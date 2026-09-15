@@ -356,6 +356,7 @@ var Jungle = {
         '<span class="mut">'+parts+'段</span></div>';}).join('');
     Modal.open('<h2>🎚️ 試聽：旁白＋環境音</h2>'+
       '<p class="mut">撳落去就播，唔需要開投屏。旁白係柔和女聲、講故事語氣；環境音只作細聲墊底。</p>'+
+      '<p class="mut">逐段旁白覆蓋：'+esc(Jungle.sceneCoverage())+'（逐段模式會跟圖自動跳下一張）</p>'+
       '<h3>旁白</h3>'+epRows+
       '<h3>環境音</h3>'+rows.map(function(r){
         return '<div class="amb-row"><button class="btn sm" onclick="Jungle.ambPlayLab(\''+r[0]+'\')">▶ '+r[1]+'</button><button class="btn sm" onclick="Jungle.ambPlayLab(\''+r[0]+'\',true)">🔁 連播</button><span class="mut">'+r[2]+'</span></div>';}).join('')+
@@ -408,6 +409,15 @@ var Jungle = {
     step(0);
   },
   packSummary:function(){return Jungle.audioPackList().length+' 個語音檔';},
+  /* 逐段旁白覆蓋率（畀領袖一眼睇到邊種語言齊）：例如「粵 27/27、普 27/27、英 26/27」 */
+  sceneCoverage:function(){
+    var total=DATA.jungle.episodes.reduce(function(n,e){return n+e.scenes.length;},0);
+    return DATA.jungle.narration.langs.map(function(l){
+      var done=0;
+      DATA.jungle.episodes.forEach(function(e){done+=(((DATA.jungle.sceneAudio[e.id]||{})[l[0]]||[]).filter(Boolean).length);});
+      return l[1]+' '+done+'/'+total;
+    }).join('、');
+  },
   sheets:function(i){
     var ep=DATA.jungle.episodes[i];if(!ep)return '';
     return '<section class="psheet story-sheet"><h2>🌳 '+esc(ep.title)+'｜故事文字</h2><p class="mut">'+esc((DATA.jungle.decks[ep.id]||{}).subtitle||'')+'</p>'+ep.scenes.map(function(s,k){
