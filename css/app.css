@@ -2626,6 +2626,9 @@ body.story-open .story-stage-wrap{display:flex}
 .story-audio .story-lang.cur{background:#8fd3b3;border-color:#8fd3b3;color:#0e1b17;font-weight:700}
 .story-audio input[type=range]{flex:1;min-width:120px;accent-color:#8fd3b3}
 .story-audio audio{display:none}
+.story-audio #story-audio-seek,.story-audio #story-amb-vol{flex:0 1 140px;min-width:90px}
+.story-audio .story-langnote{color:#c8b98a}
+.story-audio input[type=range]#story-amb-vol{accent-color:#7fb98f}
 body.story-open{overflow:hidden}
 
 body.story-open .story-stage-wrap{display:block}

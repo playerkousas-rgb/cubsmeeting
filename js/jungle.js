@@ -79,35 +79,83 @@ var Jungle = {
     if(main)main.innerHTML=html; else if(el)el.innerHTML=html;
     return html;
   },
-  /* ---------- 旁白錄音 ---------- */
-  audio:{ep:-1,lang:'',part:0,playing:false},
+  /* ---------- 旁白錄音（兩種模式）＋環境音墊底 ----------
+     逐段模式：每次只播當前嗰段，播完自動跳下一張圖（可熄）。
+     整集模式：由頭連續播成集旁白，唔會自動跳圖。
+     環境音：原創合成 loop，細音量墊底；自己講故事都可以開住。 */
+  audio:{ep:-1,lang:'',part:0,playing:false,mode:'scene',auto:true,amb:true,ambVol:0.12},
+  prefs:function(){
+    if(!Jungle._prefs){
+      var p=null;try{p=Store.get('storyPrefs',null);}catch(e){p=null;}
+      p=p||{};
+      Jungle.audio.mode=p.mode==='episode'?'episode':'scene';
+      Jungle.audio.auto=p.auto!==false;
+      Jungle.audio.amb=p.amb!==false;
+      Jungle.audio.ambVol=typeof p.ambVol==='number'&&p.ambVol>0&&p.ambVol<=0.4?p.ambVol:0.12;
+      Jungle._prefs=true;
+    }
+    return Jungle.audio;
+  },
+  savePrefs:function(){try{Store.set('storyPrefs',{mode:Jungle.audio.mode,auto:Jungle.audio.auto,amb:Jungle.audio.amb,ambVol:Jungle.audio.ambVol});}catch(e){}},
   langsOf:function(id){var f=(DATA.jungle.narration.files[id]||{});return DATA.jungle.narration.langs.filter(function(l){return f[l[0]]&&f[l[0]].length;});},
   audioEl:function(){return document.getElementById('story-track');},
+  ambEl:function(){return document.getElementById('story-amb');},
   langNote:function(lang){var n=(DATA.jungle.narration.langNotes||{})[lang];return n||'';},
+  /* 逐段旁白：slide 0 係封面，冇逐段聲；scene 由 slide 1 開始 */
+  sceneFile:function(epId,lang,slide){
+    var byLang=(DATA.jungle.sceneAudio||{})[epId];
+    if(!byLang)return '';
+    var arr=byLang[lang]||[];
+    return (slide>=1&&arr[slide-1])?arr[slide-1]:'';
+  },
+  currentSceneFile:function(){return Jungle.sceneFile(DATA.jungle.episodes[Jungle.stageState.ep].id,Jungle.audio.lang,Jungle.stageState.slide);},
+  sceneDone:function(epId,lang){
+    var byLang=(DATA.jungle.sceneAudio||{})[epId]||{};
+    var arr=byLang[lang]||[];
+    var want=DATA.jungle.episodes.find(function(e){return e.id===epId;}).scenes.length;
+    return arr.length>=want&&arr.slice(0,want).every(function(x){return !!x;});
+  },
+  slideAmb:function(){
+    var ep=DATA.jungle.episodes[Jungle.stageState.ep], d=DATA.jungle.decks[ep.id]||{};
+    if(Jungle.stageState.slide===0)return d.amb||'day';
+    var sc=ep.scenes[Jungle.stageState.slide-1];
+    return (sc&&sc.amb)||d.amb||'day';
+  },
+  ambSrc:function(){var key=Jungle.slideAmb();return (DATA.jungle.ambience||{})[key]||'';},
   audioBarHTML:function(){
     var ep=DATA.jungle.episodes[Jungle.stageState.ep], langs=Jungle.langsOf(ep.id);
     if(!langs.length)return '<span class="story-hint">🎧 本集未附旁白錄音；可以直接照文字講。</span>';
+    var a=Jungle.audio;
+    var sceneReady=langs.some(function(l){return !!Jungle.sceneFile(ep.id,l[0],1);});
     return '<span class="story-hint">🎧 旁白</span>'+
       langs.map(function(l){return '<button class="btn sm story-lang" data-lang="'+l[0]+'" onclick="Jungle.playNarration(\''+l[0]+'\')">'+esc(l[1])+'</button>';}).join('')+
       '<button class="btn sm gr" id="story-audio-btn" onclick="Jungle.toggleNarration()">▶ 播</button>'+
+      '<button class="btn sm" id="story-mode-btn" onclick="Jungle.toggleMode()" title="逐段＝一段一張圖；整集＝連續播">'+(a.mode==='scene'?'📄 逐段':'🎞️ 整集')+(Jungle.sceneDone(ep.id,a.lang)?'':(a.mode==='scene'?'（部分）':''))+'</button>'+
+      (a.mode==='scene'?'<button class="btn sm" id="story-auto-btn" onclick="Jungle.toggleAuto()" aria-pressed="'+(a.auto?'true':'false')+'">'+(a.auto?'🔁 自動跟圖':'⏸ 唔自動')+'</button>':'')+
       '<input type="range" id="story-audio-seek" min="0" max="100" value="0" oninput="Jungle.seekNarration(this.value)" aria-label="旁白進度">'+
       '<span class="story-hint" id="story-audio-state">準備好</span>'+
-      '<span class="story-hint">播住都可以照撳圖｜想自己講就唔播</span>'+
-      (Jungle.langNote(Jungle.audio.lang)?'<span class="story-hint story-langnote">'+esc(Jungle.langNote(Jungle.audio.lang))+'</span>':'');
+      '<button class="btn sm" id="story-amb-btn" onclick="Jungle.toggleAmb()" aria-pressed="'+(a.amb?'true':'false')+'">🌿 環境音'+(a.amb?'開':'關')+'</button>'+
+      '<input type="range" id="story-amb-vol" min="0" max="100" value="'+Math.round((a.ambVol-0.02)/0.35*100)+'" oninput="Jungle.setAmbVol(this.value)" aria-label="環境音音量">'+
+      '<span class="story-hint">'+(a.mode==='scene'?'逐段：播完自動跳圖｜':'')+'播住都可以照撳圖｜想自己講就唔播</span>'+
+      (Jungle.langNote(a.lang)?'<span class="story-hint story-langnote">'+esc(Jungle.langNote(a.lang))+'</span>':'');
   },
   buildAudio:function(){
+    Jungle.prefs();
     var bar=document.getElementById('story-audio');
     if(!bar)return;
     if(Jungle.audio.ep!==Jungle.stageState.ep){Jungle.audio.ep=Jungle.stageState.ep;Jungle.audio.part=0;Jungle.audio.playing=false;Jungle.audio.lang='';}
     var langs=Jungle.langsOf(DATA.jungle.episodes[Jungle.stageState.ep].id);
     if(!Jungle.audio.lang||!langs.some(function(l){return l[0]===Jungle.audio.lang;}))Jungle.audio.lang=langs.length?langs[0][0]:'';
-    bar.innerHTML='<audio id="story-track" preload="metadata"></audio>'+Jungle.audioBarHTML();
+    bar.innerHTML='<audio id="story-track" preload="metadata"></audio><audio id="story-amb" loop preload="none"></audio>'+Jungle.audioBarHTML();
     var el=Jungle.audioEl();
     if(el&&typeof el.addEventListener==='function'){
       el.addEventListener('ended',function(){Jungle.narrationEnded();});
       el.addEventListener('timeupdate',function(){Jungle.markAudio();});
       el.addEventListener('error',function(){Jungle.audioError();});
     }
+    var amb=Jungle.ambEl();
+    if(amb&&typeof amb.addEventListener==='function')amb.addEventListener('error',function(){if(amb.parentNode)amb.parentNode.removeChild(amb);});
+    Jungle.syncAmb();
     Jungle.markAudio();
   },
   audioNote:function(msg){var s=document.getElementById('story-audio-state');if(s)s.textContent=msg;},
@@ -122,38 +170,109 @@ var Jungle = {
     var btn=document.getElementById('story-audio-btn');
     if(btn)btn.textContent=Jungle.audio.playing?'⏸ 停':'▶ 播';
     var st=document.getElementById('story-audio-state');
-    if(!st||!list.length)return;
-    var el=Jungle.audioEl(), label=Jungle.audio.playing?'播放中':'已暫停';
-    var extra=(Jungle.audio.part+1)+'/'+list.length;
-    st.textContent=label+'｜'+extra+(el&&el.duration&&isFinite(el.duration)?'｜'+Jungle.mmss(el.currentTime)+' / '+Jungle.mmss(el.duration):'');
+    if(st&&list.length){
+      var el=Jungle.audioEl(), label=Jungle.audio.playing?'播放中':'已暫停';
+      var scope=Jungle.audio.mode==='scene'?'逐段':'整集';
+      var pos=Jungle.audio.mode==='scene'?((Jungle.stageState.slide>0?(Jungle.stageState.slide)+'/'+ep.scenes.length:'封面')):
+        ((Jungle.audio.part+1)+'/'+list.length);
+      st.textContent=label+'｜'+scope+' '+pos+(el&&el.duration&&isFinite(el.duration)?'｜'+Jungle.mmss(el.currentTime)+' / '+Jungle.mmss(el.duration):'');
+    }
     var seek=document.getElementById('story-audio-seek');
-    if(seek&&el&&el.duration&&isFinite(el.duration))seek.value=String(Math.round((el.currentTime/el.duration)*100));
+    var el2=Jungle.audioEl();
+    if(seek&&el2&&el2.duration&&isFinite(el2.duration))seek.value=String(Math.round((el2.currentTime/el2.duration)*100));
+    var modeBtn=document.getElementById('story-mode-btn');
+    if(modeBtn)modeBtn.textContent=(Jungle.audio.mode==='scene'?'📄 逐段':'🎞️ 整集')+(Jungle.sceneDone(ep.id,Jungle.audio.lang)?'':'（部分）');
+    var ambBtn=document.getElementById('story-amb-btn');
+    if(ambBtn)ambBtn.textContent='🌿 環境音'+(Jungle.audio.amb?'開':'關');
   },
   mmss:function(t){t=Math.max(0,Math.round(t||0));return Math.floor(t/60)+':'+('0'+(t%60)).slice(-2);},
+  /* 揀語言 */
   playNarration:function(lang){
     var ep=DATA.jungle.episodes[Jungle.stageState.ep];
     var list=(DATA.jungle.narration.files[ep.id]||{})[lang];if(!list||!list.length)return;
     Jungle.audio.lang=lang;Jungle.audio.part=0;Jungle.audio.ep=Jungle.stageState.ep;
+    Jungle.buildAudio();
+    Jungle.playCurrent(true);
+  },
+  /* 由當前位置開始播：逐段模式播當前段；整集模式由頭／由指定段播 */
+  playCurrent:function(fromStart){
+    var ep=DATA.jungle.episodes[Jungle.stageState.ep];
     var el=Jungle.audioEl();
     if(!el||typeof el.play!=='function'){Jungle.audioNote('呢部機／呢個環境播唔到；可以直接照文字講。');Jungle.markAudio();return;}
-    el.src=list[0];
+    if(Jungle.audio.mode==='scene'){
+      if(Jungle.stageState.slide===0)Jungle.stageMove(1);
+      var file=Jungle.currentSceneFile();
+      if(!file){Jungle.audioNote('呢段未有逐段旁白；可以撳「🎞️ 整集」聽成集，或自己講。');Jungle.markAudio();return;}
+      el.src=file;
+    }else{
+      var list=(DATA.jungle.narration.files[ep.id]||{})[Jungle.audio.lang]||[];
+      if(fromStart)Jungle.audio.part=0;
+      if(!list.length)return;
+      el.src=list[Math.min(Jungle.audio.part,list.length-1)];
+    }
     var p=el.play();if(p&&p.catch)p.catch(function(){Jungle.audioNote('音檔未載入，可能未快取；可以直接照文字講。');});
-    Jungle.audio.playing=true;Jungle.markAudio();
+    Jungle.audio.playing=true;Jungle.startAmb();Jungle.markAudio();
   },
   toggleNarration:function(){
     var el=Jungle.audioEl();
-    if(Jungle.audio.playing){if(el&&typeof el.pause==='function')el.pause();Jungle.audio.playing=false;Jungle.markAudio();return;}
-    if(el&&el.src){if(typeof el.play==='function')el.play();Jungle.audio.playing=true;Jungle.markAudio();return;}
-    Jungle.playNarration(Jungle.audio.lang||((Jungle.langsOf(DATA.jungle.episodes[Jungle.stageState.ep].id)[0]||[])[0]||''));
+    if(Jungle.audio.playing){Jungle.pauseNarration();return;}
+    var hasSrc=el&&el.src&&Jungle.audio.mode==='scene'&&String(el.src).indexOf('scene/')>=0;
+    if(hasSrc){if(typeof el.play==='function')el.play();Jungle.audio.playing=true;Jungle.startAmb();Jungle.markAudio();return;}
+    if(el&&el.src&&Jungle.audio.mode==='episode'){if(typeof el.play==='function')el.play();Jungle.audio.playing=true;Jungle.startAmb();Jungle.markAudio();return;}
+    Jungle.playCurrent(false);
   },
   narrationEnded:function(){
     var ep=DATA.jungle.episodes[Jungle.stageState.ep];
+    if(Jungle.audio.mode==='scene'){
+      if(!Jungle.audio.auto){Jungle.audio.playing=false;Jungle.markAudio();return;}
+      var total=Jungle.slides(Jungle.stageState.ep).length;
+      if(Jungle.stageState.slide>=total-1){Jungle.audio.playing=false;Jungle.markAudio();Jungle.audioNote('成集講完；可以再撳「▶ 播」聽多次。');return;}
+      Jungle.stageMove(1);
+      var file=Jungle.currentSceneFile();
+      if(!file){Jungle.audio.playing=false;Jungle.markAudio();Jungle.audioNote('下一段未有逐段旁白；可以自己講，或者撳「🎞️ 整集」。');return;}
+      var el=Jungle.audioEl();
+      if(el&&typeof el.play==='function'){el.src=file;el.play();}
+      Jungle.markAudio();return;
+    }
     var list=(DATA.jungle.narration.files[ep.id]||{})[Jungle.audio.lang]||[];
-    if(Jungle.audio.part+1<list.length){Jungle.audio.part++;var el=Jungle.audioEl();if(el&&typeof el.play==='function'){el.src=list[Jungle.audio.part];el.play();}Jungle.markAudio();return;}
+    if(Jungle.audio.part+1<list.length){Jungle.audio.part++;var el2=Jungle.audioEl();if(el2&&typeof el2.play==='function'){el2.src=list[Jungle.audio.part];el2.play();}Jungle.markAudio();return;}
     Jungle.audio.playing=false;Jungle.audio.part=0;Jungle.markAudio();Jungle.audioNote('播完；可以再撳「▶ 播」聽多次。');
   },
-  pauseNarration:function(){var el=Jungle.audioEl();if(el&&typeof el.pause==='function')el.pause();Jungle.audio.playing=false;Jungle.markAudio();},
+  toggleMode:function(){
+    Jungle.audio.mode=Jungle.audio.mode==='scene'?'episode':'scene';
+    Jungle.audio.part=0;Jungle.savePrefs();
+    var el=Jungle.audioEl();if(el&&typeof el.pause==='function')el.pause();
+    Jungle.audio.playing=false;
+    Jungle.buildAudio();
+    Jungle.audioNote(Jungle.audio.mode==='scene'?'已轉逐段：播完一段自動跳下一張圖。':'已轉整集：連續播完成集旁白，唔會自動跳圖。');
+  },
+  toggleAuto:function(){Jungle.audio.auto=!Jungle.audio.auto;Jungle.savePrefs();Jungle.buildAudio();Jungle.audioNote(Jungle.audio.auto?'自動跟圖：開':'自動跟圖：關（播完停低等你）');},
+  pauseNarration:function(){var el=Jungle.audioEl();if(el&&typeof el.pause==='function')el.pause();Jungle.audio.playing=false;Jungle.stopAmb();Jungle.markAudio();},
   seekNarration:function(v){var el=Jungle.audioEl();if(el&&el.duration&&isFinite(el.duration))el.currentTime=el.duration*(Number(v)/100);},
+  /* 環境音 */
+  syncAmb:function(){
+    var el=Jungle.ambEl();if(!el)return;
+    var src=Jungle.ambSrc();
+    if(src&&el.src!==src&&el.getAttribute&&el.getAttribute('src')!==src){el.src=src;}
+    el.loop=true;el.volume=Jungle.audio.ambVol;
+  },
+  startAmb:function(){
+    Jungle.prefs();if(!Jungle.audio.amb)return;
+    var el=Jungle.ambEl();if(!el||typeof el.play!=='function')return;
+    if(!el.getAttribute('src')&&!el.src)Jungle.syncAmb();
+    el.loop=true;el.volume=Jungle.audio.ambVol;
+    var p=el.play();if(p&&p.catch)p.catch(function(){});
+  },
+  stopAmb:function(){var el=Jungle.ambEl();if(el&&typeof el.pause==='function')el.pause();},
+  toggleAmb:function(){
+    Jungle.prefs();Jungle.audio.amb=!Jungle.audio.amb;Jungle.savePrefs();
+    if(Jungle.audio.amb){Jungle.syncAmb();Jungle.startAmb();Jungle.audioNote('環境音：開（細聲墊底）');}
+    else{Jungle.stopAmb();Jungle.audioNote('環境音：關');}
+    Jungle.markAudio();
+  },
+  setAmbVol:function(v){Jungle.prefs();Jungle.audio.ambVol=0.02+Math.max(0,Math.min(100,Number(v)||0))/100*0.35;Jungle.savePrefs();var el=Jungle.ambEl();if(el)el.volume=Jungle.audio.ambVol;},
+  /* 印本集文字：每段一頁，圖＋文字，問題另附領袖答案頁 */
+  /* ---------- 舞台控制 ---------- */
   show:function(i){
     if(!DATA.jungle.episodes[i])return;
     if(typeof Modal!=='undefined'&&Modal.close)Modal.close();
@@ -163,7 +282,7 @@ var Jungle = {
     Jungle.bindKeys(true);
   },
   stageClose:function(){
-    Jungle.pauseNarration();
+    Jungle.pauseNarration();Jungle.stopAmb();
     var el=document.getElementById('story-stage');if(el)el.innerHTML='';
     Jungle._skeleton=false;
     document.body.classList.remove('story-open');
@@ -173,7 +292,9 @@ var Jungle = {
   stageMove:function(d){var all=Jungle.slides(Jungle.stageState.ep);var n=Jungle.stageState.slide+d;
     if(!isFinite(n))return;n=Math.max(0,Math.min(all.length-1,n));
     if(n===Jungle.stageState.slide)return;
-    Jungle.stageState.slide=n;Jungle.page=Math.max(0,n-1);Jungle.stageState.ask=false;Jungle.renderMain();Jungle.markAudio();},
+    Jungle.stageState.slide=n;Jungle.page=Math.max(0,n-1);Jungle.stageState.ask=false;Jungle.renderMain();Jungle.syncAmb();
+    var amb=Jungle.ambEl();if(amb&&Jungle.audio.amb&&typeof amb.play==='function'&&amb.paused!==false){Jungle.startAmb();}
+    Jungle.markAudio();},
   episodeStep:function(i){if(!DATA.jungle.episodes[i]||i<0)return;Jungle.pauseNarration();Jungle.stageState={ep:i,slide:0,ask:false};Jungle.episode=i;Jungle.page=0;Jungle.stage();},
   stageAsk:function(){if(Jungle.stageState.slide===0)return;Jungle.stageState.ask=!Jungle.stageState.ask;Jungle.renderMain();},
   fontStep:function(d){var el=document.getElementById('story-stage');if(!el)return;
@@ -190,13 +311,14 @@ var Jungle = {
     if(k==='ArrowRight'||k===' '||k==='PageDown'){Jungle.stageMove(1);e.preventDefault();}
     else if(k==='ArrowLeft'||k==='PageUp'){Jungle.stageMove(-1);e.preventDefault();}
     else if(k==='q'||k==='Q'||k==='?'){Jungle.stageAsk();e.preventDefault();}
+    else if(k==='p'||k==='P'){Jungle.toggleNarration();e.preventDefault();}
+    else if(k==='m'||k==='M'){Jungle.toggleAmb();e.preventDefault();}
     else if(k==='Escape'){Jungle.stageClose();}
   },
   bindKeys:function(on){
     if(on){if(Jungle._bound)return;Jungle._bound=true;document.addEventListener('keydown',Jungle.keys);}
     else{if(!Jungle._bound)return;Jungle._bound=false;document.removeEventListener('keydown',Jungle.keys);}
   },
-  /* 印本集文字：每段一頁，圖＋文字，問題另附領袖答案頁 */
   sheets:function(i){
     var ep=DATA.jungle.episodes[i];if(!ep)return '';
     return '<section class="psheet story-sheet"><h2>🌳 '+esc(ep.title)+'｜故事文字</h2><p class="mut">'+esc((DATA.jungle.decks[ep.id]||{}).subtitle||'')+'</p>'+ep.scenes.map(function(s,k){
