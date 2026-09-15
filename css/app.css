@@ -2564,3 +2564,34 @@ body.offline .extcard{opacity:.55}
   .skill-formal-copy ol { margin: 1mm 0; }
   .skill-formal-copy small { font-size: 8pt; }
 }
+
+/* ===== 素材庫 Material Library ===== */
+.material-library { margin-top: 12px; }
+.material-cat { border: 1px solid #e4dccd; border-radius: 12px; margin-bottom: 10px; overflow: hidden; background: #fffdf8; }
+.material-cat summary { display: flex; align-items: center; gap: 8px; padding: 12px 14px; cursor: pointer; list-style: none; font-size: 15px; }
+.material-cat summary::-webkit-details-marker { display: none; }
+.material-cat summary::before { content: '▸'; color: #8d6e63; font-size: 12px; transition: transform .2s; }
+.material-cat[open] summary::before { transform: rotate(90deg); }
+.cat-icon { font-size: 22px; flex-shrink: 0; }
+.material-cat summary b { flex: 1; color: #4e342e; }
+.material-cat summary small { color: #6d6455; font-size: 12px; display: none; }
+.cat-count { background: #FF6F0018; color: #FF6F00; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+.material-items { padding: 8px 14px 14px; border-top: 1px solid #e4dccd; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+.material-item { background: #fff; border: 1px solid #e4dccd; border-radius: 10px; padding: 10px 12px; }
+.material-item b { display: block; font-size: 14px; color: #4e342e; margin-bottom: 2px; }
+.material-item small { color: #6d6455; font-size: 11px; display: block; margin-bottom: 6px; }
+.material-prompts { margin: 6px 0; padding-left: 16px; font-size: 12px; color: #4e342e; line-height: 1.5; }
+.material-prompts li { margin-bottom: 2px; }
+
+
+/* 歌曲旋律按鈕 */
+.song-play-btn { animation: pulse-soft 2s infinite; }
+@keyframes pulse-soft { 0%,100% { opacity: 1; } 50% { opacity: .85; } }
+
+@media screen and (max-width: 599px) {
+  .material-items { grid-template-columns: 1fr; }
+  .material-cat summary small { display: inline; }
+}
+@media print {
+  .material-library { display: none; }
+}

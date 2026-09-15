@@ -42,7 +42,7 @@ const ok = (c, msg) => { console.log((c ? "✓ " : "✗ FAIL ") + msg); if (!c) 
 
 /* 1. 下方導覽逐粒撳：路由開到 + 真係渲染到對應版面 */
 const expect = {
-  "#print":  ["工作紙＋歌曲", 'id="mini-worksheets"', 'id="mini-songs"'],
+  "#print":  ["素材庫＋歌曲", 'id="mini-library"', 'id="mini-songs"'],
   "#play":   ["活動・技能帶領卡", "森林故事・角色卡"],
   "#badge":  ["活動章工具書", "badge-group-grid"],
   "#jungle": ["森林故事"],
@@ -78,7 +78,7 @@ ok(!/#song/.test(bot), "#song 唔再係固定下方導覽掣");
 for (const legacy of ["#song", "#songs", "#craft"]) {
   Q(`location.hash='${legacy}'; App.route()`);
   ok(Q("App.tab") === "print", `舊 ${legacy} → 轉入工作紙＋歌曲頁（App.tab='${Q("App.tab")}'）`);
-  ok(view.innerHTML.includes("工作紙＋歌曲"), `舊 ${legacy} → 渲染到合併頁，冇孤兒版`);
+  ok(view.innerHTML.includes("素材庫＋歌曲"), `舊 ${legacy} → 渲染到合併頁，冇孤兒版`);
 }
 
 /* 3. 拆咗記錄頁之後，#track 唔可以變死胡同；改名單要有新入口 */
@@ -102,12 +102,12 @@ for (const legacy of ["#song", "#songs", "#craft"]) {
   };
   const ws = mkPane(false), sg = mkPane(true);
   const tabs = [{ classList: { add() {}, remove() {} } }, { classList: { add() {}, remove() {} } }];
-  const card = { querySelectorAll: () => tabs, querySelector: (s) => (s === "#mini-worksheets" ? ws : sg) };
+  const card = { querySelectorAll: () => tabs, querySelector: (s) => (s === "#mini-library" ? ws : sg) };
   const mkBtn = () => ({ closest: () => card, classList: { add() {}, remove() {} } });
   Q("App.showMiniTab")(mkBtn(), "songs");
-  ok(ws.hidden === true && sg.hidden === false, "撳「歌曲」小分頁 → 工作紙收起、歌曲顯示");
-  Q("App.showMiniTab")(mkBtn(), "worksheets");
-  ok(ws.hidden === false && sg.hidden === true, "撳「工作紙」小分頁 → 歌曲收起、工作紙顯示");
+  ok(ws.hidden === true && sg.hidden === false, "撳「歌曲」小分頁 → 素材庫收起、歌曲顯示");
+  Q("App.showMiniTab")(mkBtn(), "library");
+  ok(ws.hidden === false && sg.hidden === true, "撳「素材庫」小分頁 → 歌曲收起、素材庫顯示");
 }
 
 console.log(fail === 0 ? "\nNAV PASS" : `\nNAV FAIL (${fail})`);

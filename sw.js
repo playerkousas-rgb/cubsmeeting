@@ -1,5 +1,5 @@
 /* 🐺 幼童軍團集會助手 — Service Worker (offline first，cache齊) */
-var CACHE = "cubhub-v24-learning-scenes-20260915";
+var CACHE = "cubhub-v25-material-library-20260915";
 var ASSETS = [
   "./", "./index.html", "./manifest.webmanifest", "./css/app.css",
   "./js/data.js", "./js/guide.js", "./js/flow.js", "./js/app.js", "./js/redesign.js", "./js/content.js", "./js/jungle-data.js", "./js/jungle.js", "./js/practical-data.js", "./js/practical.js", "./js/uniform-ceremony.js", "./js/field-visuals.js", "./js/salute-lab.js", "./js/salute-positions.js", "./js/tracking-kit.js", "./js/material-desk.js", "./js/plain-content.js", "./js/worksheet-guides.js", "./js/skill-art.js", "./js/songbook.js",
@@ -14,12 +14,12 @@ var ASSETS = [
   "./assets/skills/help-call-scene.avif",
   "./assets/skills/help-steps-scene.avif",
   "./assets/skills/knot-choose.avif",
-  "./assets/skills/nosebleed.avif",
   "./assets/skills/overhand.avif",
   "./assets/skills/reef.avif",
   "./assets/skills/senses-scene.avif",
   "./assets/skills/snack-box-scene.avif",
-  "./assets/skills/wound.avif",
+  "./assets/skills/wound-scene.avif",
+  "./assets/skills/nosebleed-scene.avif",
   "./assets/skills/promise-reading-scene.avif",
   "./assets/skills/group-card-scene.avif",
   "./assets/skills/festival-discovery-scene.avif",

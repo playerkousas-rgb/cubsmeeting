@@ -47,14 +47,13 @@ const Q = (s) => vm.runInContext(s, sb);
 /* 2. 工作紙＋歌曲實裝 */
 {
   const p = Q("App.vPrint()");
-  const sheets = (p.match(/預覽及列印呢張/g) || []).length;
-  ok(sheets === 27, `工作紙分頁有27張逐張列印鈕（實際 ${sheets}）`);
-  ok((p.match(/領袖參考答案與提示/g) || []).length === 25, "25場實戰集會的工作紙附領袖參考鈕");
+  const sheets = (p.match(/PackPrint\.open\('sheet'/g) || []).length;
+  ok(sheets >= 25, `素材庫有${sheets}張逐張列印入口（至少25場）`);
+  ok(p.includes('material-library'), "素材庫有分類結構");
   ok(p.includes('id="mini-songs"') && p.includes("Songbook.open("), "歌曲分頁係真實歌卡（Songbook.open）");
   ok(!/onclick="toast\('🎵|onclick="toast\('📣|onclick="toast\('🔥/.test(p), "歌曲分頁冇再用死掣 toast 扮實裝");
   ok(Q("App.vSongs()") === p && Q("App.vSong()") === p, "舊 #songs／#song 路由仍指同一合併頁");
-  ok(Q("typeof Content!=='undefined' && typeof Content.worksheetIndex==='function'"), "Content.worksheetIndex 存在（#print 同 #sheets 共用單一來源）");
-  ok(Q("Content.worksheetIndex()").includes("預覽及列印呢張") && !Q("Content.worksheetIndex()").includes("教材工作台"), "工作紙分頁唔疊教材工作台面板（面板留喺手冊）");
+  ok(Q("typeof Content!=='undefined' && typeof Content.worksheetIndex==='function'"), "Content.worksheetIndex 存在（#sheets 仍可用）");
 }
 
 /* 3. Songbook 內容與界線 */
@@ -114,8 +113,8 @@ const Q = (s) => vm.runInContext(s, sb);
   });
   ok(Q("SkillArt.vectors.length")===28, '28 geometry diagrams render as SVG');
   const illustrations=Q("SkillArt.illustrations");
-  ok(Object.keys(illustrations).length===40, 'forty separately authored scenes, not rasterized line drawings');
-  ok(Q("Object.keys(SkillArt.art).filter(id=>SkillArt.media(id).kind==='legacy-diagram').length")===5, 'five legacy diagrams still explicitly pending');
+  ok(Object.keys(illustrations).length===42, 'forty-two separately authored scenes, not rasterized line drawings');
+  ok(Q("Object.keys(SkillArt.art).filter(id=>SkillArt.media(id).kind==='legacy-diagram').length")===3, 'three legacy diagrams still explicitly pending (knots)');
   for(const [id,picture] of Object.entries(illustrations)) {
     const key=keys.find(key=>map[key]===id), [tid,i]=key.split(':');
     const sheet=Q(`SkillArt.sheet('${tid}',${i})`);

@@ -35,7 +35,7 @@
     {id:'book', icon:'📖', title:'手冊', desc:'誓詞·制服·儀式·六色', color:'#FF6F00', img:'assets/manual/handbook.avif', hint:'新領袖必讀'}
   ];
   var BOTTOM = [
-    {id:'print', icon:'✂️', title:'工作紙＋歌曲', desc:'小分頁·即印即用', color:'#FF6F00', img:'assets/manual/craft.avif', hint:'合併'},
+    {id:'print', icon:'✂️', title:'素材庫＋歌曲', desc:'搵素材·即印即用', color:'#FF6F00', img:'assets/manual/craft.avif', hint:'素材庫'},
     {id:'play', icon:'🎮', title:'活動', desc:'遊戲·技能·帶領卡', color:'#1565C0', img:'assets/manual/games.avif', hint:'即開即用'},
     {id:'badge', icon:'🏅', title:'活動章', desc:'分類·內容·考核建議', color:'#6A1B9A', img:'assets/manual/songs.avif', hint:'逐章查看'},
     {id:'jungle', icon:'🌳', title:'森林故事', desc:'11角色·5故事·逐段帶', color:'#2E7D32', img:'', hint:'逐段閱讀'},
@@ -225,18 +225,56 @@
   /* 工作紙庫：對應 ghmeeting #print + 舊 #sheets。
      實裝版：工作紙分頁用真實27張索引（逐張預覽／列印＋領袖參考），
      歌曲分頁用 Songbook（跟唱卡＋A4歌紙），冇再係死掣 toast。 */
+  /* 素材庫分類：按「我想做咩」組織，唔跟集會編號 */
+  App.materialCategories = [
+    {id:'coop', icon:'🤝', name:'合作與規則', desc:'小隊建立、誓詞規律、保護自己',
+     tids:['c01','c02','c03','c14']},
+    {id:'outdoor', icon:'🏕️', name:'戶外與遠足', desc:'觀察、露營、遠足、追蹤、天氣',
+     tids:['c05','c09','c12','c18','c23']},
+    {id:'craft', icon:'🧵', name:'手工與技能', desc:'結繩、煮食、工程、實驗',
+     tids:['c06','c10','c15','c17']},
+    {id:'care', icon:'❤️', name:'關懷與服務', desc:'了解需要、用心準備、減廢行動',
+     tids:['c11','c16','c24']},
+    {id:'direction', icon:'🧭', name:'方向與社區', desc:'地圖、指南針、社區行走',
+     tids:['c07','c25']},
+    {id:'safety', icon:'🩹', name:'安全與急救', desc:'求助、擦傷、鼻血、技能輪轉',
+     tids:['c03','c08','c20']},
+    {id:'growth', icon:'🎯', name:'成長與回顧', desc:'整理證據、運動、回顧、下一程',
+     tids:['c19','c21','c22']},
+    {id:'culture', icon:'🎉', name:'文化與慶祝', desc:'中國節慶、童軍家庭、森林故事',
+     tids:['c13','c14']}
+  ];
   App.vPrint = function(){
     var hasContent = (typeof Content!=='undefined');
-    var worksheets = (hasContent && Content.worksheetIndex) ? Content.worksheetIndex()
-      : (hasContent && Content.worksheetBase) ? Content.worksheetBase() : App.vCraft();
     var songs = (typeof Songbook!=='undefined' && Songbook.panel) ? Songbook.panel()
       : '<p class="mut">歌曲模組未載入：重新整理一次。</p>';
-    return '<section class="card"><a class="back" href="#plan">‹ 返回目錄</a><h2>✂️ 工作紙＋歌曲</h2><p class="mut">兩個小分頁，全部即開即用：工作紙逐張預覽及列印（點哪張印哪張）；歌曲有圍圈跟唱同單張A4歌紙。</p><div class="subtabs compact-tabs"><button class="subtab cur" onclick="App.showMiniTab(this,\'worksheets\')">✂️ 工作紙</button><button class="subtab" onclick="App.showMiniTab(this,\'songs\')">🎵 歌曲</button></div><div id="mini-worksheets" class="mini-pane">'+worksheets+'</div><div id="mini-songs" class="hidden mini-pane">'+songs+'</div></section>';
+    /* 素材庫：按「我想做咩」分類，唔跟集會編號 */
+    var library = '<div class="material-library">';
+    App.materialCategories.forEach(function(cat){
+      var meetings = cat.tids.map(function(tid){
+        return DATA.meetings.find(function(m){return m.tid===tid;});
+      }).filter(Boolean);
+      library += '<details class="material-cat"><summary><span class="cat-icon">'+cat.icon+'</span><b>'+cat.name+'</b><small>'+cat.desc+'</small><span class="cat-count">'+meetings.length+'份</span></summary>';
+      library += '<div class="material-items">';
+      meetings.forEach(function(m){
+        library += '<div class="material-item"><b>'+esc(m.n)+'</b><small>'+esc(m.month)+' · '+esc(m.badge)+'</small>';
+        if(m.worksheet && m.worksheet.prompts){
+          library += '<ul class="material-prompts">'+m.worksheet.prompts.map(function(p){return '<li>'+esc(p)+'</li>';}).join('')+'</ul>';
+        }
+        library += '<button class="btn sm" onclick="PackPrint.open(\'sheet\',\''+m.tid+'\')">預覽及列印</button></div>';
+      });
+      library += '</div></details>';
+    });
+    library += '</div>';
+    return '<section class="card"><a class="back" href="#plan">‹ 返回目錄</a><h2>✂️ 素材庫＋歌曲</h2><p class="mut">領袖搵素材嘅地方：揀你想做咩，搵合適嘅工作紙同教材。逐張預覽及列印，唔使跟集會編號。</p><div class="subtabs compact-tabs"><button class="subtab cur" onclick="App.showMiniTab(this,\'library\')">✂️ 素材庫</button><button class="subtab" onclick="App.showMiniTab(this,\'songs\')">🎵 歌曲</button></div><div id="mini-library" class="mini-pane">'+library+'</div><div id="mini-songs" class="hidden mini-pane">'+songs+'</div></section>';
   };
   App.showMiniTab = function(btn, key){
     var root=btn.closest('.card'); if(!root)return;
     root.querySelectorAll('.subtab').forEach(function(x){x.classList.remove('cur');}); btn.classList.add('cur');
-    root.querySelector('#mini-worksheets').classList.toggle('hidden',key!=='worksheets'); root.querySelector('#mini-songs').classList.toggle('hidden',key!=='songs');
+    var library=root.querySelector('#mini-library'); var worksheets=root.querySelector('#mini-worksheets'); var songs=root.querySelector('#mini-songs');
+    if(library) library.classList.toggle('hidden',key!=='library');
+    if(worksheets) worksheets.classList.toggle('hidden',key!=='worksheets');
+    if(songs) songs.classList.toggle('hidden',key!=='songs');
   };
   App.vSheets = App.vPrint;
 
