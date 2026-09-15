@@ -2628,6 +2628,7 @@ body.story-open .story-stage-wrap{display:flex}
 .story-audio audio{display:none}
 .story-audio #story-audio-seek,.story-audio #story-amb-vol{flex:0 1 140px;min-width:90px}
 .story-audio .story-langnote{color:#c8b98a}
+.story-audio .story-hintmsg{color:#f0d79a}
 .story-audio input[type=range]#story-amb-vol{accent-color:#7fb98f}
 body.story-open{overflow:hidden}
 

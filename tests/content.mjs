@@ -205,15 +205,23 @@ ctx.Jungle.toggleAuto();
 
 /* 3. 逐段未錄嘅集數：唔會亂跳，會提示改用整集 */
 ctx.Jungle.show(4);
-assert.equal(ctx.Jungle.sceneFile('village','yue',1),'','第五集未錄逐段旁白');
-assert(ctx.Jungle.sceneFile('fire','yue',3).includes('fire-3-yue.mp3'),'第四集第三段有逐段旁白');
-assert.equal(ctx.Jungle.sceneFile('fire','yue',4),'','第四集第四段未錄');
+assert.equal(ctx.Jungle.sceneFile('village','zh',1),'','第五集普通話逐段未錄');
+assert(ctx.Jungle.sceneFile('village','yue',5).includes('village-5-yue.mp3'),'第五集最後一段粵語已錄');
+assert(ctx.Jungle.sceneFile('fire','yue',4).includes('fire-4-yue.mp3'),'第四集第四段粵語已錄');
 assert(!ctx.Jungle.sceneDone('welcome','yue')===false,'第一集粵語逐段已錄完');
 assert(ctx.Jungle.sceneDone('help','yue')===true,'第二集粵語逐段已錄完');
 assert(ctx.Jungle.sceneDone('rules','yue')===true,'第三集粵語逐段已錄完');
-assert(ctx.Jungle.sceneDone('fire','yue')===false,'第四集粵語逐段只錄到一半');
+assert(ctx.Jungle.sceneDone('fire','yue')===true,'第四集粵語逐段已錄完');
+assert(ctx.Jungle.sceneDone('village','yue')===true,'第五集粵語逐段已錄完');
+assert(ctx.Jungle.sceneDone('welcome','zh')===false,'普通話逐段仲未錄完');
+const before=played.length;
+ctx.Jungle.playNarration('zh');
+assert(played.length===before,'未錄逐段就唔會亂播其他集音檔');
+assert(ctx.document.getElementById('story-audio-note').textContent.includes('未有逐段旁白'),'未錄逐段要出提示');
+assert(!ctx.document.getElementById('story-audio-state').textContent.includes('未有逐段旁白'),'提示唔應該被狀態文字蓋過');
+/* 錄齊嘅集數就照播，唔會跳去第二集 */
 ctx.Jungle.playNarration('yue');
-assert(played.every(x=>!x.includes('village')),'未錄逐段就唔會亂播其他集音檔');
+assert(played[played.length-1].includes('scene/village-1-yue.mp3'),'第五集粵語錄齊就會播返第五集');
 
 /* 4. 環境音：跟段落轉、細音量、可熄 */
 ctx.Jungle.show(0);
@@ -264,10 +272,19 @@ assert(ctx.Jungle.mmss(75)==='1:15','時間顯示格式');
     }
   }
   function scenesFilledPartial(id,code){const arr=(sa[id]||{})[code]||[];return arr.some(Boolean)&&!arr.every(Boolean);}
-  assert(filled>=10,'起碼有 10 段逐段旁白（實際 '+filled+'）');
+  assert(filled>=30,'起碼有 30 段逐段旁白（實際 '+filled+'）');
+  assert.equal(Object.values(sa).reduce((n,b)=>n+(b.yue||[]).filter(Boolean).length,0),27,'粵語逐段共 27 段');
+  for(const ep of DATA.jungle.episodes){
+    assert(ctx.Jungle.sceneDone(ep.id,'yue'),'粵語逐段要全套完成：'+ep.id);
+    const yue=(sa[ep.id].yue||[]);
+    assert(yue.length===ep.scenes.length,'粵語逐段數量要等於段數：'+ep.id);
+    assert(yue.every(Boolean),'粵語逐段唔應該有空格：'+ep.id);
+  }
   assert(ctx.Jungle.sceneFile('welcome','yue',1).includes('welcome-1-yue.mp3'),'sceneFile 對得住第一段');
   assert.equal(ctx.Jungle.sceneFile('welcome','yue',0),'','封面冇逐段聲');
-  assert.equal(ctx.Jungle.sceneFile('welcome','zh',1),'','未錄嘅語言唔會亂回檔案');
+  assert.equal(ctx.Jungle.sceneFile('help','zh',1),'','未錄嘅語言唔會亂回檔案');
+  assert(ctx.Jungle.sceneFile('welcome','zh',1).includes('welcome-1-zh.mp3'),'普通話逐段開始有檔案');
+  assert.equal(ctx.Jungle.sceneFile('welcome','zh',4),'','未錄嘅段落要回空（唔會亂咁回一個檔）');
   assert.equal(ctx.Jungle.sceneFile('nope','yue',1),'','唔存在嘅集唔會爆');
 }
 /* 7. 環境音：檔案齊、已入快取、音量上限 */

@@ -83,7 +83,7 @@ var Jungle = {
      逐段模式：每次只播當前嗰段，播完自動跳下一張圖（可熄）。
      整集模式：由頭連續播成集旁白，唔會自動跳圖。
      環境音：原創合成 loop，細音量墊底；自己講故事都可以開住。 */
-  audio:{ep:-1,lang:'',part:0,playing:false,mode:'scene',auto:true,amb:true,ambVol:0.12},
+  audio:{ep:-1,lang:'',part:0,playing:false,mode:'scene',auto:true,amb:true,ambVol:0.12,note:''},
   prefs:function(){
     if(!Jungle._prefs){
       var p=null;try{p=Store.get('storyPrefs',null);}catch(e){p=null;}
@@ -134,6 +134,7 @@ var Jungle = {
       (a.mode==='scene'?'<button class="btn sm" id="story-auto-btn" onclick="Jungle.toggleAuto()" aria-pressed="'+(a.auto?'true':'false')+'">'+(a.auto?'🔁 自動跟圖':'⏸ 唔自動')+'</button>':'')+
       '<input type="range" id="story-audio-seek" min="0" max="100" value="0" oninput="Jungle.seekNarration(this.value)" aria-label="旁白進度">'+
       '<span class="story-hint" id="story-audio-state">準備好</span>'+
+      '<span class="story-hint story-hintmsg" id="story-audio-note">'+esc(Jungle.audio.note||'')+'</span>'+
       '<button class="btn sm" id="story-amb-btn" onclick="Jungle.toggleAmb()" aria-pressed="'+(a.amb?'true':'false')+'">🌿 環境音'+(a.amb?'開':'關')+'</button>'+
       '<input type="range" id="story-amb-vol" min="0" max="100" value="'+Math.round((a.ambVol-0.02)/0.35*100)+'" oninput="Jungle.setAmbVol(this.value)" aria-label="環境音音量">'+
       '<span class="story-hint">'+(a.mode==='scene'?'逐段：播完自動跳圖｜':'')+'播住都可以照撳圖｜想自己講就唔播</span>'+
@@ -158,7 +159,7 @@ var Jungle = {
     Jungle.syncAmb();
     Jungle.markAudio();
   },
-  audioNote:function(msg){var s=document.getElementById('story-audio-state');if(s)s.textContent=msg;},
+  audioNote:function(msg){Jungle.audio.note=msg||'';var s=document.getElementById('story-audio-note')||document.getElementById('story-audio-state');if(s)s.textContent=Jungle.audio.note;},
   audioError:function(){Jungle.audio.playing=false;Jungle.audioNote('音檔未載入，可能未快取；可以直接照文字講。');Jungle.markAudio();},
   markAudio:function(){
     var ep=DATA.jungle.episodes[Jungle.stageState.ep], list=(DATA.jungle.narration.files[ep.id]||{})[Jungle.audio.lang]||[];
@@ -210,6 +211,7 @@ var Jungle = {
       if(!list.length)return;
       el.src=list[Math.min(Jungle.audio.part,list.length-1)];
     }
+    Jungle.audioNote('');
     var p=el.play();if(p&&p.catch)p.catch(function(){Jungle.audioNote('音檔未載入，可能未快取；可以直接照文字講。');});
     Jungle.audio.playing=true;Jungle.startAmb();Jungle.markAudio();
   },
@@ -239,6 +241,7 @@ var Jungle = {
     Jungle.audio.playing=false;Jungle.audio.part=0;Jungle.markAudio();Jungle.audioNote('播完；可以再撳「▶ 播」聽多次。');
   },
   toggleMode:function(){
+    Jungle.audio.note='';
     Jungle.audio.mode=Jungle.audio.mode==='scene'?'episode':'scene';
     Jungle.audio.part=0;Jungle.savePrefs();
     var el=Jungle.audioEl();if(el&&typeof el.pause==='function')el.pause();
