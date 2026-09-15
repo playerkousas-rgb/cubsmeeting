@@ -1,6 +1,7 @@
-/* print-songs-art：2026-09-14 三項用戶回饋嘅回歸測試
+/* print-songs-art：列印＋素材庫回歸測試（2026-09-15 更新）
    1) 列印隔离：點哪項印哪項（body.print-pack 只出 #printarea；冇預覽就唔印彈窗）。
-   2) 工作紙＋歌曲實裝：27張工作紙逐張可印＋領袖參考；歌曲有跟唱卡同A4歌紙，冇死掣 toast。
+   2) 素材庫實裝：獨立試卷庫逐份可印（成員卷／領袖答案分開）；圖紙係成員跟做紙；
+      歌曲有跟唱卡同A4歌紙，冇死掣 toast。集會反思紙保留喺出隊包（跟集會印）。
    3) 活動／技能圖解：每個對映鍵都有真實節、SVG 齊開齊埋、附自繪聲明；可單印一張圖解卡。 */
 import fs from "fs";
 import vm from "vm";
@@ -23,7 +24,7 @@ const sb = {
 };
 sb.window = sb; sb.globalThis = sb;
 vm.createContext(sb);
-for (const f of ["js/data.js", "js/jungle-data.js", "js/practical-data.js", "js/guide.js", "js/flow.js", "js/app.js", "js/redesign.js", "js/content.js", "js/jungle.js", "js/practical.js", "js/uniform-ceremony.js", "js/field-visuals.js", "js/salute-lab.js", "js/salute-positions.js", "js/tracking-kit.js", "js/material-desk.js", "js/plain-content.js", "js/worksheet-guides.js", "js/skill-art.js", "js/craft-sheets.js", "js/songbook.js"]) {
+for (const f of ["js/data.js", "js/jungle-data.js", "js/practical-data.js", "js/guide.js", "js/flow.js", "js/app.js", "js/redesign.js", "js/content.js", "js/jungle.js", "js/practical.js", "js/uniform-ceremony.js", "js/field-visuals.js", "js/salute-lab.js", "js/salute-positions.js", "js/tracking-kit.js", "js/material-desk.js", "js/plain-content.js", "js/worksheet-guides.js", "js/exam-papers.js", "js/skill-art.js", "js/craft-sheets.js", "js/songbook.js"]) {
   vm.runInContext(fs.readFileSync(path.join(root, f), "utf8"), sb, { filename: f });
 }
 const Q = (s) => vm.runInContext(s, sb);
@@ -47,24 +48,38 @@ const Q = (s) => vm.runInContext(s, sb);
 /* 2. 素材庫三個分頁實裝 */
 {
   const p = Q("App.vPrint()");
-  const sheets = (p.match(/PackPrint\.open\('sheet'/g) || []).length;
-  ok(sheets >= 25, `素材庫工作紙分頁有${sheets}張逐張列印入口（至少25場）`);
-  ok(p.includes('id="mini-worksheets"') && p.includes('sheet-entry'), "工作紙分頁係真實索引");
+  ok(p.includes('id="mini-worksheets"') && p.includes('exam-grid'), "工作紙分頁係獨立試卷庫（唔跟集會編號）");
+  ok(!p.includes('sheet-entry'), "工作紙分頁唔再有集會索引（已搬去試卷庫）");
+  const papers = Q("ExamPapers.papers");
+  ok(papers.length >= 6, `試卷庫有 ${papers.length} 份卷（≥6）`);
+  papers.forEach((pp) => {
+    ok(!!pp.title && !!pp.topic && pp.mins >= 5 && pp.sections.length >= 2, `${pp.id} 有標題／主題／時間／至少兩部分`);
+    ok(Q(`ExamPapers.sheet('${pp.id}',false)`).includes('class="psheet exam-sheet'), `${pp.id} 成員卷係單張A4`);
+    ok(!Q(`ExamPapers.sheet('${pp.id}',false)`).includes('exam-key'), `${pp.id} 成員卷唔含答案`);
+    ok(Q(`ExamPapers.sheet('${pp.id}',true)`).includes('exam-key') && Q(`ExamPapers.sheet('${pp.id}',true)`).includes('唔派畀成員'), `${pp.id} 領袖答案有答案＋唔派警告`);
+  });
+  ok(Q("ExamPapers.get('nope')") === undefined && Q("ExamPapers.sheet('nope')") === '', "唔存在嘅試卷唔會出空紙");
   ok(p.includes('id="mini-sheets"') && p.includes('craft-card'), "圖紙分頁有手工卡（Craft）");
   ok(p.includes('id="mini-sheets"') && p.includes('sheet-print-grid'), "圖紙分頁有剪卡／題紙列印掣");
   ok(p.includes('id="mini-songs"') && p.includes("Songbook.open("), "歌曲分頁係真實歌卡（Songbook.open）");
   ok(!/onclick="toast\('🎵|onclick="toast\('📣|onclick="toast\('🔥/.test(p), "歌曲分頁冇再用死掣 toast 扮實裝");
   ok(Q("App.vSongs()") === p && Q("App.vSong()") === p, "舊 #songs／#song 路由仍指同一素材庫");
   ok(Q("typeof Content!=='undefined' && typeof Content.worksheetIndex==='function'"), "Content.worksheetIndex 存在（#sheets 仍可用）");
+  /* 集會反思紙保留喺出隊包：跟集會印，唔喺素材庫出現 */
+  ok(Q("SessionPack.build(Practical.meeting('c01'),1,true)").includes('工作紙領袖參考'), "出隊包仍連埋嗰場反思紙領袖參考");
+  ok(Q("Practical.summary(Practical.meeting('c01'))").includes("WorksheetGuide.open('c01')"), "集會摘要仍有反思紙點答入口");
   const craft = Q("Craft.items");
   ok(craft.length >= 4, `圖紙有 ${craft.length} 個小手工`);
   craft.forEach((c) => {
     ok(c.mats.length >= 3 && c.steps.length >= 3 && !!c.safety && !!c.leader, `${c.id} 有物料／步驟／安全／領袖提示`);
+    ok(!!c.recordTitle && !!c.record, `${c.id} 有跟做記錄表（派畀成員填）`);
     ok(fs.existsSync(path.join(root, c.img)) || c.img.includes('assets/skills/'), `${c.id} 用現有圖，唔會開新圖檔`);
   });
   const sheet = Q("Craft.sheet('bracelet')");
-  ok((sheet.match(/class="psheet/g) || []).length === 1, "手工圖紙係單張A4");
-  ok(sheet.includes('唔當考驗完成'), "圖紙寫明唔當考驗完成");
+  ok((sheet.match(/class="psheet/g) || []).length === 1, "手工跟做紙係單張A4");
+  ok(sheet.includes('唔當考驗完成'), "跟做紙寫明唔當考驗完成");
+  ok(sheet.includes('跟住做') && sheet.includes('領袖簽名'), "跟做紙有打剔步驟同簽名位（成員用）");
+  ok(!sheet.includes('領袖提示'), "跟做紙唔印領袖提示（留喺畫面）");
   ok(Q("Craft.get('nope')") === undefined && Q("Craft.sheet('nope')") === '', "唔存在嘅手工唔會出空紙");
   Q("var __cap='';Modal.open=function(h){__cap=h;};");
   Q("Craft.open('bracelet')");const opened = Q("__cap");
@@ -92,6 +107,14 @@ const Q = (s) => vm.runInContext(s, sb);
   ok((Q("Songbook.songs.map(function(s){return Songbook.sheet(s.id);}).join('')").match(/class="psheet song-sheet"/g) || []).length === songs.length, "印今晚歌單＝每首一張");
   ok(Q("Songbook.formal").length === 3 && Q("Songbook.formal").every((f) => f.open), "正式文字入口（團呼／誓詞／口令）開既有已核卡");
   ok(!/誓詞|規律|銘言/.test(Q("Songbook.songs.map(function(s){return s.lines.map(function(l){return l[1];}).join('');}).join('')")), "歌曲歌詞唔改寫正式誓詞／規律／銘言原文");
+  /* 2026-09-15 旋律修正回歸：只播已核對嘅譜，未核對嘅唔造假 */
+  ok(Q("Object.keys(SongPlayer.melodies).sort().join(',')") === 'campfire-burning,kumbayah,parting,shalom', "內置旋律得4首已核對（其餘跟領袖唱）");
+  ok(Q("Songbook.hasMelody('together')") === false && Q("Songbook.hasMelody('wolf-tail')") === false, "旅團曲調未核對：唔提供假旋律");
+  ok(Q("Songbook.hasMelody('ready-call')") === false, "自編口號本來就無旋律");
+  ok(JSON.stringify(Q("SongPlayer.melodies['kumbayah'].notes.slice(0,3)")) === JSON.stringify([[60,1],[64,1],[67,1]]), "Kumbaya 開頭 C-E-G（舊錯譜 C-E-G-E 已換）");
+  ok(Q("SongPlayer.melodies['shalom'].notes[0][0]") === 57 && Q("SongPlayer.melodies['shalom'].notes.some(function(n){return n[0]===74;})"), "Shalom 係D小調：A3起板＋有高音D5（舊C大調錯譜已換）");
+  ok(JSON.stringify(Q("SongPlayer.melodies['parting'].notes.slice(0,4).map(function(n){return n[0];})")) === JSON.stringify([55,60,60,60]), "臨歧頌開頭 G-C-C-C（Auld Lang Syne，舊C-E開頭錯譜已換）");
+  ok(Q("Songbook.get('parting').lead.join('')").includes('併唱'), "臨歧頌歌卡提醒十字句配八字旋律");
 }
 
 /* 4. SkillArt 圖解 */

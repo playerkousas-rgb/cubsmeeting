@@ -5,7 +5,7 @@ const mem={},els={};
 const element=()=>({innerHTML:'',className:'',style:{},value:'',checked:false,classList:{toggle(){},add(){},remove(){}},setAttribute(){},removeAttribute(){}});
 const ctx={console,localStorage:{getItem:k=>mem[k]??null,setItem:(k,v)=>{mem[k]=String(v);}},location:{hash:'#plan'},navigator:{onLine:true},document:{getElementById:id=>els[id]??=element(),querySelectorAll:()=>[],body:element(),documentElement:element()},setTimeout:()=>{},clearTimeout(){},setInterval:()=>1,clearInterval(){},addEventListener(){},scrollTo(){},print(){}};ctx.window=ctx;vm.createContext(ctx);
 let jungleBefore,beforePlain;
-for(const file of ['data','jungle-data','practical-data','guide','flow','app','redesign','content','jungle','practical','uniform-ceremony','field-visuals','salute-lab','salute-positions','tracking-kit','material-desk','plain-content','worksheet-guides']){
+for(const file of ['data','jungle-data','practical-data','guide','flow','app','redesign','content','jungle','practical','uniform-ceremony','field-visuals','salute-lab','salute-positions','tracking-kit','material-desk','plain-content','worksheet-guides','exam-papers']){
  if(file==='practical-data')jungleBefore=JSON.stringify(ctx.DATA.meetings.filter(m=>['c26','c27'].includes(m.tid)));
  if(file==='plain-content')beforePlain=JSON.parse(JSON.stringify({meetings:ctx.DATA.meetings,facts:ctx.DATA.facts,ceremonies:ctx.Ceremony.items,followup:ctx.DATA.followupContent,stored:mem}));
  vm.runInContext(fs.readFileSync(`js/${file}.js`,'utf8'),ctx);
@@ -238,12 +238,13 @@ for(const tid of Object.keys(WorksheetGuide.data)){
  assert(SessionPack.build(meeting,1,false).includes('worksheet-guide'));
 }
 assert.equal(responseCount,75);assert.equal(WorksheetGuide.get('c26'),null);assert.equal(WorksheetGuide.sheet('no-such-id'),'');const priorGuideHtml=html;WorksheetGuide.open('bad');WorksheetGuide.print('bad');assert.equal(html,priorGuideHtml);
-assert.equal((App.vSheets().match(/領袖參考答案與提示/g)||[]).length,25);
+assert.equal((App.vSheets().match(/class="exam-card"/g)||[]).length,8,'vSheets shows 8 standalone exam papers');
+assert(!App.vSheets().includes('sheet-entry'),'meeting worksheet index moved out of vSheets');
 assert(WorksheetGuide.data.c08[2][0].includes('10至15分鐘'));assert(WorksheetGuide.data.c08[2][1].includes('呼吸困難'));
 assert(WorksheetGuide.data.c24[2][1].includes('不以同一集會做三次代替一週'));
 assert(WorksheetGuide.data.c17[1][0].includes('真實'));assert(WorksheetGuide.data.c22[1][0].includes('待查'));
 assert.equal(JSON.stringify(mem),answerBefore);assert.equal(ctx.curTid(),answerTid);
-console.log('WORKSHEET GUIDES PASS: 25 sheets/75 responses, live question alignment, prompts and observation hints, exact leader-only insertion, no child answers, no state or forest changes.');
+console.log('WORKSHEET GUIDES PASS: 25 per-meeting guides/75 responses in meeting flow, 8 standalone exam papers in vSheets, live question alignment, exact leader-only insertion, no child answers, no state or forest changes.');
 
 // September 2026: chapter 5 text is read, not inferred from the 2021 appendix.
 for(const c of Ceremony.items){

@@ -13,13 +13,13 @@ const ok = (c, msg) => { console.log((c ? "✓ " : "✗ FAIL ") + msg); if (!c) 
 {
   ok(!fs.existsSync(path.join(root, "package-lock.json")) || true, "無需build（靜態檔直開）");
   ok(!/webpack|vite|next/.test(read("package.json")), "package.json無build依賴");
-  ["index.html", "css/app.css", "js/data.js", "js/guide.js", "js/flow.js", "js/app.js", "js/content.js", "js/redesign.js", "js/jungle-data.js", "js/jungle.js", "js/practical-data.js", "js/practical.js", "js/uniform-ceremony.js", "js/field-visuals.js", "js/salute-lab.js", "js/salute-positions.js", "js/tracking-kit.js", "js/material-desk.js", "js/plain-content.js", "js/worksheet-guides.js", "js/skill-art.js", "js/craft-sheets.js", "js/songbook.js", "manifest.webmanifest", "sw.js"].forEach((f) =>
+  ["index.html", "css/app.css", "js/data.js", "js/guide.js", "js/flow.js", "js/app.js", "js/content.js", "js/redesign.js", "js/jungle-data.js", "js/jungle.js", "js/practical-data.js", "js/practical.js", "js/uniform-ceremony.js", "js/field-visuals.js", "js/salute-lab.js", "js/salute-positions.js", "js/tracking-kit.js", "js/material-desk.js", "js/plain-content.js", "js/worksheet-guides.js", "js/exam-papers.js", "js/skill-art.js", "js/craft-sheets.js", "js/songbook.js", "manifest.webmanifest", "sw.js"].forEach((f) =>
     ok(fs.existsSync(path.join(root, f)), `有 ${f}`));
 }
 /* 2. SW cache齊 */
 {
   const sw = read("sw.js");
-  ["index.html", "css/app.css", "js/data.js", "js/guide.js", "js/flow.js", "js/app.js", "js/content.js", "js/redesign.js", "js/jungle-data.js", "js/jungle.js", "js/practical-data.js", "js/practical.js", "js/uniform-ceremony.js", "js/field-visuals.js", "js/salute-lab.js", "js/salute-positions.js", "js/tracking-kit.js", "js/material-desk.js", "js/plain-content.js", "js/worksheet-guides.js", "js/skill-art.js", "js/craft-sheets.js", "js/songbook.js", "manifest.webmanifest"].forEach((a) =>
+  ["index.html", "css/app.css", "js/data.js", "js/guide.js", "js/flow.js", "js/app.js", "js/content.js", "js/redesign.js", "js/jungle-data.js", "js/jungle.js", "js/practical-data.js", "js/practical.js", "js/uniform-ceremony.js", "js/field-visuals.js", "js/salute-lab.js", "js/salute-positions.js", "js/tracking-kit.js", "js/material-desk.js", "js/plain-content.js", "js/worksheet-guides.js", "js/exam-papers.js", "js/skill-art.js", "js/craft-sheets.js", "js/songbook.js", "manifest.webmanifest"].forEach((a) =>
     ok(sw.includes(a), `SW有cache ${a}`));
   ok(/skipWaiting|clients\.claim/.test(sw), "SW即時接管");
   ok(/cubsbadge|scout-circulars/.test(sw), "SW放過外部APP（唔cache網上服務）");

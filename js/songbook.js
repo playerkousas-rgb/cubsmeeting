@@ -1,38 +1,58 @@
-/* 🎵 Songbook — 工作紙＋歌曲頁嘅歌曲分頁實裝。
-   內容分三類，界線寫清楚：
-   1) 正式文字（誓詞・規律・銘言・團呼）：已核對原文，開既有儀式／手冊卡，唔改寫。
-   2) 傳統營火歌：旋律屬公有領域、歌詞為香港童軍旅團長期流通版本；
-      非《幼童軍訓練綱要》考核內容，正式場合用歌按旅團安排。來源紀錄見 docs/content-audit.md。
+/* 🎵 Songbook — 素材庫歌曲分頁實裝。
+   2026-09-15 旋律修正：用戶回饋「旋律全錯」，經核對香港童軍旅團歌集後重寫。
+   歌單來源（只用可核對嘅流通版本，唔自創歌詞）：
+   - 離島區第18旅營火歌集 http://www.islands18.org/campsong.htm
+   - 九龍第165旅歌曲集（營火歌／野營歌／Shalom／Kumbayah 等）
+   - 66HKG 童軍歌曲 https://www.66hkg.com/scoutsongs/（Campfire's Burning 英文詞）
+   旋律政策（唔再俾錯旋律誤導小朋友）：
+   - 有內置播放（🎶）＝ 旋律屬公有領域＋轉譜已核對（Frère Jacques／Kumbaya／
+     Shalom D小調／Auld Lang Syne），來源寫喺 SongPlayer.melodies 註釋。
+   - 無內置播放（🎤跟領袖唱）＝ 香港旅團特有曲調未能核對，唔造假旋律；
+     領袖起板，成員跟唱（營火本來就係咁帶）。
+   1) 正式文字（團呼・誓詞規律・口令）：已核對原文，開既有儀式／手冊卡，唔改寫。
+   2) 傳統營火歌：非《幼童軍訓練綱要》考核內容，正式場合用歌按旅團安排。
    3) 本套包自編帶動口號：標明「自編」，唔冒充官方文字。
    功能：圍圈跟唱（逐句回声）、動作提示、單首A4歌紙列印——點哪首印哪首。 */
 var Songbook = {
   songs: [
     {
-      id: 'campfire-burning', title: '營火熊熊', en: "Campfire's Burning", kind: 'traditional',
-      tune: '傳統營火歌・旋律公有領域（與 Frère Jacques 同調）', use: '圍圈開始・營火點起後第一首',
+      id: 'campfire-song', title: '營火歌', en: '', kind: 'traditional',
+      tune: '香港童軍旅團流通版本（離島18旅／九龍165旅歌集）', use: '營火晚會開場・第一首',
       lines: [
-        ['領', '熊熊營火，熊熊營火，'], ['眾', '團團坐，團團坐，'],
-        ['領', '黑夜來臨，黑夜來臨，'], ['眾', '大家歡呼高歌。'],
-        ['合', "Campfire's burning, Campfire's burning,"], ['合', 'Draw nearer, draw nearer.'],
-        ['合', 'In the gloaming, in the gloaming,'], ['合', 'Come sing and be merry.']
+        ['合', '紅日西沉，黑夜來臨，營火高燒曠野裡，'],
+        ['合', '你來彈琴，他們唱歌，大家一齊樂歡暢。'],
+        ['合', '你唱歌仔，我講故事，表演節目花樣多，'],
+        ['合', '一同歡呼，一同遊戲，今晚歡樂永難忘。']
       ],
-      actions: '兩人一組面對面；句尾拍手兩下。第二輪先加輕搖，唔好一次過加晒動作。',
-      lead: ['領袖先完整唱一次，再一句一句回声唱：領唱一句，成員跟一句。', '第二輪先加動作；速度保持慢，聽得清先算帶到。', '唱完請值日小隊長帶下一項，唔留空檔。']
+      actions: '圍圈坐好；唱到「一同歡呼」時舉手輕搖，唔好站起跑動。',
+      lead: ['呢首先係香港童軍營火歌（唔係 Frère Jacques 嗰首英文 Campfire＇s Burning，兩首唔同歌）。', '領袖先完整唱一次，成員跟住齊唱；速度放慢，咬字清楚。']
+    },
+    {
+      id: 'campfire-burning', title: "Campfire's Burning", en: "Campfire's Burning", kind: 'traditional',
+      tune: 'Frère Jacques 旋律・公有領域；英文詞為童軍流通版本', use: '圍圈輪唱・英文歌',
+      lines: [
+        ['合', "Campfire's burning, campfire's burning,"],
+        ['合', 'Draw nearer, draw nearer.'],
+        ['合', 'In the gloaming, in the gloaming,'],
+        ['合', 'Come sing and be merry. Come sing and be merry.']
+      ],
+      actions: '可分兩組輪唱：第二組遲兩句加入。唔識英文可以淨哼旋律。',
+      lead: ['先完整唱一次，再分組試輪唱。', '輪唱時每組跟自己進度，唔好被隔離組帶走；唱完請值日小隊長帶下一項，唔留空檔。']
     },
     {
       id: 'together', title: '當我們同在一起', en: 'The More We Get Together', kind: 'traditional',
-      tune: '傳統民歌旋律・公有領域', use: '破冰・轉場・等人齊時',
+      tune: 'The More We Get Together・傳統民歌旋律・公有領域；中文詞為旅團流通版本', use: '破冰・轉場・等人齊時',
       lines: [
         ['領', '當我們同在一起，'], ['眾', '在一起，在一起，'],
-        ['領', '當我們同在一起，'], ['眾', '真快樂無比。'],
-        ['合', '你對我笑嘻嘻，我對你笑哈哈，'], ['合', '當我們同在一起，真快樂無比。']
+        ['領', '當我們同在一起，'], ['眾', '其快樂無比。'],
+        ['合', '你對著我笑嘻嘻，我對著你笑哈哈，'], ['合', '當我們同在一起，其快樂無比。']
       ],
       actions: '搭肩或叉腰左右輕搖；「笑嘻嘻」時向隔離隊友點頭，唔強求身體接觸。',
       lead: ['先問成員想唔想搭肩；唔想就用叉腰或拍手代替。', '最後一句全員轉向圈心唱，收細聲結束。']
     },
     {
       id: 'wolf-tail', title: '一隻小狼一條尾', en: '', kind: 'traditional',
-      tune: '幼童軍傳統帶動唱・流通版本', use: '幼童軍圍圈接力・醒神',
+      tune: '幼童軍傳統帶動唱・香港旅團流通版本', use: '幼童軍圍圈接力・醒神',
       lines: [
         ['領', '一隻小狼一條尾，'], ['眾', '兩隻耳朵直豎起，'],
         ['領', '四條腿兒蹦蹦跳，'], ['眾', '第二隻小狼輪到你。']
@@ -44,16 +64,21 @@ var Songbook = {
       id: 'kumbayah', title: 'Kumbayah', en: 'Kumbayah', kind: 'traditional',
       tune: '傳統靈歌・公有領域', use: '營火中段・靜落嚟',
       lines: [
-        ['領', "Someone's singing, Lord,"], ['眾', 'Kumbayah…'],
-        ['領', "Someone's singing, Lord,"], ['眾', 'Kumbayah…'],
-        ['合', 'Oh, Lord, Kumbayah.'], ['合', 'Oh, Lord, Kumbayah.']
+        ['合', 'Kumbayah, my Lord, kumbayah,'],
+        ['合', 'Kumbayah, my Lord, kumbayah,'],
+        ['合', 'Kumbayah, my Lord, kumbayah,'],
+        ['合', 'Oh Lord, kumbayah.'],
+        ['合', "Someone's singing, Lord, kumbayah,"],
+        ['合', "Someone's singing, Lord, kumbayah,"],
+        ['合', "Someone's singing, Lord, kumbayah,"],
+        ['合', 'Oh Lord, kumbayah.']
       ],
-      actions: '雙手放膝，身體輕搖；Kumbayah 時雙手由下慢慢舉起再放下。',
-      lead: ['聲量逐句收細，帶出安靜氣氛。', '解釋 Kumbayah 意思係「主啊，嚟我處」，尊重唔同信仰成員：可以淨係跟旋律。']
+      actions: '雙手放膝，身體輕搖；唱到 Oh Lord 時雙手合十。唔識英文可以淨哼旋律。',
+      lead: ['兩段共用同一旋律；聲量逐句收細，帶出安靜氣氛。', '解釋 Kumbayah 意思係「主啊，嚟我處」，尊重唔同信仰成員：可以淨係跟旋律哼唱。']
     },
     {
       id: 'shalom', title: 'Shalom', en: 'Shalom', kind: 'traditional',
-      tune: '傳統希伯來民歌・公有領域', use: '道別・互祝平安',
+      tune: '傳統希伯來民歌・公有領域・D小調', use: '道別・互祝平安',
       lines: [
         ['合', 'Shalom my friends,'], ['合', 'Shalom my friends,'],
         ['合', 'Shalom, shalom.'], ['合', "We'll see you again,"],
@@ -63,14 +88,26 @@ var Songbook = {
       lead: ['解釋 shalom 意思係平安／問安。', '最後一次用氣聲唱，作為散會前過渡。']
     },
     {
-      id: 'parting', title: '驪歌（道別歌）', en: '', kind: 'traditional',
-      tune: 'Auld Lang Syne 旋律・公有領域；中文詞為童軍流通版本', use: '散會前・營火收尾',
+      id: 'parting', title: '臨歧頌（道別歌）', en: '', kind: 'traditional',
+      tune: 'Auld Lang Syne 旋律・公有領域；中文詞為童軍流通版本（臨歧頌）', use: '散會前・營火收尾',
       lines: [
-        ['合', '我們低聲唱著別離的歌，'], ['合', '明天大家又各在一方，'],
-        ['合', '珍重吧，我親愛的朋友們，'], ['合', '天涯海角永遠不相忘。']
+        ['合', '我們低聲唱著別離的歌，'],
+        ['合', '明天大家又各在一方，'],
+        ['合', '珍重吧我親愛的朋友們，'],
+        ['合', '天涯海角永遠不相忘。']
       ],
       actions: '手拉手或雙手放膝；聲音放輕，唔鬥大聲。',
-      lead: ['先講呢首係道別歌，唱完就係今晚最後一項。', '有成員唔方便拉手就改雙手放膝，一樣算參與。']
+      lead: ['先講呢首係道別歌（臨歧頌），唱完就係今晚最後一項。', '中文十字句配八字旋律，個別字併唱：先慢唱一次，等大家跟到節奏。', '有成員唔方便拉手就改雙手放膝，一樣算參與。']
+    },
+    {
+      id: 'grace', title: '謝飯歌', en: '', kind: 'traditional',
+      tune: '香港童軍旅團流通版本（謝飯歌）', use: '開餐前・謝飯',
+      lines: [
+        ['領', '一群童軍，'], ['眾', '聚首一堂，'],
+        ['領', '感謝上主，'], ['眾', '賜我用糧。']
+      ],
+      actions: '開餐前全體企定，雙手合十或放膝，唱完先開餐。',
+      lead: ['謝飯歌要莊重，唔好嘻哈；領袖起板，成員跟唱。', '有唔同信仰嘅成員一齊食飯，唱之前講一句：大家用自己方式感恩。']
     },
     {
       id: 'ready-call', title: '準備好未？（帶動口號）', en: '', kind: 'original',
@@ -91,37 +128,39 @@ var Songbook = {
     { id: 'commands', title: '六個集合口令', desc: '正式口令・2026綱要第74頁', open: "Ceremony.open('commands')" }
   ],
   get: function (id) { return Songbook.songs.find(function (s) { return s.id === id; }); },
+  hasMelody: function (id) { return !!(typeof SongPlayer !== 'undefined' && SongPlayer.melodies && SongPlayer.melodies[id]); },
   reader: { id: '', index: 0 },
   lineHtml: function (l, big) {
     var who = l[0] === '領' ? 'lead' : (l[0] === '眾' ? 'cubs' : 'all');
     return '<p class="song-line ' + who + (big ? ' big' : '') + '"><b>' + esc(l[0]) + '</b>' + esc(l[1]) + '</p>';
   },
   panel: function () {
-    var h = '<h3>🎵 歌曲・帶動唱</h3><p class="mut">撳歌名開跟唱卡：逐句回声、動作提示、可單印一張A4歌紙。傳統歌非綱要考核內容；正式文字另開儀式卡。</p>';
+    var h = '<h3>🎵 歌曲・帶動唱</h3><p class="mut">撳歌名開跟唱卡：逐句回声、動作提示、可單印一張A4歌紙。🎶有旋律＝可播內置主旋律；🎤跟領袖唱＝旅團曲調無內置播放，領袖起板。傳統歌非綱要考核內容；正式文字另開儀式卡。</p>';
     h += '<div class="song-grid">' + Songbook.songs.map(function (s) {
-      var hasMelody = !!(SongPlayer.melodies && SongPlayer.melodies[s.id]);
+      var hasMelody = Songbook.hasMelody(s.id);
       return '<button class="song-card' + (s.kind === 'original' ? ' own' : '') + '" onclick="Songbook.open(\'' + s.id + '\')">' +
         '<b>' + (s.kind === 'original' ? '📣 ' : '🎵 ') + esc(s.title) + '</b>' +
         '<small>' + esc(s.use) + '</small>' +
-        '<span class="song-kind">' + (s.kind === 'original' ? '自編口號' : '傳統・公有領域旋律') + (hasMelody ? ' · 🎶有旋律' : '') + '</span></button>';
+        '<span class="song-kind">' + (s.kind === 'original' ? '自編口號' : '傳統・流通版本') + (hasMelody ? ' · 🎶有旋律' : ' · 🎤跟領袖唱') + '</span></button>';
     }).join('') + '</div>';
     h += '<h3>📣 正式文字（照讀・唔改寫）</h3><div class="song-grid">' + Songbook.formal.map(function (f) {
       return '<button class="song-card formal" onclick="' + f.open + '"><b>📜 ' + esc(f.title) + '</b><small>' + esc(f.desc) + '</small><span class="song-kind">已核原文</span></button>';
     }).join('') + '</div>';
     h += '<div class="quick"><button class="btn" onclick="Songbook.printAll()">🖨️ 印今晚歌單（每首一張）</button></div>';
-    h += '<p class="mut song-prov">傳統歌詞為香港童軍旅團長期流通版本，旋律屬公有領域；來源紀錄見 docs/content-audit.md。自編口號標明「自編」。歌曲唔屬獎章考核；離線照用得。</p>';
+    h += '<p class="mut song-prov">歌詞為香港童軍旅團長期流通版本（離島18旅／九龍165旅歌集）；國際傳統歌旋律屬公有領域，轉譜來源見 docs/content-audit.md。自編口號標明「自編」。歌曲唔屬獎章考核；離線照用得。</p>';
     return h;
   },
   open: function (id) {
     var s = Songbook.get(id); if (!s) return;
     Songbook.reader = { id: id, index: 0 };
+    var hasMelody = Songbook.hasMelody(id);
     Modal.open('<h2>' + (s.kind === 'original' ? '📣 ' : '🎵 ') + esc(s.title) + (s.en ? ' <small>' + esc(s.en) + '</small>' : '') + '</h2>' +
-      '<p class="mut">' + esc(s.tune) + '｜用途：' + esc(s.use) + '</p>' +
+      '<p class="mut">' + esc(s.tune) + '｜用途：' + esc(s.use) + (hasMelody ? '｜🎶有內置旋律' : '｜🎤跟領袖唱（無內置播放）') + '</p>' +
       '<div class="song-lines">' + s.lines.map(function (l) { return Songbook.lineHtml(l, false); }).join('') + '</div>' +
       '<details open><summary>動作提示</summary><p>' + esc(s.actions) + '</p></details>' +
       '<details><summary>點帶（領袖）</summary><ol>' + s.lead.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ol></details>' +
       '<div class="quick">' +
-      (SongPlayer.melodies[id] ? '<button class="btn song-play-btn" style="background:#E65100;color:#fff" onclick="SongPlayer.playing?SongPlayer.stop():SongPlayer.play(\'' + id + '\')">🎶 播旋律</button>' : '') +
+      (hasMelody ? '<button class="btn song-play-btn" style="background:#E65100;color:#fff" onclick="SongPlayer.playing?SongPlayer.stop():SongPlayer.play(\'' + id + '\')">🎶 播旋律</button>' : '') +
       '<button class="btn gr" onclick="Songbook.sing(\'' + id + '\')">▶ 圍圈跟唱</button>' +
       '<button class="btn" onclick="Songbook.print(\'' + id + '\')">🖨️ 印呢首A4歌紙</button>' +
       '<button class="btn ghost" onclick="Modal.close()">關閉</button></div>');
@@ -131,12 +170,13 @@ var Songbook = {
     var r = Songbook.reader; if (r.id !== id) r = Songbook.reader = { id: id, index: 0 };
     var l = s.lines[Math.min(r.index, s.lines.length - 1)];
     var done = r.index >= s.lines.length;
+    var hasMelody = Songbook.hasMelody(id);
     Modal.open('<h2>▶ 跟唱：' + esc(s.title) + '</h2>' +
-      '<p class="mut">句 ' + Math.min(r.index + 1, s.lines.length) + '／' + s.lines.length + '｜' + (l[0] === '領' ? '領袖唱呢句，成員聽' : l[0] === '眾' ? '成員跟唱' : '全員齊唱') + '</p>' +
+      '<p class="mut">句 ' + Math.min(r.index + 1, s.lines.length) + '／' + s.lines.length + '｜' + (l[0] === '領' ? '領袖唱呢句，成員聽' : l[0] === '眾' ? '成員跟唱' : '全員齊唱') + (hasMelody ? '' : '｜🎤跟領袖起板') + '</p>' +
       (done ? '<div class="song-now done"><b>🎉 唱完！</b><p>' + esc(s.actions) + '</p></div>'
         : '<div class="song-now">' + Songbook.lineHtml(l, true) + '</div>') +
       '<div class="quick">' +
-      (SongPlayer.melodies[id] ? '<button class="btn song-play-btn" style="background:#E65100;color:#fff" onclick="SongPlayer.playing?SongPlayer.stop():SongPlayer.play(\'' + id + '\')">' + (SongPlayer.playing ? '⏹ 停止旋律' : '🎶 播旋律') + '</button>' : '') +
+      (hasMelody ? '<button class="btn song-play-btn" style="background:#E65100;color:#fff" onclick="SongPlayer.playing?SongPlayer.stop():SongPlayer.play(\'' + id + '\')">' + (SongPlayer.playing ? '⏹ 停止旋律' : '🎶 播旋律') + '</button>' : '') +
       '<button class="btn" onclick="Songbook.move(-1)"' + (r.index === 0 ? ' disabled' : '') + '>‹ 上一句</button>' +
       '<button class="btn gr" onclick="Songbook.move(1)">' + (done ? '↺ 重頭唱' : '下一句 ›') + '</button>' +
       '<button class="btn" onclick="Lead.beep(880,0.12)">👏 拍手拍子</button>' +
@@ -152,12 +192,13 @@ var Songbook = {
   },
   sheet: function (id) {
     var s = Songbook.get(id); if (!s) return '';
+    var hasMelody = Songbook.hasMelody(id);
     return '<section class="psheet song-sheet"><h2>' + (s.kind === 'original' ? '📣 ' : '🎵 ') + esc(s.title) + (s.en ? '（' + esc(s.en) + '）' : '') + '</h2>' +
-      '<p>' + esc(s.use) + '｜' + esc(s.tune) + '</p>' +
+      '<p>' + esc(s.use) + '｜' + esc(s.tune) + (hasMelody ? '｜🎶有內置旋律' : '｜🎤跟領袖唱') + '</p>' +
       '<div class="song-lines print">' + s.lines.map(function (l) { return Songbook.lineHtml(l, false); }).join('') + '</div>' +
       '<h3>動作提示</h3><p>' + esc(s.actions) + '</p>' +
       '<h3>領袖帶法</h3><ol>' + s.lead.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ol>' +
-      '<p class="p-foot">' + (s.kind === 'original' ? '本套包自編帶動口號，非官方文字。' : '傳統營火歌：旋律公有領域、歌詞為香港童軍旅團流通版本；非《幼童軍訓練綱要》考核內容。') + '正式場合用歌按旅團安排。</p></section>';
+      '<p class="p-foot">' + (s.kind === 'original' ? '本套包自編帶動口號，非官方文字。' : '營火歌：歌詞為香港童軍旅團流通版本；國際傳統歌旋律屬公有領域；非《幼童軍訓練綱要》考核內容。') + '正式場合用歌按旅團安排。</p></section>';
   },
   print: function (id) {
     var html = Songbook.sheet(id);
@@ -171,8 +212,22 @@ var Songbook = {
 };
 
 /* 🎶 SongPlayer — Web Audio API 旋律播放：用簡單合成器播出歌曲主旋律。
-   每首歌定義一組音符（MIDI 音高＋時值），播放時可暫停／重播。
-   配合領唱語音（generate_speech 生成嘅 mp3）使用效果更好。 */
+   2026-09-15 修正：舊版 6 首轉譜全部核對，錯嘅刪、啱嘅留：
+   - campfire-burning（Frère Jacques）：舊譜啱，保留。8 句結構 CDEC×2／EFG×2／
+     GAGFEC×2／CGC×2，C4=60。來源：傳統兒歌，公有領域。
+   - kumbayah：舊譜錯（C-E-G-E 進行唔係 Kumbaya）。新譜 C 大調：
+     C E G G G A A G／C E G G G F E D／同第一句／A G E D C。
+     頭三句轉自 F# 大調鍵盤譜（playinoneday.com），尾句 Oh Lord 按和弦
+     F-C-G-C 收落主音。靈歌・公有領域。
+   - shalom：舊譜錯（C 大調 G-F-E-D，Shalom 係 D 小調）。新譜逐粒音轉自
+     維基 Shalom chaverim 條目 LilyPond（D小調 4/4，A3 起板）。
+     希伯來民歌・公有領域。
+   - parting（臨歧頌／Auld Lang Syne）：舊譜錯（C-E 開頭）。新譜 C 大調：
+     G C C C E D C D／E D C C E G A／A G E E C D C D／E D C A A G C，
+     轉自 F# 五聲音階譜（musicwithease.com）。蘇格蘭傳統・公有領域。
+   - together／wolf-tail／campfire-song／grace：旅團曲調未能核對，唔造假譜，
+     無內置播放，跟領袖唱。ready-call 係口號，本來就無旋律。
+   每首歌定義一組音符（MIDI 音高＋時值），播放時可暫停／重播。 */
 var SongPlayer = {
   ctx: null,
   playing: false,
@@ -190,54 +245,37 @@ var SongPlayer = {
         [60,1],[55,1],[60,2],[60,1],[55,1],[60,2]
       ]
     },
-    'together': {
-      tempo: 110,
-      notes: [
-        [60,1],[62,1],[64,0.5],[65,0.5],[64,1],[62,0.5],[60,0.5],
-        [62,1],[64,0.5],[62,0.5],[60,2],
-        [60,1],[64,1],[65,0.5],[67,0.5],[65,0.5],[64,0.5],
-        [62,1],[64,0.5],[62,0.5],[60,2],
-        [65,1],[67,1],[69,1],[67,1],[65,1],[64,1],
-        [62,1],[64,0.5],[62,0.5],[60,2]
-      ]
-    },
-    'wolf-tail': {
-      tempo: 130,
-      notes: [
-        [64,1],[64,0.5],[65,0.5],[67,1],[67,1],
-        [65,1],[65,0.5],[64,0.5],[62,1],[62,1],
-        [60,1],[62,1],[64,1],[65,1],
-        [64,1],[62,1],[60,2]
-      ]
-    },
     'kumbayah': {
       tempo: 80,
       notes: [
-        [60,1.5],[64,0.5],[67,1],[64,1],
-        [60,1.5],[64,0.5],[67,2],
-        [60,1.5],[64,0.5],[67,1],[64,1],
-        [60,1.5],[64,0.5],[67,2],
-        [72,1],[67,1],[64,1],[60,1],
-        [60,1.5],[64,0.5],[67,2]
+        [60,1],[64,1],[67,1],[67,1],[67,1],[69,1],[69,1],[67,1],
+        [60,1],[64,1],[67,1],[67,1],[67,1],[65,1],[64,1],[62,1],
+        [60,1],[64,1],[67,1],[67,1],[67,1],[69,1],[69,1],[67,1],
+        [69,2],[67,1],[64,1],[62,1],[60,3]
       ]
     },
     'shalom': {
       tempo: 90,
       notes: [
-        [67,1],[65,1],[64,1],[62,1],
-        [67,1],[65,1],[64,1],[62,1],
-        [60,1],[64,1],[60,2],
-        [65,1],[67,1],[64,1],[62,1],
-        [60,1],[64,1],[60,2]
+        [57,1],
+        [62,1],[62,0.5],[64,0.5],[65,1],[62,1],
+        [65,1],[65,0.5],[67,0.5],[69,1],[69,1],
+        [74,2],[72,2],
+        [69,3],
+        [69,1],
+        [74,1],[69,0.5],[67,0.5],[65,1],[67,1],
+        [69,1],[65,0.5],[64,0.5],[62,1],[57,1],
+        [62,3],[64,0.5],[65,0.5],
+        [62,3]
       ]
     },
     'parting': {
-      tempo: 70,
+      tempo: 72,
       notes: [
-        [60,1],[64,2],[65,1],[67,2],[65,1],
-        [64,1],[62,1],[60,1],[62,1],
-        [64,2],[62,1],[60,1],
-        [64,1],[62,1],[60,1],[55,1],[60,3]
+        [55,1],[60,1],[60,1],[60,1],[64,1],[62,1],[60,1],[62,2],
+        [64,1],[62,1],[60,1],[60,1],[64,1],[67,1],[69,2],
+        [69,1],[67,1],[64,1],[64,1],[60,1],[62,1],[60,1],[62,2],
+        [64,1],[62,1],[60,1],[57,1],[57,1],[55,1],[60,3]
       ]
     }
   },
@@ -253,7 +291,7 @@ var SongPlayer = {
     if (!SongPlayer.init()) { toast('瀏覽器唔支援音效'); return; }
     SongPlayer.stop();
     var melody = SongPlayer.melodies[id];
-    if (!melody) { toast('呢首歌未有旋律，跟唱卡照用'); return; }
+    if (!melody) { toast('呢首歌跟領袖唱，無內置旋律'); return; }
     SongPlayer.playing = true;
     var beatMs = 60000 / melody.tempo;
     var ctx = SongPlayer.ctx;
@@ -303,6 +341,7 @@ var SongPlayer = {
     SongPlayer.updateUI();
   },
   updateUI: function () {
+    if (typeof document === 'undefined' || !document.querySelectorAll) return;
     var btns = document.querySelectorAll('.song-play-btn');
     btns.forEach(function (b) {
       b.textContent = SongPlayer.playing ? '⏹ 停止旋律' : '🎶 播旋律';

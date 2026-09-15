@@ -42,7 +42,9 @@
   var Content=(typeof window!=='undefined'&&window.Content)?window.Content:{};
   if(typeof window!=='undefined')window.Content=Content;
   Content.worksheetBase=worksheetBase;
-  App.vSheets=function(){return worksheetBase();};
+  /* #sheets 工作紙頁：改出獨立試卷庫（唔跟集會）；試卷模組未載入先退回舊索引。 */
+  Content.worksheetIndex=Content.worksheetIndex||function(){return ExamPapers.panel();};
+  App.vSheets=function(){return (typeof ExamPapers!=='undefined'&&ExamPapers.panel)?ExamPapers.panel():worksheetBase();};
   App.vPack=function(){var m=curMeet(),n=Store.get('roster',[]).length||1;return '<section class="card"><h2>🖨️ 今場文字教材 · 精簡列印</h2><p>'+esc(m.n)+'</p><p class="mut">適合現場會使用APP的領袖：一頁流程摘要與成員工作紙。需要離開螢幕帶領，可選完整出隊包。未填名單預設印1份。</p><div class="quick"><button class="btn gr" onclick="PackPrint.open(\'all\')">印流程摘要＋分隔頁＋工作紙（'+n+'份）</button><button class="btn" onclick="PackPrint.open(\'leader\')">只印領袖流程</button><button class="btn" onclick="PackPrint.open(\'sheet\')">只印工作紙</button></div></section>'+learning(m)+'<section class="card"><h3>🧺 執袋／設場唔使印</h3><div class="quick"><button class="btn" onclick="Bag.open()">執袋清單</button><button class="btn" onclick="Venue.open()">設場清單</button></div></section>';};
   App.activity=function(tid,i){var m=DATA.meetings.find(function(x){return x.tid===tid;}),s=m.segs[i];Modal.open('<h2>'+esc(s.n)+'</h2><p class="mut">'+s.m+'分鐘 · '+esc(m.n)+'</p><p class="say">📢 '+esc(s.script)+'</p><ol class="lsteps">'+s.steps.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ol><p class="safe">⛑️ '+esc(s.safety)+'</p><details><summary>物資、觀察及節奏</summary><p>物資：'+esc(s.mats.join('、')||'無額外物資')+'</p><p>觀察：'+esc(s.watch)+'</p><p>'+esc(s.rhythm)+'</p><p>未涵蓋：'+esc(m.gap)+'</p></details>');};
   PackPrint.open=function(mode,tid){
