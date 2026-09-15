@@ -124,25 +124,25 @@ for(const ep of DATA.jungle.episodes){
   if(narr.pending.includes(ep.id))assert.equal(langs.length,0,'待錄旁白嘅集數唔應該有清單：'+ep.id);
   else assert(langs.length>=1,'每集至少一種語言旁白（'+ep.id+'）');
   for(const [code] of langs){
-    const list=narr.files[ep.id][code];
-    assert(Array.isArray(list)&&list.length>=1,'旁白清單要係陣列：'+ep.id+'/'+code);
-    for(const f of list){assert(fs.existsSync(path.join(root,f)),'旁白檔案要存在：'+f);
-      narrFiles.push(f);
-      assert(fs.readFileSync('sw.js','utf8').includes('./'+f),'旁白要入離線快取：'+f);}
+    const list=narr.files[ep.id][code]||[];
+    const sceneClips=((DATA.jungle.sceneAudio[ep.id]||{})[code]||[]).filter(Boolean);
+    assert(Array.isArray(list),'旁白清單要係陣列：'+ep.id+'/'+code);
+    assert(list.length>=1||sceneClips.length>=1,'該語言要有旁白或逐段聲：'+ep.id+'/'+code);
+    for(const f of list.concat(sceneClips)){assert(fs.existsSync(path.join(root,f)),'旁白檔案要存在：'+f);
+      narrFiles.push(f);}
   }
 }
 assert(narrFiles.length>=5,'起碼有幾段旁白（實際 '+narrFiles.length+'）');
-assert(narr.files.help.zh&&narr.files.help.zh.length===1,'普通話旁白要覆蓋第二集');
+assert(ctx.Jungle.langsOf('help').some(l=>l[0]==='zh'),'普通話旁白要覆蓋第二集');
 assert(narr.files.welcome.en.length===2,'英文旁白可以分幾段順住播');
 /* 2026-09-15 第二輪：普通話＋英文補齊五集；粵語第一集試聽，並標明語氣限制。 */
 assert.deepEqual===undefined||true;
 assert.equal(JSON.stringify(Object.keys(narr.files).sort()),JSON.stringify(['fire','help','rules','village','welcome']),'五集都有旁白資料');
 for(const [ep,byLang] of Object.entries(narr.files)){
-  assert(byLang.zh&&byLang.zh.length>=1,ep+' 要有普通話旁白');
-  assert(byLang.en&&byLang.en.length>=1,ep+' 要有英文旁白');
+  assert(byLang.en&&byLang.en.length>=1,ep+' 要有英文旁白（逐段未齊之前）');
 }
-assert(narr.files.welcome.yue&&narr.files.welcome.yue.length===1,'粵語第一集');
-for(const [ep,byLang] of Object.entries(narr.files))assert(byLang.yue&&byLang.yue.length>=1,ep+' 要有粵語旁白');
+assert(ctx.Jungle.langsOf('welcome').some(l=>l[0]==='yue'),'第一集有粵語');
+for(const ep of DATA.jungle.episodes)assert(ctx.Jungle.sceneDone(ep.id,'yue'),'五集都要有粵語旁白：'+ep.id);
 assert(narr.langNotes&&narr.langNotes.yue.includes('生硬'),'粵語要標明語氣限制');
 assert.equal(narr.pending.length,0,'旁白唔應該再有待錄項');
 assert.equal(DATA.jungle.pendingArt.length,0,'場景圖要全部出齊');
@@ -181,7 +181,7 @@ assert(ctx.Jungle.stageState.slide===slideAtStart,'整集模式唔會自動跳�
 ctx.Jungle.narrationEnded();
 assert(!ctx.Jungle.audio.playing,'整集播完停低');
 ctx.Jungle.playNarration('zh');
-assert(played[played.length-1].includes('welcome-zh.mp3'),'整集模式：可以轉普通話');
+assert(played[played.length-1].includes('scene/welcome-1-zh.mp3'),'整集模式：普通話逐段齊，會接住播');
 
 /* 2. 逐段模式：一段一張圖，播放器跟住圖走 */
 ctx.Jungle.toggleMode();
@@ -269,7 +269,6 @@ assert(ctx.Jungle.mmss(75)==='1:15','時間顯示格式');
       else {assert(pending.has(ep.id+':'+code)||scenesFilledPartial(ep.id,code),'未錄完要喺 scenePending：'+ep.id+':'+code);}
       for(const f of arr){if(!f)continue;filled++;
         assert(fs.existsSync(path.join(root,f)),'逐段旁白檔案要存在：'+f);
-        assert(sw.includes('./'+f),'逐段旁白要入快取：'+f);
         missing+=0;}
     }
   }
@@ -296,7 +295,7 @@ assert(ctx.Jungle.mmss(75)==='1:15','時間顯示格式');
   for(const k of ['night','day','leaves','fire']){
     assert(amb[k],'要有環境音：'+k);
     assert(fs.existsSync(path.join(root,amb[k])),'環境音檔案要存在：'+amb[k]);
-    assert(fs.readFileSync('sw.js','utf8').includes('./'+amb[k]),'環境音要入快取：'+amb[k]);
+    assert(fs.readFileSync('sw.js','utf8').includes('./'+amb[k]),'環境音細細隻，要入安裝包（快取）');
     assert(fs.statSync(path.join(root,amb[k])).size<120*1024,'環境音要細過 120KB：'+amb[k]);
   }
   for(const ep of DATA.jungle.episodes)for(const sc of ep.scenes)assert(['night','day','leaves','fire'].includes(sc.amb),'每段要有環境音標籤：'+sc.title);
@@ -321,6 +320,66 @@ assert(ctx.Jungle.mmss(75)==='1:15','時間顯示格式');
   assert(ctx.document.getElementById('story-lab-amb').src.includes('fire-crackle.mp3'),'試聽環境音會揀啱檔案');
   ctx.Jungle.ambPlayLab('night');
   assert(ctx.document.getElementById('story-lab-amb').src.includes('jungle-night.mp3')&&ctx.document.getElementById('story-lab-amb').loop===true,'環境音試聽要 loop');
+  ctx.Jungle.show(0);
+}
+/* 9. 體積控制：唔重複錄同一段內容、audio 唔塞入安裝包、有離線語音包下載 */
+{
+  const fsx=fs, pathx=path;
+  const audioDir=pathx.join(root,'assets/jungle/audio');
+  const sceneDir=pathx.join(audioDir,'scene');
+  const ambDir=pathx.join(root,'assets/jungle/ambience');
+  const onDisk=[].concat(
+    fsx.readdirSync(audioDir).filter(f=>f.endsWith('.mp3')).map(f=>'assets/jungle/audio/'+f),
+    fsx.readdirSync(sceneDir).filter(f=>f.endsWith('.mp3')).map(f=>'assets/jungle/audio/scene/'+f),
+    fsx.readdirSync(ambDir).filter(f=>f.endsWith('.mp3')).map(f=>'assets/jungle/ambience/'+f));
+  const pack=ctx.Jungle.audioPackList();
+  /* (a) 每個檔案都要有用途（唔可以留低冇人用嘅重複檔） */
+  const orphan=onDisk.filter(f=>!pack.includes(f));
+  assert.equal(orphan.length,0,'唔可以留低無人用嘅語音檔：'+orphan.join('、'));
+  /* (b) 逐段錄齊嘅語言，唔應該再有一套成集聲（重複佔位） */
+  for(const ep of DATA.jungle.episodes){
+    for(const code of ['zh','en','yue']){
+      if(!ctx.Jungle.sceneDone(ep.id,code))continue;
+      assert.equal((narr.files[ep.id][code]||[]).length,0,'逐段齊咗就唔應該再有一套成集聲：'+ep.id+'/'+code);
+      const pl=ctx.Jungle.playlist(ep.id,code);
+      assert(pl.chained&&pl.files.length===ep.scenes.length,'整集模式要用逐段接播（'+ep.id+'/'+code+'）');
+    }
+  }
+  /* (c) 成集模式接住播：唔會跳圖，播完最後一段就停 */
+  ctx.Jungle.show(0);ctx.Jungle.audio.mode='episode';
+  ctx.Jungle.playNarration('zh');
+  assert(played[played.length-1].includes('scene/welcome-1-zh.mp3'),'普通話第一集：整集模式＝逐段接播');
+  const slide0=ctx.Jungle.stageState.slide;
+  ctx.Jungle.narrationEnded();
+  assert(ctx.Jungle.stageState.slide===slide0,'接播唔會跳圖');
+  assert(played[played.length-1].includes('scene/welcome-2-zh.mp3'),'接播會順住第二段');
+  /* (d) 未錄齊嘅語言照用成集聲 */
+  ctx.Jungle.show(4);ctx.Jungle.playNarration('en');
+  assert(played[played.length-1].includes('village-en-1.mp3'),'未錄齊嘅語言照樣播成集聲');
+  ctx.Jungle.toggleMode();ctx.Jungle.show(0);
+  /* (e) 體積上限 */
+  let audioBytes=0;for(const f of onDisk)audioBytes+=fsx.statSync(pathx.join(root,f)).size;
+  assert(audioBytes<9*1048576,'語音檔總量要細過 9MB（實際 '+(audioBytes/1048576).toFixed(1)+'MB）');
+  for(const f of onDisk)assert(fsx.statSync(pathx.join(root,f)).size<800*1024,'單個語音檔唔應該大過 800KB：'+f);
+  let slideBytes=0;for(const f of fsx.readdirSync(pathx.join(root,'assets/jungle/slides')))slideBytes+=fsx.statSync(pathx.join(root,'assets/jungle/slides/'+f)).size;
+  assert(slideBytes<3*1048576,'場景圖總量要細過 3MB（實際 '+(slideBytes/1048576).toFixed(1)+'MB）');
+  /* (f) 安裝包唔包 audio（只有細細隻環境音） */
+  const swSrc=fsx.readFileSync('sw.js','utf8');
+  const precache=(swSrc.match(/ASSETS = \[([\s\S]*?)\];/)||[])[1]||'';
+  assert(!/\/assets\/jungle\/audio\//.test(precache),'安裝包唔應該塞成 10MB 語音檔');
+  assert(/\/assets\/jungle\/ambience\//.test(precache),'環境音（細檔）可以入安裝包');
+  assert(/AUDIO_RE/.test(swSrc),'Service Worker 要為語音檔做即時快取');
+  assert(swSrc.includes('AUDIO_RE.test')&&swSrc.includes('(audio|ambience)'),'即時快取要涵蓋旁白同環境音');
+  assert(swSrc.includes('has("range")'),'要處理媒體 Range 請求，否則快取唔到');
+  assert(pack.length>=40,'離線語音包要包括全部旁白／逐段／環境音（實際 '+pack.length+'）');
+  assert(ctx.Jungle.packSummary().includes(String(pack.length)),'面板要顯示語音檔數量');
+  let asked=[];
+  ctx.fetch=(u)=>{asked.push(u);return Promise.resolve({blob:()=>Promise.resolve({size:1024})});};
+  ctx.caches={open:()=>Promise.resolve({})};
+  ctx.Jungle.downloadAudioPack();
+  ctx.Jungle.downloadAudioPack();
+  assert(asked.length>=1&&asked[0].includes('assets/jungle/'),'下載會逐個檔案抓');
+  assert(ctx.document.getElementById('pack-state').textContent.includes('下載中'),'下載時要顯示進度');
   ctx.Jungle.show(0);
 }
 ctx.Jungle.printEpisode(0);

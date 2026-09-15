@@ -1,5 +1,5 @@
 /* 🐺 幼童軍團集會助手 — Service Worker (offline first，cache齊) */
-var CACHE = "cubhub-v35-scene-zh-batch2-20260915";
+var CACHE = "cubhub-v36-lazy-audio-20260915";
 var ASSETS = [
   "./", "./index.html", "./manifest.webmanifest", "./css/app.css",
   "./js/data.js", "./js/guide.js", "./js/flow.js", "./js/app.js", "./js/redesign.js", "./js/content.js", "./js/jungle-data.js", "./js/jungle.js", "./js/practical-data.js", "./js/practical.js", "./js/uniform-ceremony.js", "./js/field-visuals.js", "./js/salute-lab.js", "./js/salute-positions.js", "./js/tracking-kit.js", "./js/material-desk.js", "./js/plain-content.js", "./js/worksheet-guides.js", "./js/skill-art.js", "./js/craft-sheets.js", "./js/songbook.js",
@@ -62,13 +62,6 @@ var ASSETS = [
   "./assets/jungle/slides/jungle-water-snake.avif",
   "./assets/jungle/slides/jungle-monkeys.avif",
   "./assets/jungle/slides/jungle-kite-message.avif",
-  "./assets/jungle/audio/welcome-zh.mp3",
-  "./assets/jungle/audio/help-zh.mp3",
-  "./assets/jungle/audio/rules-zh.mp3",
-  "./assets/jungle/audio/fire-zh.mp3",
-  "./assets/jungle/audio/rules-en.mp3",
-  "./assets/jungle/audio/welcome-en-1.mp3",
-  "./assets/jungle/audio/welcome-en-2.mp3",
   "./assets/jungle/slides/jungle-baloo-lesson.avif",
   "./assets/jungle/slides/jungle-bees-bat.avif",
   "./assets/jungle/slides/jungle-hunting-grounds.avif",
@@ -84,66 +77,10 @@ var ASSETS = [
   "./assets/jungle/slides/jungle-tiger-return.avif",
   "./assets/jungle/slides/jungle-herd-plan.avif",
   "./assets/jungle/slides/jungle-carry-on.avif",
-  "./assets/jungle/audio/village-zh-1.mp3",
-  "./assets/jungle/audio/village-zh-2.mp3",
-  "./assets/jungle/audio/help-en-1.mp3",
-  "./assets/jungle/audio/help-en-2.mp3",
-  "./assets/jungle/audio/fire-en-1.mp3",
-  "./assets/jungle/audio/fire-en-2.mp3",
-  "./assets/jungle/audio/village-en-1.mp3",
-  "./assets/jungle/audio/village-en-2.mp3",
-  "./assets/jungle/audio/welcome-yue.mp3",
-  "./assets/jungle/audio/help-yue-1.mp3",
-  "./assets/jungle/audio/help-yue-2.mp3",
-  "./assets/jungle/audio/rules-yue.mp3",
-  "./assets/jungle/audio/fire-yue-1.mp3",
-  "./assets/jungle/audio/fire-yue-2.mp3",
-  "./assets/jungle/audio/village-yue-1.mp3",
-  "./assets/jungle/audio/village-yue-2.mp3",
   "./assets/jungle/ambience/jungle-night.mp3",
   "./assets/jungle/ambience/jungle-day.mp3",
   "./assets/jungle/ambience/leaves.mp3",
   "./assets/jungle/ambience/fire-crackle.mp3",
-  "./assets/jungle/audio/scene/welcome-1-yue.mp3",
-  "./assets/jungle/audio/scene/welcome-2-yue.mp3",
-  "./assets/jungle/audio/scene/welcome-3-yue.mp3",
-  "./assets/jungle/audio/scene/welcome-4-yue.mp3",
-  "./assets/jungle/audio/scene/welcome-5-yue.mp3",
-  "./assets/jungle/audio/scene/welcome-6-yue.mp3",
-  "./assets/jungle/audio/scene/help-1-yue.mp3",
-  "./assets/jungle/audio/scene/help-2-yue.mp3",
-  "./assets/jungle/audio/scene/help-3-yue.mp3",
-  "./assets/jungle/audio/scene/help-4-yue.mp3",
-  "./assets/jungle/audio/scene/help-5-yue.mp3",
-  "./assets/jungle/audio/scene/help-6-yue.mp3",
-  "./assets/jungle/audio/scene/help-7-yue.mp3",
-  "./assets/jungle/audio/scene/rules-1-yue.mp3",
-  "./assets/jungle/audio/scene/rules-2-yue.mp3",
-  "./assets/jungle/audio/scene/rules-3-yue.mp3",
-  "./assets/jungle/audio/scene/rules-4-yue.mp3",
-  "./assets/jungle/audio/scene/fire-1-yue.mp3",
-  "./assets/jungle/audio/scene/fire-2-yue.mp3",
-  "./assets/jungle/audio/scene/fire-3-yue.mp3",
-  "./assets/jungle/audio/scene/fire-4-yue.mp3",
-  "./assets/jungle/audio/scene/fire-5-yue.mp3",
-  "./assets/jungle/audio/scene/village-1-yue.mp3",
-  "./assets/jungle/audio/scene/village-2-yue.mp3",
-  "./assets/jungle/audio/scene/village-3-yue.mp3",
-  "./assets/jungle/audio/scene/village-4-yue.mp3",
-  "./assets/jungle/audio/scene/village-5-yue.mp3",
-  "./assets/jungle/audio/scene/welcome-1-zh.mp3",
-  "./assets/jungle/audio/scene/welcome-2-zh.mp3",
-  "./assets/jungle/audio/scene/welcome-3-zh.mp3",
-  "./assets/jungle/audio/scene/welcome-4-zh.mp3",
-  "./assets/jungle/audio/scene/welcome-5-zh.mp3",
-  "./assets/jungle/audio/scene/welcome-6-zh.mp3",
-  "./assets/jungle/audio/scene/help-1-zh.mp3",
-  "./assets/jungle/audio/scene/help-2-zh.mp3",
-  "./assets/jungle/audio/scene/help-3-zh.mp3",
-  "./assets/jungle/audio/scene/help-4-zh.mp3",
-  "./assets/jungle/audio/scene/help-5-zh.mp3",
-  "./assets/jungle/audio/scene/help-6-zh.mp3",
-  "./assets/jungle/audio/scene/help-7-zh.mp3",
   "./assets/teaching/right-hand-salute.avif",
   "./icons/icon-192.png", "./icons/icon-512.png",
   "./assets/jungle/mowgli.avif", "./assets/jungle/raksha.avif", "./assets/jungle/akela.avif", "./assets/jungle/baloo.avif",
@@ -157,14 +94,29 @@ self.addEventListener("activate", function (e) {
     return Promise.all(ks.filter(function (k) { return k !== CACHE; }).map(function (k) { return caches.delete(k); }));
   }).then(function () { return self.clients.claim(); }));
 });
+/* 語音檔唔預先塞入安裝包（唔想 app 一裝就成 10MB）：
+   第一次播／撳「下載離線語音包」時才存落快取，之後冇網都播到。
+   媒體請求多數帶 Range header，206 回應唔可以入 cache，所以另外用一個無 Range 嘅請求存檔。 */
+var AUDIO_RE = /\/assets\/jungle\/(audio|ambience)\//;
 self.addEventListener("fetch", function (e) {
   if (e.request.method !== "GET") return;
   if (new URL(e.request.url).origin !== self.location.origin) return;
   /* 外部APP（網上服務）唔cache，直出network */
   if (/cubsbadge\.vercel\.app|scout-circulars\.vercel\.app/.test(e.request.url)) return;
+  var isAudio = AUDIO_RE.test(new URL(e.request.url).pathname);
   e.respondWith(
     caches.match(e.request, { ignoreSearch: true }).then(function (hit) {
       if (hit) return hit;
+      if (isAudio) {
+        var plain = e.request.headers.has("range") ? new Request(e.request.url, { credentials: "same-origin" }) : e.request;
+        return fetch(plain).then(function (res) {
+          if (res && res.status === 200 && res.type !== "opaque") {
+            var copy = res.clone();
+            caches.open(CACHE).then(function (c) { try { c.put(plain, copy); } catch (_) {} });
+          }
+          return res;
+        }).catch(function () { return caches.match("./index.html"); });
+      }
       return fetch(e.request).then(function (res) {
         var copy = res.clone();
         caches.open(CACHE).then(function (c) { try { c.put(e.request, copy); } catch (_) {} });

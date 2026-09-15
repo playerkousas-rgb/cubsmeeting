@@ -97,7 +97,26 @@ var Jungle = {
     return Jungle.audio;
   },
   savePrefs:function(){try{Store.set('storyPrefs',{mode:Jungle.audio.mode,auto:Jungle.audio.auto,amb:Jungle.audio.amb,ambVol:Jungle.audio.ambVol});}catch(e){}},
-  langsOf:function(id){var f=(DATA.jungle.narration.files[id]||{});return DATA.jungle.narration.langs.filter(function(l){return f[l[0]]&&f[l[0]].length;});},
+  langsOf:function(id){var f=(DATA.jungle.narration.files[id]||{}),sc=(DATA.jungle.sceneAudio||{})[id]||{};
+    return DATA.jungle.narration.langs.filter(function(l){return (f[l[0]]&&f[l[0]].length)||((sc[l[0]]||[]).filter(Boolean).length);});},
+  /* 播放清單：逐段錄齊嘅語言，整集模式＝順住逐段接播（唔會重複錄一套成集聲，慳位） */
+  playlist:function(id,lang){
+    var ep=DATA.jungle.episodes.find(function(e){return e.id===id;});if(!ep)return {files:[],chained:false};
+    var sc=((DATA.jungle.sceneAudio||{})[id]||{})[lang]||[];
+    var full=sc.length>=ep.scenes.length&&sc.slice(0,ep.scenes.length).every(Boolean);
+    if(full)return {files:sc.slice(0,ep.scenes.length),chained:true};
+    return {files:((DATA.jungle.narration.files[id]||{})[lang]||[]),chained:false};
+  },
+  /* 離線語音包：所有旁白＋逐段＋環境音檔案（唔預先塞入安裝包，領袖自己決定幾時下載） */
+  audioPackList:function(){
+    var out=[],seen={};
+    function put(u){if(!u||seen[u])return;seen[u]=1;out.push(u);}
+    var n=DATA.jungle.narration.files,sa=DATA.jungle.sceneAudio||{};
+    Object.keys(n).forEach(function(id){Object.keys(n[id]).forEach(function(l){(n[id][l]||[]).forEach(put);});});
+    Object.keys(sa).forEach(function(id){Object.keys(sa[id]).forEach(function(l){(sa[id][l]||[]).forEach(put);});});
+    Object.keys(DATA.jungle.ambience||{}).forEach(function(k){put(DATA.jungle.ambience[k]);});
+    return out;
+  },
   audioEl:function(){return document.getElementById('story-track');},
   ambEl:function(){return document.getElementById('story-amb');},
   langNote:function(lang){var n=(DATA.jungle.narration.langNotes||{})[lang];return n||'';},
@@ -162,7 +181,7 @@ var Jungle = {
   audioNote:function(msg){Jungle.audio.note=msg||'';var s=document.getElementById('story-audio-note')||document.getElementById('story-audio-state');if(s)s.textContent=Jungle.audio.note;},
   audioError:function(){Jungle.audio.playing=false;Jungle.audioNote('音檔未載入，可能未快取；可以直接照文字講。');Jungle.markAudio();},
   markAudio:function(){
-    var ep=DATA.jungle.episodes[Jungle.stageState.ep], list=(DATA.jungle.narration.files[ep.id]||{})[Jungle.audio.lang]||[];
+    var ep=DATA.jungle.episodes[Jungle.stageState.ep], pl=Jungle.playlist(ep.id,Jungle.audio.lang), list=pl.files;
     var bar=document.getElementById('story-audio');
     if(bar&&bar.querySelectorAll){
       var chips=bar.querySelectorAll('.story-lang');
@@ -173,7 +192,7 @@ var Jungle = {
     var st=document.getElementById('story-audio-state');
     if(st&&list.length){
       var el=Jungle.audioEl(), label=Jungle.audio.playing?'播放中':'已暫停';
-      var scope=Jungle.audio.mode==='scene'?'逐段':'整集';
+      var scope=Jungle.audio.mode==='scene'?'逐段':(pl.chained?'整集（接段）':'整集');
       var pos=Jungle.audio.mode==='scene'?((Jungle.stageState.slide>0?(Jungle.stageState.slide)+'/'+ep.scenes.length:'封面')):
         ((Jungle.audio.part+1)+'/'+list.length);
       st.textContent=label+'｜'+scope+' '+pos+(el&&el.duration&&isFinite(el.duration)?'｜'+Jungle.mmss(el.currentTime)+' / '+Jungle.mmss(el.duration):'');
@@ -190,7 +209,7 @@ var Jungle = {
   /* 揀語言 */
   playNarration:function(lang){
     var ep=DATA.jungle.episodes[Jungle.stageState.ep];
-    var list=(DATA.jungle.narration.files[ep.id]||{})[lang];if(!list||!list.length)return;
+    var list=Jungle.playlist(ep.id,lang).files;if(!list||!list.length)return;
     Jungle.audio.lang=lang;Jungle.audio.part=0;Jungle.audio.ep=Jungle.stageState.ep;
     Jungle.buildAudio();
     Jungle.playCurrent(true);
@@ -206,7 +225,7 @@ var Jungle = {
       if(!file){Jungle.audioNote('呢段未有逐段旁白；可以撳「🎞️ 整集」聽成集，或自己講。');Jungle.markAudio();return;}
       el.src=file;
     }else{
-      var list=(DATA.jungle.narration.files[ep.id]||{})[Jungle.audio.lang]||[];
+      var list=Jungle.playlist(ep.id,Jungle.audio.lang).files;
       if(fromStart)Jungle.audio.part=0;
       if(!list.length)return;
       el.src=list[Math.min(Jungle.audio.part,list.length-1)];
@@ -236,7 +255,7 @@ var Jungle = {
       if(el&&typeof el.play==='function'){el.src=file;el.play();}
       Jungle.markAudio();return;
     }
-    var list=(DATA.jungle.narration.files[ep.id]||{})[Jungle.audio.lang]||[];
+    var list=Jungle.playlist(ep.id,Jungle.audio.lang).files;
     if(Jungle.audio.part+1<list.length){Jungle.audio.part++;var el2=Jungle.audioEl();if(el2&&typeof el2.play==='function'){el2.src=list[Jungle.audio.part];el2.play();}Jungle.markAudio();return;}
     Jungle.audio.playing=false;Jungle.audio.part=0;Jungle.markAudio();Jungle.audioNote('播完；可以再撳「▶ 播」聽多次。');
   },
@@ -342,6 +361,7 @@ var Jungle = {
         return '<div class="amb-row"><button class="btn sm" onclick="Jungle.ambPlayLab(\''+r[0]+'\')">▶ '+r[1]+'</button><button class="btn sm" onclick="Jungle.ambPlayLab(\''+r[0]+'\',true)">🔁 連播</button><span class="mut">'+r[2]+'</span></div>';}).join('')+
       '<p class="eyebrow">環境音音量</p><input type="range" id="amb-lab-vol" min="0" max="100" value="'+Math.round((Jungle.audio.ambVol-0.02)/0.35*100)+'" oninput="Jungle.ambLabVol(this.value)">'+
       '<audio id="story-lab" preload="none"></audio><audio id="story-lab-amb" preload="none"></audio>'+
+      '<h3>離線用</h3><div class="amb-row"><button class="btn gr" onclick="Jungle.downloadAudioPack()">⬇️ 下載離線語音包</button><span class="mut" id="pack-state">'+Jungle.packSummary()+'：唔會佔用 app 安裝包，一撳就存入裝置，之後冇網都播到（連環境音）。</span></div>'+
       '<p class="mut">覺得環境音太細／太大／想再密啲，直接講就可以；我改合成參數再生成，唔會換素材。</p>'+
       '<div class="quick"><button class="btn gr" onclick="Modal.close()">收起</button></div>');
   },
@@ -349,7 +369,7 @@ var Jungle = {
   labNarr:function(i,lang){
     var ep=DATA.jungle.episodes[i];if(!ep)return;
     var el=Jungle.labEl('story-lab');if(!el)return;
-    var file=Jungle.sceneFile(ep.id,lang,1)||((DATA.jungle.narration.files[ep.id]||{})[lang]||[])[0];
+    var file=Jungle.sceneFile(ep.id,lang,1)||(Jungle.playlist(ep.id,lang).files[0]||'');
     if(!file)return;
     el.src=file;
     if(el.pause&&typeof el.pause==='function')el.pause();
@@ -364,6 +384,30 @@ var Jungle = {
     if(typeof el.play==='function'){var p=el.play();if(p&&p.catch)p.catch(function(){});}
   },
   ambLabVol:function(v){Jungle.setAmbVol(v);var el=Jungle.labEl('story-lab-amb');if(el)el.volume=Jungle.audio.ambVol;},
+  /* 領袖想離線用：撳一下就把所有旁白／逐段／環境音存入裝置快取（app 安裝包本身唔會變大） */
+  downloadAudioPack:function(){
+    var list=Jungle.audioPackList();
+    var st=document.getElementById('pack-state');
+    var say=function(t){if(st)st.textContent=t;};
+    if(!list.length){say('冇語音檔');return;}
+    if(typeof fetch!=='function'||typeof caches==='undefined'){say('呢個環境唔支援離線下載；可以直接上網播。');return;}
+    say('下載中… 0/'+list.length);
+    var done=0,bytes=0;
+    var step=function(i){
+      if(i>=list.length){
+        say('已下載 '+list.length+' 個檔案（約 '+(bytes/1048576).toFixed(1)+'MB），離線都播到。');
+        return;
+      }
+      fetch(list[i]).then(function(r){return r.blob?r.blob():null;}).then(function(b){
+        if(b)bytes+=b.size||0;
+      }).catch(function(){}).then(function(){
+        done++;say('下載中… '+done+'/'+list.length);
+        step(i+1);
+      });
+    };
+    step(0);
+  },
+  packSummary:function(){return Jungle.audioPackList().length+' 個語音檔';},
   sheets:function(i){
     var ep=DATA.jungle.episodes[i];if(!ep)return '';
     return '<section class="psheet story-sheet"><h2>🌳 '+esc(ep.title)+'｜故事文字</h2><p class="mut">'+esc((DATA.jungle.decks[ep.id]||{}).subtitle||'')+'</p>'+ep.scenes.map(function(s,k){
