@@ -28,11 +28,11 @@ DATA.jungle = {
     files: {
       /* 成集聲只保留「逐段仲未錄齊」嘅語言（避免重複佔位）：
          逐段錄齊嘅語言，整集模式會用逐段接住播，聽落一樣，但唔會多一套檔。 */
-      welcome: {zh:[], en:['assets/jungle/audio/welcome-en-1.mp3','assets/jungle/audio/welcome-en-2.mp3'], yue:[]},
+      welcome: {zh:[], en:[], yue:[]},
       help:    {zh:[], en:['assets/jungle/audio/help-en-1.mp3','assets/jungle/audio/help-en-2.mp3'], yue:[]},
       rules:   {zh:[], en:['assets/jungle/audio/rules-en.mp3'], yue:[]},
       fire:    {zh:[], en:['assets/jungle/audio/fire-en-1.mp3','assets/jungle/audio/fire-en-2.mp3'], yue:[]},
-      village: {zh:['assets/jungle/audio/village-zh-1.mp3','assets/jungle/audio/village-zh-2.mp3'], en:['assets/jungle/audio/village-en-1.mp3','assets/jungle/audio/village-en-2.mp3'], yue:[]}
+      village: {zh:[], en:['assets/jungle/audio/village-en-1.mp3','assets/jungle/audio/village-en-2.mp3'], yue:[]}
     }
   },
   pendingArt:[],
@@ -40,15 +40,15 @@ DATA.jungle = {
      scenePending 記錄仲未錄完嘅集數／語言，補完之後由清單移除。 */
   sceneAudio: {
     welcome: {yue:['assets/jungle/audio/scene/welcome-1-yue.mp3','assets/jungle/audio/scene/welcome-2-yue.mp3','assets/jungle/audio/scene/welcome-3-yue.mp3','assets/jungle/audio/scene/welcome-4-yue.mp3','assets/jungle/audio/scene/welcome-5-yue.mp3','assets/jungle/audio/scene/welcome-6-yue.mp3'],
-              zh:['assets/jungle/audio/scene/welcome-1-zh.mp3','assets/jungle/audio/scene/welcome-2-zh.mp3','assets/jungle/audio/scene/welcome-3-zh.mp3','assets/jungle/audio/scene/welcome-4-zh.mp3','assets/jungle/audio/scene/welcome-5-zh.mp3','assets/jungle/audio/scene/welcome-6-zh.mp3'], en:[null,null,null,null,null,null]},
+              zh:['assets/jungle/audio/scene/welcome-1-zh.mp3','assets/jungle/audio/scene/welcome-2-zh.mp3','assets/jungle/audio/scene/welcome-3-zh.mp3','assets/jungle/audio/scene/welcome-4-zh.mp3','assets/jungle/audio/scene/welcome-5-zh.mp3','assets/jungle/audio/scene/welcome-6-zh.mp3'], en:['assets/jungle/audio/scene/welcome-1-en.mp3','assets/jungle/audio/scene/welcome-2-en.mp3','assets/jungle/audio/scene/welcome-3-en.mp3','assets/jungle/audio/scene/welcome-4-en.mp3','assets/jungle/audio/scene/welcome-5-en.mp3','assets/jungle/audio/scene/welcome-6-en.mp3']},
     help:    {yue:['assets/jungle/audio/scene/help-1-yue.mp3','assets/jungle/audio/scene/help-2-yue.mp3','assets/jungle/audio/scene/help-3-yue.mp3','assets/jungle/audio/scene/help-4-yue.mp3','assets/jungle/audio/scene/help-5-yue.mp3','assets/jungle/audio/scene/help-6-yue.mp3','assets/jungle/audio/scene/help-7-yue.mp3'],
               zh:['assets/jungle/audio/scene/help-1-zh.mp3','assets/jungle/audio/scene/help-2-zh.mp3','assets/jungle/audio/scene/help-3-zh.mp3','assets/jungle/audio/scene/help-4-zh.mp3','assets/jungle/audio/scene/help-5-zh.mp3','assets/jungle/audio/scene/help-6-zh.mp3','assets/jungle/audio/scene/help-7-zh.mp3'], en:[null,null,null,null,null,null,null]},
     rules:   {yue:['assets/jungle/audio/scene/rules-1-yue.mp3','assets/jungle/audio/scene/rules-2-yue.mp3','assets/jungle/audio/scene/rules-3-yue.mp3','assets/jungle/audio/scene/rules-4-yue.mp3'], zh:['assets/jungle/audio/scene/rules-1-zh.mp3','assets/jungle/audio/scene/rules-2-zh.mp3','assets/jungle/audio/scene/rules-3-zh.mp3','assets/jungle/audio/scene/rules-4-zh.mp3'], en:[null,null,null,null]},
     fire:    {yue:['assets/jungle/audio/scene/fire-1-yue.mp3','assets/jungle/audio/scene/fire-2-yue.mp3','assets/jungle/audio/scene/fire-3-yue.mp3','assets/jungle/audio/scene/fire-4-yue.mp3','assets/jungle/audio/scene/fire-5-yue.mp3'], zh:['assets/jungle/audio/scene/fire-1-zh.mp3','assets/jungle/audio/scene/fire-2-zh.mp3','assets/jungle/audio/scene/fire-3-zh.mp3','assets/jungle/audio/scene/fire-4-zh.mp3','assets/jungle/audio/scene/fire-5-zh.mp3'], en:[null,null,null,null,null]},
-    village: {yue:['assets/jungle/audio/scene/village-1-yue.mp3','assets/jungle/audio/scene/village-2-yue.mp3','assets/jungle/audio/scene/village-3-yue.mp3','assets/jungle/audio/scene/village-4-yue.mp3','assets/jungle/audio/scene/village-5-yue.mp3'], zh:['assets/jungle/audio/scene/village-1-zh.mp3',null,null,null,null], en:[null,null,null,null,null]},
+    village: {yue:['assets/jungle/audio/scene/village-1-yue.mp3','assets/jungle/audio/scene/village-2-yue.mp3','assets/jungle/audio/scene/village-3-yue.mp3','assets/jungle/audio/scene/village-4-yue.mp3','assets/jungle/audio/scene/village-5-yue.mp3'], zh:['assets/jungle/audio/scene/village-1-zh.mp3','assets/jungle/audio/scene/village-2-zh.mp3','assets/jungle/audio/scene/village-3-zh.mp3','assets/jungle/audio/scene/village-4-zh.mp3','assets/jungle/audio/scene/village-5-zh.mp3'], en:[null,null,null,null,null]},
   },
   /* 粵語 27 段全部完成；普通話、英文逐段繼續補。 */
-  scenePending: ['welcome:en','help:en','rules:en','fire:en','village:zh','village:en'],
+  scenePending: ['help:en','rules:en','fire:en','village:en'],
   /* 環境音：原創程序合成（tools/make-ambience.mjs），細音量墊底，唔會蓋過人聲。 */
   ambience: {night:'assets/jungle/ambience/jungle-night.mp3', day:'assets/jungle/ambience/jungle-day.mp3', leaves:'assets/jungle/ambience/leaves.mp3', fire:'assets/jungle/ambience/fire-crackle.mp3'},
   decks: {
