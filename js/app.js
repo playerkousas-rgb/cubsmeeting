@@ -409,7 +409,58 @@ var PackPrint = {
 
 /* ---------- 投影帶領：大字計時音效計分抽籤 ---------- */
 var Lead = {
-  idx: 0, secs: 0, timer: null, scores: { "紅隊": 0, "黃隊": 0, "藍隊": 0, "綠隊": 0 },
+  idx: 0, secs: 0, timer: null, scores: {},
+  /* 小隊：預設紅黃藍綠四隊；領袖可以自己加隊、改名、刪隊。名單會記住，分數唔會。 */
+  defaultTeams: ["紅隊", "黃隊", "藍隊", "綠隊"],
+  teams: null, maxTeams: 16,
+  teamList: function () {
+    if (!Lead.teams) {
+      var saved = Store.get("teams", null);
+      Lead.teams = (Array.isArray(saved) && saved.length ? saved : Lead.defaultTeams.slice())
+        .map(function (t) { return String(t).slice(0, 12); }).slice(0, Lead.maxTeams);
+      if (!Lead.teams.length) Lead.teams = Lead.defaultTeams.slice();
+    }
+    Lead.teams.forEach(function (t) { if (typeof Lead.scores[t] !== "number") Lead.scores[t] = 0; });
+    return Lead.teams;
+  },
+  saveTeams: function () { Store.set("teams", Lead.teams); },
+  syncTeamCount: function () {
+    var el = document.getElementById("teamcount");
+    if (el) el.textContent = "而家 " + Lead.teamList().length + " 隊（撳隊名可以改名）";
+  },
+  resetScores: function () {
+    if (typeof confirm === "function" && !confirm("將所有小隊分數清返 0？分數本來就唔會儲存，只係清今場畫面。")) return;
+    Lead.teamList().forEach(function (t) { Lead.scores[t] = 0; });
+    Lead.renderScore(); toast("↺ 分數已清零");
+  },
+  addTeam: function () {
+    var list = Lead.teamList();
+    if (list.length >= Lead.maxTeams) { toast("最多 " + Lead.maxTeams + " 隊"); return; }
+    var suggest = "小隊" + (list.length + 1);
+    var name = (typeof prompt === "function" ? prompt("新小隊名（最多12個字）", suggest) : suggest);
+    name = String(name == null ? "" : name).trim().slice(0, 12);
+    if (!name) return;
+    if (list.indexOf(name) >= 0) { toast("已經有呢一隊"); return; }
+    list.push(name); Lead.scores[name] = 0; Lead.saveTeams(); Lead.renderScore(); toast("＋ " + name);
+  },
+  renameTeam: function (i) {
+    var list = Lead.teamList(), old = list[i];
+    if (old == null) return;
+    var name = (typeof prompt === "function" ? prompt("改隊名", old) : old);
+    name = String(name == null ? "" : name).trim().slice(0, 12);
+    if (!name || name === old) return;
+    if (list.indexOf(name) >= 0) { toast("已經有呢一隊"); return; }
+    list[i] = name; Lead.scores[name] = Lead.scores[old] || 0; delete Lead.scores[old];
+    Lead.saveTeams(); Lead.renderScore();
+  },
+  removeTeam: function (i) {
+    var list = Lead.teamList(), name = list[i];
+    if (name == null) return;
+    if (list.length <= 1) { toast("至少要有一隊"); return; }
+    if (typeof confirm === "function" && !confirm("刪除「" + name + "」？" + (Lead.scores[name] ? "呢隊而家有 " + Lead.scores[name] + " 分，一齊清走。" : ""))) return;
+    list.splice(i, 1); delete Lead.scores[name];
+    Lead.saveTeams(); Lead.renderScore();
+  },
   mount: function () { Lead.stopTimer(); Lead.idx = 0; Lead.render(); Lead.renderScore(); },
   full: function () {
     var el = document.documentElement;
@@ -428,20 +479,37 @@ var Lead = {
   whistle: function () { Lead.beep(2200, 0.15); setTimeout(function () { Lead.beep(2200, 0.15); }, 250); toast("🤫 5秒安靜：望住我！"); },
   horn: function () { Lead.beep(660, 0.4); setTimeout(function () { Lead.beep(880, 0.5); }, 300); toast("🎺 集合！"); },
   renderScore: function () {
-    var el = document.getElementById("leadscore"); if (!el) return;
-    el.innerHTML = '<div class="scorebar">' + Object.keys(Lead.scores).map(function (t) {
-      return "<span class='team'><b>" + t + " " + Lead.scores[t] + "分</b> <button onclick=\"Lead.add('" + t + "',1)\">＋1</button><button onclick=\"Lead.add('" + t + "',-1)\">－1</button></span>";
-    }).join("") + "</div>";
+    var el = document.getElementById("leadscore");
+    if (!el) { Lead.syncTeamCount(); return; }
+    var teams = Lead.teamList();
+    el.innerHTML = '<div class="scorebar">' + teams.map(function (t, i) {
+      return '<div class="team"><button type="button" class="team-name" onclick="Lead.renameTeam(' + i + ')" title="撳一下改隊名">' + esc(t) + '</button>' +
+        '<b class="team-score">' + (Lead.scores[t] || 0) + '</b>' +
+        '<span class="team-btns">' +
+        '<button type="button" onclick="Lead.add(' + i + ',1)" aria-label="' + esc(t) + ' 加一分">＋1</button>' +
+        '<button type="button" onclick="Lead.add(' + i + ',-1)" aria-label="' + esc(t) + ' 減一分">－1</button>' +
+        '<button type="button" class="team-del" onclick="Lead.removeTeam(' + i + ')" aria-label="刪除 ' + esc(t) + '">✕</button>' +
+        '</span></div>';
+    }).join("") + '</div>';
+    Lead.syncTeamCount();
   },
-  add: function (t, d) { Lead.scores[t] = Math.max(0, Lead.scores[t] + d); Lead.beep(d > 0 ? 880 : 440, 0.2); Lead.renderScore(); },
+  /* 舊寫法 Lead.add('紅隊',1) 照收；新寫法用隊序號，避免隊名夾雜引號時出錯。 */
+  add: function (t, d) {
+    var list = Lead.teamList();
+    var name = (typeof t === "number") ? list[t] : t;
+    if (name == null || typeof Lead.scores[name] !== "number") return;
+    Lead.scores[name] = Math.max(0, Lead.scores[name] + d);
+    Lead.beep(d > 0 ? 880 : 440, 0.2);
+    Lead.renderScore();
+  },
   pick: function () {
-    var roster = Store.get("roster", []);
-    var pool = roster.length ? roster : ["1號", "2號", "3號", "4號", "5號", "6號", "7號", "8號", "9號", "10號", "11號", "12號"];
+    var pool = (typeof Tools !== "undefined" && Tools.pool) ? Tools.pool()
+      : ["1號", "2號", "3號", "4號", "5號", "6號", "7號", "8號", "9號", "10號", "11號", "12號"];
     var n = pool[Math.floor(Math.random() * pool.length)];
     Lead.beep(1200, 0.3);
     toast("🎲 抽中：" + n + "！出嚟！");
     var el = document.getElementById("leadstage");
-    if (el) el.innerHTML = "<div class='picked'>🎲 抽中：<b>" + esc(n) + "</b>！出嚟答／表演！</div>" + el.innerHTML;
+    if (el) el.innerHTML = "<div class='picked'>🎲 抽中：<b>" + esc(n) + "</b>！出嚟答／表演！（號碼數量喺「快鍵」頁設定）</div>" + el.innerHTML;
   },
   render: function () {
     var st = document.getElementById("leadstage"); if (!st) return;

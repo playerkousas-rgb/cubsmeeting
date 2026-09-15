@@ -35,7 +35,7 @@
     {id:'book', icon:'📖', title:'手冊', desc:'誓詞·制服·儀式·六色', color:'#FF6F00', img:'assets/manual/handbook.avif', hint:'新領袖必讀'}
   ];
   var BOTTOM = [
-    {id:'print', icon:'✂️', title:'素材庫＋歌曲', desc:'搵素材·即印即用', color:'#FF6F00', img:'assets/manual/craft.avif', hint:'素材庫'},
+    {id:'print', icon:'✂️', title:'素材庫', desc:'工作紙·圖紙·歌曲', color:'#FF6F00', img:'assets/manual/craft.avif', hint:'即印即用'},
     {id:'play', icon:'🎮', title:'活動', desc:'遊戲·技能·帶領卡', color:'#1565C0', img:'assets/manual/games.avif', hint:'即開即用'},
     {id:'badge', icon:'🏅', title:'活動章', desc:'分類·內容·考核建議', color:'#6A1B9A', img:'assets/manual/songs.avif', hint:'逐章查看'},
     {id:'jungle', icon:'🌳', title:'森林故事', desc:'11角色·5故事·逐段帶', color:'#2E7D32', img:'', hint:'逐段閱讀'},
@@ -163,14 +163,16 @@
 
   /* 制服同集會儀式係獨立嘅事前準備頁，唔再跳去手冊小分頁。 */
   App.vUniform = function(){
-    return '<section class="card"><a class="back" href="#plan">‹ 返回目錄</a><span class="eyebrow">事前準備・必用</span><h1>👕 制服</h1><p class="mut">認清六區位置、學捲旅巾、戴帽同出門自查；附官方款式圖，可放大或印成觀察紙。</p></section>'
+    return '<section class="card"><a class="back" href="#plan">‹ 返回目錄</a><span class="eyebrow">事前準備・必用</span><h1>👕 制服</h1><p class="mut">認清六區位置、學捲旅巾、戴帽同出門自查；附官方款式圖及2025徽章位置圖，可放大或印成觀察紙。</p></section>'
+      + ((typeof FieldVisuals !== 'undefined' && FieldVisuals.officialPanel) ? FieldVisuals.officialPanel('📌 官方佩戴位置圖（2025）','香港童軍總會2025年9月上載嘅徽章佩戴位置圖：正面睇恤衫各章位置，下面分開右袖同左袖。呢張係官方圖，唔係本APP自繪，只定位置、唔定車縫尺寸。',['badgemap']) : '')
       + (typeof Uniform !== 'undefined' && Uniform.panel ? Uniform.panel() : '')
       + (typeof FormalKit !== 'undefined' && FormalKit.get ? '<section class="card"><h2>🔍 制服實物核對卡</h2><div class="quick">'
         + ['uniform','hats'].map(function(id){var c=FormalKit.get(id);return c?'<button class="btn" onclick="FormalKit.open(\''+id+'\')">'+esc(c.title)+'</button>':'';}).join('')
         + '</div><p class="mut">開卡即看準備、辨別要點及來源；印領袖卡可離線用。</p></section>' : '');
   };
   App.vCeremony = function(){
-    return '<section class="card"><a class="back" href="#plan">‹ 返回目錄</a><span class="eyebrow">事前準備・必用</span><h1>🎪 集會儀式</h1><p class="mut">團呼、六個口令、展旗、宣誓、敬禮同開始結束，逐步卡可直接開或印。</p></section>'
+    return '<section class="card"><a class="back" href="#plan">‹ 返回目錄</a><span class="eyebrow">事前準備・必用</span><h1>🎪 集會儀式</h1><p class="mut">團呼、六個口令、展旗、宣誓、敬禮同開始結束，逐步卡可直接開或印；另附真實大會操旗隊相片，睇實際場合點做。</p></section>'
+      + ((typeof FieldVisuals !== 'undefined' && FieldVisuals.officialPanel) ? FieldVisuals.officialPanel('📸 真實場合參考','政府新聞處嘅香港童軍大會操2025相片：旗隊持旗步操、隊列整齊。呢個係童軍支部場合，唔係幼童軍團集會程序；照樣睇整齊度同持旗姿勢，程序跟下面逐步卡（KT/37/25及2026第五章）做。',['rally']) : '')
       + (typeof Ceremony !== 'undefined' && Ceremony.panel ? Ceremony.panel() : '')
       + (typeof FormalKit !== 'undefined' && FormalKit.get ? '<section class="card"><h2>🚩 升旗・國歌・旗幟核對卡</h2><div class="quick">'
         + ['respect','flags'].map(function(id){var c=FormalKit.get(id);return c?'<button class="btn" onclick="FormalKit.open(\''+id+'\')">'+esc(c.title)+'</button>':'';}).join('')
@@ -225,56 +227,43 @@
   /* 工作紙庫：對應 ghmeeting #print + 舊 #sheets。
      實裝版：工作紙分頁用真實27張索引（逐張預覽／列印＋領袖參考），
      歌曲分頁用 Songbook（跟唱卡＋A4歌紙），冇再係死掣 toast。 */
-  /* 素材庫分類：按「我想做咩」組織，唔跟集會編號 */
-  App.materialCategories = [
-    {id:'coop', icon:'🤝', name:'合作與規則', desc:'小隊建立、誓詞規律、保護自己',
-     tids:['c01','c02','c03','c14']},
-    {id:'outdoor', icon:'🏕️', name:'戶外與遠足', desc:'觀察、露營、遠足、追蹤、天氣',
-     tids:['c05','c09','c12','c18','c23']},
-    {id:'craft', icon:'🧵', name:'手工與技能', desc:'結繩、煮食、工程、實驗',
-     tids:['c06','c10','c15','c17']},
-    {id:'care', icon:'❤️', name:'關懷與服務', desc:'了解需要、用心準備、減廢行動',
-     tids:['c11','c16','c24']},
-    {id:'direction', icon:'🧭', name:'方向與社區', desc:'地圖、指南針、社區行走',
-     tids:['c07','c25']},
-    {id:'safety', icon:'🩹', name:'安全與急救', desc:'求助、擦傷、鼻血、技能輪轉',
-     tids:['c03','c08','c20']},
-    {id:'growth', icon:'🎯', name:'成長與回顧', desc:'整理證據、運動、回顧、下一程',
-     tids:['c19','c21','c22']},
-    {id:'culture', icon:'🎉', name:'文化與慶祝', desc:'中國節慶、童軍家庭、森林故事',
-     tids:['c13','c14']}
-  ];
+  /* 素材庫：三個分頁共用一份來源。
+     工作紙＝成員答問題（Content.worksheetIndex，27張逐張可印）；
+     圖紙＝做小手工同剪卡（Craft ＋ 已實裝嘅剪卡／題紙）；
+     歌曲＝Songbook 跟唱卡。全部即開即印，唔跟集會編號。 */
+  App.sheetPrintButtons = function(){
+    var rows = [
+      ['✂️ 追蹤符號六張剪卡（共用）', "TrackingKit.print('cards')"],
+      ['🗺️ 追蹤符號成員圖表', "TrackingKit.print('worksheet')"],
+      ['🐺 團呼隊形與角色提示紙', 'FieldVisuals.printFormation()'],
+      ['👕 制服款式觀察紙', 'FieldVisuals.printReference()'],
+      ['👕 制服位置配對題紙（成員）', 'Uniform.print(false)'],
+      ['🐾 三指手勢情境紙（成員）', 'SaluteLab.print(false)'],
+      ['🧭 全禮與半禮位置圖', 'SalutePositions.print()']
+    ];
+    return '<h3>✂️ 剪卡、題紙同模板</h3><p class="mut">揀邊張就印邊張，唔會一次過印晒。儀式口令卡喺上方「集會儀式」。</p>' +
+      '<div class="sheet-print-grid">' + rows.map(function(r){
+        return '<button class="btn" onclick="' + r[1] + '">' + r[0] + '</button>';
+      }).join('') + '</div>';
+  };
   App.vPrint = function(){
-    var hasContent = (typeof Content!=='undefined');
     var songs = (typeof Songbook!=='undefined' && Songbook.panel) ? Songbook.panel()
       : '<p class="mut">歌曲模組未載入：重新整理一次。</p>';
-    /* 素材庫：按「我想做咩」分類，唔跟集會編號 */
-    var library = '<div class="material-library">';
-    App.materialCategories.forEach(function(cat){
-      var meetings = cat.tids.map(function(tid){
-        return DATA.meetings.find(function(m){return m.tid===tid;});
-      }).filter(Boolean);
-      library += '<details class="material-cat"><summary><span class="cat-icon">'+cat.icon+'</span><b>'+cat.name+'</b><small>'+cat.desc+'</small><span class="cat-count">'+meetings.length+'份</span></summary>';
-      library += '<div class="material-items">';
-      meetings.forEach(function(m){
-        library += '<div class="material-item"><b>'+esc(m.n)+'</b><small>'+esc(m.month)+' · '+esc(m.badge)+'</small>';
-        if(m.worksheet && m.worksheet.prompts){
-          library += '<ul class="material-prompts">'+m.worksheet.prompts.map(function(p){return '<li>'+esc(p)+'</li>';}).join('')+'</ul>';
-        }
-        library += '<button class="btn sm" onclick="PackPrint.open(\'sheet\',\''+m.tid+'\')">預覽及列印</button></div>';
-      });
-      library += '</div></details>';
-    });
-    library += '</div>';
-    return '<section class="card"><a class="back" href="#plan">‹ 返回目錄</a><h2>✂️ 素材庫＋歌曲</h2><p class="mut">領袖搵素材嘅地方：揀你想做咩，搵合適嘅工作紙同教材。逐張預覽及列印，唔使跟集會編號。</p><div class="subtabs compact-tabs"><button class="subtab cur" onclick="App.showMiniTab(this,\'library\')">✂️ 素材庫</button><button class="subtab" onclick="App.showMiniTab(this,\'songs\')">🎵 歌曲</button></div><div id="mini-library" class="mini-pane">'+library+'</div><div id="mini-songs" class="hidden mini-pane">'+songs+'</div></section>';
+    var worksheets = (typeof Content!=='undefined' && Content.worksheetIndex)
+      ? Content.worksheetIndex()
+      : '<p class="mut">文字工作紙載入中。</p>';
+    var worksheets = (typeof Content!=='undefined' && Content.worksheetIndex) ? Content.worksheetIndex() : library;
+    var sheets = ((typeof Craft!=='undefined' && Craft.panel) ? Craft.panel() : '<p class="mut">圖紙載入中。</p>') + App.sheetPrintButtons();
+    return '<section class="card"><a class="back" href="#plan">‹ 返回目錄</a><h2>✂️ 素材庫</h2><p class="mut">集會中途即開即印。三個分頁：工作紙（成員答問題）、圖紙（做小手工同剪卡）、歌曲。</p><div class="subtabs compact-tabs"><button class="subtab cur" onclick="App.showMiniTab(this,\'worksheets\')">📝 工作紙</button><button class="subtab" onclick="App.showMiniTab(this,\'sheets\')">✂️ 圖紙</button><button class="subtab" onclick="App.showMiniTab(this,\'songs\')">🎵 歌曲</button></div><div id="mini-worksheets" class="mini-pane">'+worksheets+'</div><div id="mini-sheets" class="hidden mini-pane">'+sheets+'</div><div id="mini-songs" class="hidden mini-pane">'+songs+'</div></section>';
   };
   App.showMiniTab = function(btn, key){
+    if(key==='library') key='worksheets';
     var root=btn.closest('.card'); if(!root)return;
     root.querySelectorAll('.subtab').forEach(function(x){x.classList.remove('cur');}); btn.classList.add('cur');
-    var library=root.querySelector('#mini-library'); var worksheets=root.querySelector('#mini-worksheets'); var songs=root.querySelector('#mini-songs');
-    if(library) library.classList.toggle('hidden',key!=='library');
-    if(worksheets) worksheets.classList.toggle('hidden',key!=='worksheets');
-    if(songs) songs.classList.toggle('hidden',key!=='songs');
+    ['worksheets','sheets','songs'].forEach(function(k){
+      var pane=root.querySelector('#mini-'+k);
+      if(pane) pane.classList.toggle('hidden', k!==key);
+    });
   };
   App.vSheets = App.vPrint;
 
@@ -506,17 +495,29 @@
   App.vTools = function(teams){
     var isTeams = !!teams;
     if(isTeams){
-      return '<section class="card"><a class="back" href="#tools" style="text-decoration:none;color:var(--ord)">‹ 返回快鍵</a><h2>🐾 小隊計分</h2><p class="mut">紅黃藍綠四隊；撳 ＋1／－1 即加分。分數只喺今場畫面，唔會儲存。</p><div id="leadscore"></div></section>';
+      var list = (typeof Lead!=='undefined' && Lead.teamList) ? Lead.teamList() : [];
+      return '<section class="card"><a class="back" href="#tools" style="text-decoration:none;color:var(--ord)">‹ 返回快鍵</a><h2>🐾 小隊計分</h2>'
+        + '<p class="mut">預設紅黃藍綠四隊，可以加隊、改名或者刪隊（最多16隊）。小隊名單會記住，分數只喺今場畫面，唔會儲存。</p>'
+        + '<div class="quick"><button class="btn gr" onclick="Lead.addTeam()">＋ 加小隊</button><button class="btn ghost" onclick="Lead.resetScores()">↺ 分數清零</button></div>'
+        + '<p class="mut" id="teamcount">而家 ' + list.length + ' 隊（撳隊名可以改名）</p>'
+        + '<div id="leadscore"></div></section>';
     }
+    var max = (typeof Tools!=='undefined' && Tools.max) ? Tools.max() : 12;
+    var roster = (typeof Store!=='undefined') ? Store.get('roster',[]) : [];
     return '<section class="card"><a class="back" href="#plan" style="text-decoration:none;color:var(--ord)">‹ 返回</a><h2>🎲 快鍵（集會中途即用）</h2><p class="mut">即撳即用，唔影響今場流程：發訊號、抽籤、計分、倒數。</p>'
       + '<div class="tk-grid">'
-      + '<button class="tk-btn" onclick="Lead.whistle()"><b>🤫 安靜訊號</b><small>響兩下·5秒望住我</small></button>'
-      + '<button class="tk-btn" onclick="Lead.horn()"><b>📣 集合</b><small>吹哨·全體集合</small></button>'
-      + '<button class="tk-btn" onclick="Tools.pick()"><b>🎲 抽籤</b><small>隨機抽一個人</small></button>'
-      + '<a class="tk-btn" href="#teams"><b>🐾 小隊計分</b><small>開計分板·紅黃藍綠</small></a>'
+      + '<button class="tk-btn" onclick="Lead.whistle()"><b>🤫 安靜訊號</b><small>響兩下・5秒望住我</small></button>'
+      + '<button class="tk-btn" onclick="Lead.horn()"><b>📣 集合</b><small>吹哨・全體集合</small></button>'
+      + '<a class="tk-btn" href="#teams"><b>🐾 小隊計分</b><small>預設4隊・可加隊改名</small></a>'
+      + '<button class="tk-btn" onclick="Tools.pick()"><b>🎲 抽籤</b><small>自設號碼數量・即抽一個</small></button>'
       + '</div>'
-      + '<div id="toolpick" class="toolpick" style="min-height:28px;margin:10px 0;font-size:20px;font-weight:800;color:var(--ord)"></div>'
-      + '<h3>⏱️ 倒數計時</h3><div style="display:flex;gap:8px;align-items:center"><label style="flex:1">分鐘 <input id="toolMinutes" type="number" min="1" max="120" value="5" onchange="Tools.reset()"></label><div id="toolClock" role="status" class="tool-clock" style="font-size:32px;font-weight:800">05:00</div></div><div class="btns"><button class="btn gr" onclick="Tools.start()">開始</button><button class="btn" onclick="Tools.stop()">暫停</button><button class="btn ghost" onclick="Tools.reset()">重設</button></div></section>';
+      + '<h3>🎲 抽籤</h3><p class="mut">自己設定有幾個號碼，撳一下抽出一個。</p>'
+      + '<div class="dr-draw"><label class="dr-field">號碼 1 至 <input id="toolPickMax" type="number" min="1" max="200" step="1" value="' + max + '" onchange="Tools.setMax(this.value)" oninput="Tools.setMax(this.value)"></label>'
+      + (roster.length ? '<label class="dr-check"><input id="toolUseRoster" type="checkbox" onchange="Tools.drawInfo()"> 改用名單姓名（' + roster.length + '人）</label>' : '<span class="mut">未填名單；要抽姓名就先喺出隊包頁填名單。</span>')
+      + '<button class="btn gr" onclick="Tools.pick()">🎲 抽一個</button></div>'
+      + '<div id="toolpick" class="toolpick" role="status" aria-live="polite">未抽。</div>'
+      + '<div class="dr-info" id="toolpickinfo"></div>'
+      + '<h3>⏱️ 倒數計時</h3><div class="dr-draw"><label class="dr-field">分鐘 <input id="toolMinutes" type="number" min="1" max="120" value="5" onchange="Tools.reset()"></label><div id="toolClock" role="status" class="tool-clock">05:00</div><button class="btn gr" onclick="Tools.start()">開始</button></div><div class="btns"><button class="btn" onclick="Tools.stop()">暫停</button><button class="btn ghost" onclick="Tools.reset()">重設</button></div></section>';
   };
 
   /* === 路由：對齊 ghmeeting 的 5+5，同時兼容舊連結，保留 sheets/skills 獨立 tab === */
@@ -626,6 +627,7 @@
     }
     if(tab==='lead' && typeof Lead!=='undefined') Lead.mount();
     if(tab==='teams' && typeof Lead!=='undefined' && Lead.renderScore) Lead.renderScore();
+    if(tab==='tools' && typeof Tools!=='undefined' && Tools.sync) Tools.sync();
     window.scrollTo(0,0);
   };
 
@@ -663,20 +665,43 @@
 })();
 
 var Tools = {
-  seconds:300, timer:null,
-  time:function(){return String(Math.floor(Tools.seconds/60)).padStart(2,'0')+':'+String(Tools.seconds%60).padStart(2,'0');},
+  seconds:300, timer:null, lastPick:'',
+  /* ---- 抽籤設定：號碼數量由用戶自己定，記住上次設定 ---- */
+  defaultMax:12,
+  max:function(){var v=Number((typeof Store!=='undefined')?Store.get('pickmax',Tools.defaultMax):Tools.defaultMax);return (Number.isInteger(v)&&v>=1&&v<=200)?v:Tools.defaultMax;},
+  setMax:function(v){var n=Number(v);if(!Number.isFinite(n))return Tools.max();n=Math.max(1,Math.min(200,Math.floor(n)));if(typeof Store!=='undefined')Store.set('pickmax',n);var e=document.getElementById('toolPickMax');if(e&&String(e.value)!==String(n))e.value=n;Tools.drawInfo();return n;},
+  useRoster:function(){var e=document.getElementById('toolUseRoster');return !!(e&&e.checked)&&(typeof Store!=='undefined')&&Store.get('roster',[]).length>0;},
+  /* 抽籤池：號碼 1–N，或者（有填名單且揀咗）成員姓名 */
+  pool:function(){
+    if(Tools.useRoster())return Store.get('roster',[]).slice();
+    var n=Tools.max(),out=[];
+    for(var i=1;i<=n;i++)out.push(i+'號');
+    return out;
+  },
+  drawInfo:function(){
+    var el=document.getElementById('toolpickinfo');if(!el)return;
+    var roster=(typeof Store!=='undefined')?Store.get('roster',[]):[];
+    el.textContent=Tools.useRoster()
+      ? '而家會抽名單姓名（'+roster.length+'人）。'
+      : '而家會抽 1 至 '+Tools.max()+' 號。';
+  },
   draw:function(){var e=document.getElementById('toolClock');if(e)e.textContent=Tools.time();},
+  time:function(){return String(Math.floor(Tools.seconds/60)).padStart(2,'0')+':'+String(Tools.seconds%60).padStart(2,'0');},
   stop:function(){clearInterval(Tools.timer);Tools.timer=null;},
   reset:function(){Tools.stop();var e=document.getElementById('toolMinutes');Tools.seconds=Math.max(1,Math.min(120,Number(e&&e.value)||5))*60;Tools.draw();},
   start:function(){if(Tools.timer)return;if(Tools.seconds<=0)Tools.reset();Tools.timer=setInterval(function(){Tools.seconds--;Tools.draw();if(Tools.seconds<=0){Tools.stop();if(typeof Lead!=='undefined'&&Lead.beep)Lead.beep();toast('⏱️ 時間到！');}},1000);},
   /* 抽籤：結果直接顯示喺快鍵頁（#toolpick），唔再靠隱形嘅投影區 */
   pick:function(){
-    var roster = (typeof Store!=='undefined') ? Store.get('roster',[]) : [];
-    var pool = roster.length ? roster : ['1號','2號','3號','4號','5號','6號','7號','8號','9號','10號','11號','12號'];
-    var n = pool[Math.floor(Math.random()*pool.length)];
+    var pool=Tools.pool();
+    var n=pool[Math.floor(Math.random()*pool.length)];
+    Tools.lastPick=n;
+    Tools.drawInfo();
     if(typeof Lead!=='undefined'&&Lead.beep) Lead.beep(1200,0.3);
-    var el = document.getElementById('toolpick');
-    if(el) el.textContent = '🎲 抽中：'+n+'（再撳一次再抽）';
+    var el=document.getElementById('toolpick');
+    if(el){el.innerHTML='🎲 抽中：<b>'+esc(n)+'</b><small>（1–'+pool.length+'・再撳再抽）</small>';el.classList.add('on');}
     toast('🎲 抽中：'+n);
-  }
+    return n;
+  },
+  clearPick:function(){var el=document.getElementById('toolpick');if(el){el.innerHTML='未抽。';el.classList.remove('on');}Tools.lastPick='';},
+  sync:function(){var e=document.getElementById('toolPickMax');if(e)e.value=Tools.max();Tools.draw();Tools.drawInfo();}
 };
