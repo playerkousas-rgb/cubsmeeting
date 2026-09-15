@@ -1,5 +1,5 @@
 /* 🐺 幼童軍團集會助手 — Service Worker (offline first，cache齊) */
-var CACHE = "cubhub-v27-official-imagery-20260915";
+var CACHE = "cubhub-v28-jungle-slides-20260915";
 var ASSETS = [
   "./", "./index.html", "./manifest.webmanifest", "./css/app.css",
   "./js/data.js", "./js/guide.js", "./js/flow.js", "./js/app.js", "./js/redesign.js", "./js/content.js", "./js/jungle-data.js", "./js/jungle.js", "./js/practical-data.js", "./js/practical.js", "./js/uniform-ceremony.js", "./js/field-visuals.js", "./js/salute-lab.js", "./js/salute-positions.js", "./js/tracking-kit.js", "./js/material-desk.js", "./js/plain-content.js", "./js/worksheet-guides.js", "./js/skill-art.js", "./js/craft-sheets.js", "./js/songbook.js",
@@ -53,6 +53,15 @@ var ASSETS = [
   "./assets/reference/cub-uniform-boy.avif", "./assets/reference/cub-uniform-girl.avif",
   "./assets/reference/cub-badge-map-2025.avif",
   "./assets/reference/rally-flag-party-2025.avif",
+  "./assets/jungle/slides/jungle-night-tiger.avif",
+  "./assets/jungle/slides/jungle-wolf-carry.avif",
+  "./assets/jungle/slides/jungle-tiger-cave.avif",
+  "./assets/jungle/slides/jungle-den-family.avif",
+  "./assets/jungle/slides/jungle-council.avif",
+  "./assets/jungle/slides/jungle-presented.avif",
+  "./assets/jungle/slides/jungle-water-snake.avif",
+  "./assets/jungle/slides/jungle-monkeys.avif",
+  "./assets/jungle/slides/jungle-kite-message.avif",
   "./assets/teaching/right-hand-salute.avif",
   "./icons/icon-192.png", "./icons/icon-512.png",
   "./assets/jungle/mowgli.avif", "./assets/jungle/raksha.avif", "./assets/jungle/akela.avif", "./assets/jungle/baloo.avif",

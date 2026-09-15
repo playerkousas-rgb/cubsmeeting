@@ -2615,6 +2615,44 @@ body.offline .extcard{opacity:.55}
 .official-zoom{display:block;width:100%;height:auto;border-radius:12px;background:#fff}
 @media print{.official-zoom{max-height:210mm;object-fit:contain}}
 
+/* ===== 森林故事投屏（投影用大字大圖）===== */
+.story-stage-wrap{--story-scale:1;position:fixed;inset:0;z-index:90;display:none}
+body.story-open{overflow:hidden}
+body.story-open .story-stage-wrap{display:block}
+.story-stage{position:absolute;inset:0;display:flex;flex-direction:column;background:#0e1b17;color:#f4f1e6}
+.story-bar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#12241e;border-bottom:1px solid #24463a;font-size:.95rem}
+.story-bar b{font-size:1.05rem}
+.story-count{color:#a9c6b6}
+.story-spacer{flex:1}
+.story-bar .btn{background:#1c3a30;color:#eaf3ec;border-color:#2f5a4a;min-height:40px}
+.story-body{flex:1;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:18px;padding:16px 20px 8px;overflow:auto}
+.story-stage.on-cover .story-body{grid-template-columns:1fr}
+.story-photo{width:100%;height:auto;max-height:74vh;object-fit:contain;border-radius:14px;background:#08120f}
+.story-visual{display:flex;flex-direction:column;gap:8px;align-items:center;justify-content:center;background:#08120f;border-radius:14px;padding:10px}
+.story-visual .story-cast{background:transparent;gap:14px}
+.story-visual .story-cast img{width:132px;height:132px;border-radius:12px}
+.story-visual .story-cast figcaption{font-size:.95rem}
+.story-words{display:flex;flex-direction:column;gap:10px;min-width:0}
+.story-words .eyebrow{color:#8fd3b3;font-size:calc(1rem * var(--story-scale))}
+.story-lead{margin:0;font-size:calc(1.45rem * var(--story-scale));line-height:1.75;font-weight:600;letter-spacing:.01em}
+.story-castline{margin:0;color:#9fbdae;font-size:calc(.95rem * var(--story-scale))}
+.story-ask{background:#14302795;border:1px solid #2f5a4a;border-radius:12px;padding:10px 12px}
+.story-ask .q{margin:0 0 6px;font-size:calc(1.2rem * var(--story-scale));font-weight:700;color:#ffe6a7}
+.story-hint{color:#7fa495;font-size:.82rem}
+.story-foot{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:10px 14px;background:#12241e;border-top:1px solid #24463a}
+.story-foot .btn{min-height:52px;font-size:1rem}
+.story-foot .btn.gr{background:#2f7a55;border-color:#2f7a55;color:#fff}
+.story-dots{display:flex;gap:6px;align-items:center}
+.story-dots i{width:10px;height:10px;border-radius:50%;background:#2f5a4a;display:block}
+.story-dots i.cur{background:#8fd3b3;transform:scale(1.25)}
+.story-credit{margin:0;padding:4px 16px 10px;color:#6d8b7d;font-size:.75rem}
+.story-sheet .story-page{margin:0 0 14px;page-break-inside:avoid}
+.story-sheet .story-page h3{margin:8px 0 4px}
+.story-sheet .story-page img{max-height:95mm;object-fit:contain;width:auto}
+.story-reader .story-photo{max-height:46vh}
+@media(max-width:820px){.story-body{grid-template-columns:1fr}.story-photo{max-height:46vh}.story-foot .btn{min-height:46px}}
+@media print{.story-stage-wrap{display:none!important}}
+
 /* ===== 素材庫：工作紙／圖紙／歌曲 ===== */
 .craft-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin:10px 0 14px}
 .craft-card{display:flex;flex-direction:column;align-items:flex-start;gap:6px;width:100%;padding:12px;font:inherit;color:inherit;
