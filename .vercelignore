@@ -1,0 +1,28 @@
+# Vercel 部署瘦身：只上傳網站執行所需檔案
+# 語法與 .gitignore 相同；這裡列出的檔案不會進入 Vercel 部署。
+
+# 文件、測試、開發腳本與 CI 設定
+*.md
+docs/
+tests/
+test/
+scripts/
+tools/
+.github/
+
+# 原始設計檔、壓縮檔及非前端直接提供的文件
+*.psd
+*.ai
+*.zip
+*.pdf
+
+# 未被網站引用的 JPG 原圖（執行時只用同名 .avif）
+assets/reference/*.jpg
+assets/teaching/*.jpg
+
+# 本機開發產物
+node_modules/
+.cache/
+playwright-report/
+test-results/
+*.log

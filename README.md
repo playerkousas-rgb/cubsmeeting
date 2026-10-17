@@ -27,6 +27,13 @@ python3 -m http.server 8090 --bind 0.0.0.0
 npm test
 ```
 
+### Vercel 部署
+
+- 生產部署只跟 `main`；`vercel.json` 的 `git.deploymentEnabled` 同時設定 `"main": true` 與 `"**": false`，停用其他分支（包括 `arena/*`）的自動預覽部署。Vercel 對未列出的分支預設仍會部署，所以兩項要一齊寫。
+- `.vercelignore` 只保留網站執行檔：`docs/`、`tests/`、`tools/`、`scripts/`、`*.md`、原始設計檔及未被引用的 JPG 不會上傳。
+- `ignoreCommand` 會跳過只改文件／測試的 commit；改動 `index.html`、`js/`、`css/`、`assets/`、`sw.js`、`manifest.webmanifest` 或部署設定時仍會建置。日後若加入 GitHub Actions 自動更新，請在 commit 訊息加 `[skip ci]`，避免重複建置。
+- 目前沒有超過 500 KB 的 PNG；最大圖片為 `assets/reference/rally-flag-party-2025.jpg`（約 112 KB），而且執行時用同名 AVIF，JPG 原圖已排除部署。
+
 ## 本輪完成範圍
 
 介面、目錄、範本、逐步準備頁、活動／技能即用卡、工作紙索引、現場工具入口，以及保留原有cub_*裝置記錄。新設計集中於 `js/redesign.js`，沿用既有帶領、出席、物資及列印模組。
