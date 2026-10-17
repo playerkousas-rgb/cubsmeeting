@@ -31,7 +31,7 @@ npm test
 
 - 生產部署只跟 `main`；`vercel.json` 的 `git.deploymentEnabled` 同時設定 `"main": true` 與 `"**": false`，停用其他分支（包括 `arena/*`）的自動預覽部署。Vercel 對未列出的分支預設仍會部署，所以兩項要一齊寫。
 - `.vercelignore` 只保留網站執行檔：`docs/`、`tests/`、`tools/`、`scripts/`、`*.md`、原始設計檔及未被引用的 JPG 不會上傳。
-- `ignoreCommand` 會跳過只改文件／測試的 commit；改動 `index.html`、`js/`、`css/`、`assets/`、`sw.js`、`manifest.webmanifest` 或部署設定時仍會建置。日後若加入 GitHub Actions 自動更新，請在 commit 訊息加 `[skip ci]`，避免重複建置。
+- `ignoreCommand` 會跳過只改文件／測試的 commit；改動 `index.html`、`js/`、`css/`、`assets/`、`sw.js`、`manifest.webmanifest` 或部署設定時仍會建置。Vercel schema 限制此字串最多 256 字元，修改時請先計長度（現為 210 字元）。日後若加入 GitHub Actions 自動更新，請在 commit 訊息加 `[skip ci]`，避免重複建置。
 - 目前沒有超過 500 KB 的 PNG；全專案最大圖片為 `docs/previews/practice-scenes-20260915.avif`（約 117 KB，已排除部署），部署用最大圖為 `assets/jungle/slides/jungle-wolf-carry.avif`（約 112 KB），全部低於 200 KB，無需壓縮。
 - `assets/reference/*.jpg`、`assets/teaching/*.jpg` 是未被前端引用的原圖，執行時只用同名 AVIF，已排除部署。
 

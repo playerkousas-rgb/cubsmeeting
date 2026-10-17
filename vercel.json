@@ -6,5 +6,5 @@
       "main": true
     }
   },
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- . ':(exclude)*.md' ':(exclude)tests/' ':(exclude)test/' ':(exclude)scripts/' ':(exclude)tools/' ':(exclude)docs/' ':(exclude).github/' ':(exclude)*.psd' ':(exclude)*.ai' ':(exclude)*.zip' ':(exclude)*.pdf' ':(exclude)assets/reference/*.jpg' ':(exclude)assets/teaching/*.jpg'"
+  "ignoreCommand": "files=$(git diff --name-only HEAD^ HEAD) || exit 1; printf '%s\\n' \"$files\" | grep -qvE '^(docs|tests|test|scripts|tools|\\.github)/|\\.(md|psd|ai|zip|pdf)$|^assets/(reference|teaching)/.*\\.jpg$' && exit 1; exit 0"
 }
