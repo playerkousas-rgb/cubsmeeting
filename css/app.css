@@ -2,9 +2,10 @@
 /* 基底沿用 ghmeeting 的 5+5 外殼，品牌色改為幼童軍橙 */
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-  --or:#FF6F00;--ord:#E65100;--or2:#FF8F00;
+  /* 主色加深至 4.5:1 以上，白字按鈕及標題在淺底仍讀得清 */
+  --or:#C43E00;--ord:#A63A00;--or2:#D84315;
   --gr:#2E7D32;--grd:#1B5E20;
-  --bg:#FFF8F0;--card:#ffffff;--ink:#3E2723;--mute:#8D6E63;
+  --bg:#FFF8F0;--card:#ffffff;--ink:#3E2723;--mute:#7A5C52;
   --line:#FFE0B2;--blue:#1565C0;--red:#C62828;--brn:#4E342E;
   --gold:#FFB300;
   --sh:0 2px 10px rgba(120,60,0,.10);
@@ -26,15 +27,15 @@ small,.mut{color:var(--mute)}
 #topbar{z-index:50;display:flex;align-items:center;justify-content:space-between;
   padding:10px 14px;background:linear-gradient(95deg,var(--ord),var(--or));color:#fff;box-shadow:var(--sh)}
 .brand{font-weight:800;font-size:1.1rem;letter-spacing:.5px;cursor:pointer}
-.iconbtn{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.18);font-size:1.25rem}
+.iconbtn{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.18);font-size:1.25rem}
 .topbtns{display:flex;gap:5px}
-@media(max-width:420px){.brand{font-size:.94rem}.iconbtn{width:33px;height:33px;font-size:1.02rem;border-radius:10px}
+@media(max-width:420px){.brand{font-size:.94rem}.iconbtn{width:42px;height:42px;font-size:1.05rem;border-radius:10px}
   #topbar{padding:8px 10px}}
 #view{max-width:860px;margin:0 auto;padding:14px 14px 128px}
 /* ---- 上下兩條導航：🅰️ 上方＝事前準備 ／ 🅱️ 下方＝即插即用 ---- */
 .navcap{font-size:.62rem;font-weight:800;letter-spacing:.3px;text-align:center;padding:2px 6px 1px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.navcap.a{background:#FFF3E0;color:#BF4B00;border-bottom:1px solid #FFE0B2}
+.navcap.a{background:#FFF3E0;color:#A63A00;border-bottom:1px solid #FFE0B2}
 .navcap.b{background:#E8F5E9;color:var(--grd);border-bottom:1px solid #C8E6C9}
 .navrow{display:flex}
 #topnav{background:#fff;border-bottom:1px solid var(--line);
@@ -123,11 +124,11 @@ small,.mut{color:var(--mute)}
 .song-act small{display:block;color:var(--mute);font-size:.78rem;margin-top:1px}
 /* ---- 🧭 嚮導條：揀咗集會之後一步步帶到散會（貼喺工具箱上面） ---- */
 #flowbar{position:fixed;left:0;right:0;bottom:0;z-index:51;pointer-events:none}
-#flowbar.on{pointer-events:auto;bottom:calc(64px + env(safe-area-inset-bottom))}
+#flowbar.on{pointer-events:auto;bottom:calc(84px + env(safe-area-inset-bottom))}
 #flowbar.on>*{box-sizing:border-box}
 #flowbar.on>*{max-width:860px;margin:0 auto}
-.fb-top{display:flex;align-items:center;gap:6px;background:linear-gradient(95deg,#2e7d32,#66bb6a);
-  color:#fff;padding:4px 10px;font-size:.72rem;border-radius:14px 14px 0 0;box-shadow:0 -3px 12px rgba(0,0,0,.12)}
+.fb-top{display:flex;align-items:center;gap:6px;background:linear-gradient(95deg,#1b5e20,#2e7d32);
+  color:#fff;padding:5px 10px;font-size:.78rem;border-radius:14px 14px 0 0;box-shadow:0 -3px 12px rgba(0,0,0,.12)}
 .fb-top b{font-size:.74rem;font-weight:800;white-space:nowrap}
 .fb-no{background:rgba(255,255,255,.24);border-radius:99px;padding:1px 8px;font-weight:700;white-space:nowrap}
 .fb-no.ok{background:#fff;color:var(--grd)}
@@ -135,12 +136,12 @@ small,.mut{color:var(--mute)}
 .fb-dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.4)}
 .fb-dots i.d{background:#fff}
 .fb-dots i.c{background:#fff59d;box-shadow:0 0 0 2px rgba(255,255,255,.45)}
-.fb-ic{width:22px;height:22px;border-radius:7px;background:rgba(255,255,255,.2);color:#fff;font-size:.72rem;flex:none}
-.fb-main{display:flex;align-items:center;gap:10px;background:#fff;border:2px solid #66bb6a;border-top:0;
+.fb-ic{width:32px;height:32px;border-radius:9px;background:rgba(255,255,255,.2);color:#fff;font-size:.85rem;flex:none}
+.fb-main{display:flex;align-items:center;gap:10px;background:#fff;border:2px solid #2e7d32;border-top:0;
   border-radius:0 0 14px 14px;padding:8px 10px;box-shadow:0 -2px 10px rgba(0,0,0,.08)}
 .fb-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
 .fb-txt b{font-size:.92rem;color:var(--ink)}
-.fb-txt small{font-size:.72rem;color:var(--mute);line-height:1.35;
+.fb-txt small{font-size:.78rem;color:var(--mute);line-height:1.35;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .fb-act{display:flex;flex-direction:column;gap:4px;flex:none}
 .fb-act .btn.sm{padding:6px 10px;white-space:nowrap}
@@ -149,19 +150,20 @@ small,.mut{color:var(--mute)}
   font-size:.82rem;color:#33691e}
 .flow-invite b{display:block;color:var(--grd);font-size:.9rem;margin-bottom:2px}
 .flow-invite.on{background:#fff8e1;border-color:#ffb74d;color:#8a5a2a}
-.flow-invite.on b{color:#e65100}
+.flow-invite.on b{color:var(--ord)}
 /* ---- cards / bits ---- */
 .card{background:var(--card);border-radius:18px;box-shadow:var(--sh);padding:14px 16px;margin:12px 0}
 .card h2,.card h3{color:var(--ord)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 @media(max-width:560px){.grid3{grid-template-columns:1fr 1fr}}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--or);color:#fff;
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;background:var(--or);color:#fff;
   border-radius:14px;padding:10px 16px;font-weight:700;font-size:.95rem;box-shadow:var(--sh);transition:.12s}
 .btn:active{transform:scale(.96)}
 .btn.gr{background:var(--gr)}.btn.bl{background:var(--blue)}.btn.rd{background:var(--red)}
 .btn.ghost{background:#fff;color:var(--ord);border:1.5px solid var(--or)}
-.btn.sm{padding:6px 10px;font-size:.8rem;border-radius:10px}
+.btn.sm{min-height:40px;padding:6px 12px;font-size:.82rem;border-radius:10px}
+.btn.xs{min-height:36px;padding:5px 9px;font-size:.78rem;border-radius:9px}
 .btn.blk{width:100%}
 .btns{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
 .tag{display:inline-block;font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:99px;
@@ -2129,7 +2131,7 @@ figure.fig figcaption{font-size:.76rem;color:var(--mute);padding:7px 10px;border
 .toc-hero{margin-bottom:10px}
 .toc-hero h1{margin:.15em 0 .1em}
 .toc-hero p{margin:0;font-size:.9rem}
-.toc-row{display:flex;align-items:flex-start;gap:9px;padding:9px 2px;border-bottom:1px solid #faf0e2;cursor:pointer;border-radius:8px;transition:background .15s}
+.toc-row{display:flex;align-items:flex-start;gap:9px;padding:9px 2px;border-bottom:1px solid #faf0e2;border-radius:8px;transition:background .15s}
 .toc-row:hover{background:#fff8ee}
 .toc-row:focus-visible{outline:2px solid var(--ord);outline-offset:-2px}
 .toc-row:active{transform:scale(.995)}
@@ -2182,8 +2184,8 @@ figure.fig figcaption{font-size:.76rem;color:var(--mute);padding:7px 10px;border
 
 /* ==== Cub Hub 覆蓋：品牌色統一為幼童軍橙，兼容舊 .cur ==== */
 :root{
-  --or:#FF6F00;--ord:#E65100;
-  --bg:#FFF8F0;--card:#ffffff;--line:#FFE0B2;--ink:#3E2723;--mute:#8D6E63;
+  --or:#C43E00;--ord:#A63A00;
+  --bg:#FFF8F0;--card:#ffffff;--line:#FFE0B2;--ink:#3E2723;--mute:#7A5C52;
 }
 #topbar{background:linear-gradient(95deg,var(--ord),var(--or));color:#fff}
 #view{padding:14px 14px 128px;max-width:860px}
@@ -2273,8 +2275,8 @@ figure.fig figcaption{font-size:.76rem;color:var(--mute);padding:7px 10px;border
 .manual-card b{display:block;font-size:14px;margin:4px 0}
 .manual-card small{display:block}
 .subtabs{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
-.subtab{background:#fff;border:2px solid var(--line);border-radius:999px;padding:6px 14px;font-size:13px;cursor:pointer}
-.subtab.cur{background:var(--brand,#FF6F00);color:#fff;border-color:var(--brand,#FF6F00)}
+.subtab{background:#fff;border:2px solid var(--line);border-radius:999px;min-height:40px;padding:6px 14px;font-size:13px;cursor:pointer}
+.subtab.cur{background:var(--brand,var(--ord));color:#fff;border-color:var(--brand,var(--ord))}
 .info-section{border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0;background:#fff}
 
 /* hero 統一：沿用 ghmeeting 的 ready-hero 風格，但用幼童軍橙 */
@@ -2318,7 +2320,7 @@ body.offline .extcard{opacity:.55}
 /* Modal safety: every content card can be dismissed, including long cards. */
 #modal.on{display:flex}
 #modal .mbox{position:relative;background:#fff;width:min(94vw,720px);max-height:90dvh;overflow:auto;border-radius:20px;padding:42px 16px 18px;box-shadow:0 12px 40px rgba(0,0,0,.25)}
-#modal .mbox .mx{position:absolute;right:12px;top:10px;width:36px;height:36px;border-radius:50%;background:#f6efe6;color:var(--brn);font-size:1.1rem;font-weight:800;z-index:2}
+#modal .mbox .mx{min-width:44px;min-height:44px;position:absolute;right:10px;top:8px;width:44px;height:44px;border-radius:50%;background:#f6efe6;color:var(--brn);font-size:1.1rem;font-weight:800;z-index:2}
 #modal .mbox .modal-content{min-width:0}
 #modal .mbox .quick{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
 #modal .mbox button:disabled{opacity:.45;cursor:not-allowed}
@@ -2330,7 +2332,7 @@ body.offline .extcard{opacity:.55}
 .catalog-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
 .catalog-head h2{margin:0;color:var(--ord)}
 .toc-row .toc-mid{display:block;text-decoration:none;color:inherit}
-.toc-row .pill{flex:none;margin:0;font-size:.72rem;white-space:nowrap}
+.toc-row .pill{flex:none;margin:0;min-height:36px;padding:6px 12px;font-size:.76rem;white-space:nowrap}
 .route-back{display:inline-flex;align-items:center;gap:3px;margin:0 0 8px;color:var(--ord);font-weight:700;font-size:.88rem}
 .route-back:focus-visible{outline:2px solid var(--or);outline-offset:3px;border-radius:5px}
 .compact-tabs{margin:10px 0}.badge-tabs{overflow-x:auto;flex-wrap:nowrap}.badge-tabs .subtab{white-space:nowrap}
@@ -2722,3 +2724,63 @@ body.story-open .story-stage-wrap{display:block}
 .craft-follow li{margin-bottom:5px}
 .craft-blank.tall{min-height:130px}
 @media print{.exam-grid{display:none}.exam-key{border:1px solid #888}}
+
+/* ═══════════ 2026 制服新制徽章帶 ═══════════ */
+.uniform-band{border:1.5px solid #cfe3cd;background:linear-gradient(135deg,#f4fbf3,#fff);border-radius:14px;padding:12px 14px;margin:14px 0}
+.ub-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px}
+.ub-head b{font-size:.92rem}
+.ub-tag{background:var(--gr);color:#fff;font-weight:800;font-size:.72rem;border-radius:99px;padding:2px 9px}
+.ub-lead{margin:2px 0 8px;font-size:.9rem;font-weight:700}
+.ub-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:6px 0}
+.ub-lab{flex:0 0 84px;font-size:.76rem;font-weight:800;color:var(--mute)}
+.ub-chip{display:inline-flex;align-items:center;gap:5px;background:#fff;border:1px solid #e5ded2;border-radius:99px;padding:3px 9px;font-size:.76rem;font-weight:700}
+.ub-chip i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.ub-chip small{color:var(--mute);font-weight:600}
+.ub-note{margin:8px 0 0;font-size:.78rem;color:#5d4037;line-height:1.55}
+@media(max-width:420px){.ub-lab{flex-basis:100%}}
+@media print{.uniform-band{border:1px solid #999;background:#fff;break-inside:avoid}.ub-chip{border:1px solid #999}.ub-note{font-size:10px}}
+
+
+/* ═══════════ 可用性收尾：鍵盤、觸控、彈窗、列印清單 ═══════════ */
+a.brand{color:#fff;text-decoration:none}
+a.brand:focus-visible,.iconbtn:focus-visible,.btn:focus-visible,.subtab:focus-visible,.pill:focus-visible,.badge-name-card:focus-visible,.badge-group-card:focus-visible{outline:3px solid var(--ord);outline-offset:2px}
+#topnav a:focus-visible,#tabbar a:focus-visible{outline:3px solid var(--ord);outline-offset:-3px}
+@media screen{body.modal-open{overflow:hidden}}
+.search-hit{width:100%;text-align:left;font:inherit;cursor:pointer}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+}
+ul.printlist{margin:6px 0 4px;padding-left:20px;font-size:.9rem}
+ul.printlist li{padding:3px 0;border-bottom:1px dashed #f3e5d5}
+ul.printlist li:last-child{border-bottom:0}
+@media print{ul.printlist{font-size:11pt}}
+
+@media(max-width:360px){.branch-tag{display:none}}
+
+/* 2026 制服新制重點 */
+.uniform-news{margin:10px 0 4px;padding-left:20px;font-size:.86rem;line-height:1.55;color:#4e342e}
+.uniform-news li{margin:3px 0}
+.uniform-news b{color:var(--ord);margin-right:4px}
+@media print{.uniform-news{font-size:10px;margin:2mm 0}}
+
+/* 離線提示條同頂欄都 sticky：把頂欄放低，避免互相遮蓋 */
+body.offline #stickytop{top:33px}
+@media(max-width:420px){body.offline #stickytop{top:31px}}
+
+/* 舊版制服位置圖：預設收埋，只作對照 */
+details.map-legacy{margin:12px 0;border:1px dashed var(--line);border-radius:12px;background:#fffdf8}
+details.map-legacy>summary{cursor:pointer;padding:10px 12px;font-weight:700;font-size:.9rem;color:#5d4037;min-height:44px;display:flex;align-items:center}
+details.map-legacy>summary:focus-visible{outline:3px solid var(--ord);outline-offset:2px}
+details.map-legacy[open]>summary{border-bottom:1px dashed var(--line)}
+details.map-legacy>*:not(summary){margin:10px 12px}
+details.map-legacy .mut{font-size:.82rem}
+@media print{details.map-legacy{break-inside:avoid}}
+
+/* 自繪示意圖：同官方圖分開，避免誤認 */
+details.map-self{margin:12px 0;border:1px dashed #b8a98f;border-radius:12px;background:#fffdf8}
+details.map-self>summary{cursor:pointer;padding:10px 12px;font-weight:700;font-size:.88rem;color:#5d4037;min-height:44px;display:flex;align-items:center}
+details.map-self>summary:focus-visible{outline:3px solid var(--ord);outline-offset:2px}
+details.map-self[open]>summary{border-bottom:1px dashed #b8a98f}
+details.map-self>*:not(summary){margin:10px 12px}
+details.map-self .mut{font-size:.82rem}
+@media print{details.map-self{break-inside:avoid}}

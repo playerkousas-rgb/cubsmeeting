@@ -1,21 +1,49 @@
 {
   "name": "幼童軍團集會助手 Cub Hub",
   "short_name": "幼童軍助手",
-  "description": "取代官方《幼童軍團集會套包》：新領袖淨係用呢個APP就帶得完一場集會。開季規劃、執集會、投影帶領、事後追蹤一條龍。",
+  "description": "幼童軍團集會助手：2026綱要、集會目錄、教材列印、投影帶領。離線可用；不記錄個人獎章進度。",
   "lang": "zh-HK",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#FFF8F0",
-  "theme_color": "#FF6F00",
+  "theme_color": "#C43E00",
   "shortcuts": [
-    {"name": "✂️ 圖紙（印教材）", "short_name": "圖紙", "url": "./index.html#pack"},
-    {"name": "🖨️ 印齊今場", "short_name": "印齊今場", "url": "./index.html#pack"},
-    {"name": "▶️ 即開帶領", "short_name": "帶領", "url": "./index.html#lead"}
+    {
+      "name": "📅 集會目錄",
+      "short_name": "集會目錄",
+      "url": "./index.html#plan"
+    },
+    {
+      "name": "✂️ 素材庫",
+      "short_name": "素材庫",
+      "url": "./index.html#print"
+    },
+    {
+      "name": "▶️ 投影帶領",
+      "short_name": "帶領",
+      "url": "./index.html#lead"
+    }
   ],
   "icons": [
-    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
-    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }

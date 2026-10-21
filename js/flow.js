@@ -2,11 +2,11 @@
    呢個套包只做「帶集會」，唔做記錄：出席同獎章進度交畀右上角嘅進度追蹤APP／通告圖書館。 */
 var Flow = {
   STEPS: [
-    { k: "pick", ic: "📅", n: "揀今場集會", why: "揀咗之後，印教材、執袋、帶領全部自動跟呢一場。", btn: "去揀集會", go: "Flow.doPick()" },
-    { k: "print", ic: "🖨️", n: "印齊教案＋圖紙", why: "撳一下成疊出：領袖教案打頭陣，分隔頁之後就係小朋友圖紙。", btn: "即刻印", go: "Flow.doPrint()" },
-    { k: "bag", ic: "🧺", n: "執袋（喺APP剔）", why: "逐樣剔，人數一改數量自動計，剔晒先好出門口。", btn: "開執袋單", go: "Flow.doBag()" },
-    { k: "venue", ic: "📍", n: "到場設場", why: "邊度做遊戲、邊度坐低、地貼貼邊度，逐項剔完先開場。", btn: "睇設場清單", go: "Flow.doVenue()" },
-    { k: "lead", ic: "▶️", n: "開始帶領", why: "跟綠色領袖卡一步步做，計時同畫面撳個掣就出。帶完就散會。", btn: "即開帶領", go: "Flow.doLead()" }
+    { k: "pick", ic: "📅", n: "揀今場集會", why: "揀一場，之後全部步驟跟住佢。", btn: "去揀集會", go: "Flow.doPick()" },
+    { k: "print", ic: "🖨️", n: "印齊教案＋圖紙", why: "一疊過：領袖教案、分隔頁、成員圖紙。", btn: "即刻印", go: "Flow.doPrint()" },
+    { k: "bag", ic: "🧺", n: "執袋（喺APP剔）", why: "逐樣剔，數量跟人數自動計。", btn: "開執袋單", go: "Flow.doBag()" },
+    { k: "venue", ic: "📍", n: "到場設場", why: "到場逐項剔，剔完先開場。", btn: "睇設場清單", go: "Flow.doVenue()" },
+    { k: "lead", ic: "▶️", n: "開始帶領", why: "跟綠色領袖卡做；計時、音效一撳即有。", btn: "即開帶領", go: "Flow.doLead()" }
   ],
   st: function () {
     try {
@@ -96,7 +96,7 @@ var Flow = {
       '<button class="fb-ic" onclick="if(confirm(\'真係唔使帶？退出後唔會再彈。\'))Flow.quit()" title="唔使帶，我自己嚟">✕</button></div>';
     if (!c) {
       return head + (s.min ? "" : '<div class="fb-main"><div class="fb-txt"><b>🎉 散會！今場由頭到尾帶齊晒。</b>' +
-        "<small>出席同獎章進度唔喺呢度記：撳右上角 🏅 進度追蹤APP。下場想再帶：撳重頭再嚟。</small></div>" +
+        "<small>進度記喺右上角 🏅 進度追蹤APP；下場再帶就撳重頭再嚟。</small></div>" +
         '<div class="fb-act"><button class="btn sm" onclick="Flow.reset()">🔁 下一場重頭再嚟</button>' +
         '<button class="btn sm ghost" onclick="Flow.quit()">完成</button></div></div>');
     }
@@ -114,7 +114,7 @@ var Flow = {
         '<button class="btn sm ghost" onclick="Flow.quit()">✕ 唔使帶</button></div></div>';
     }
     return '<div class="flow-invite"><b>🧭 第一次帶集會？我帶你由頭做到尾</b>' +
-      "<span>撳一下，畫面底部會一步步帶你：印教材 → 執袋 → 設場 → 帶領。帶完就散會。</span>" +
+      "<span>撳一下，底部逐步帶你：揀集會 → 印教材 → 執袋 → 設場 → 帶領。帶完就散會。</span>" +
       '<div class="btns"><button class="btn sm gr" onclick="Flow.start()">🧭 帶我由頭做到尾</button></div></div>';
   }
 };
