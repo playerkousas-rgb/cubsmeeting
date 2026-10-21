@@ -1,5 +1,12 @@
 /* 🐺 Cub Hub v9.1 — 對齊 ghmeeting 5+5 外殼，修復測試關鍵字與路由 — © 2026 Scout System */
 (function () {
+  /* 官方參考資料：只提供連結，唔複製、唔改寫內容。 */
+  var OFFICIAL = {
+    packet: 'https://drive.google.com/file/d/1qI5aUCFZE-sAGDDeloE8ubdGXifZg8P2/view',
+    schemePdf: 'https://prog.scouting.org.hk/cub/wp-content/uploads/2026/08/ChiCub-Scout-Section-Training-Scheme_20260809.pdf',
+    schemeDrive: 'https://drive.google.com/file/d/19StE5sobEUb8DOSkW0e57T0j784S6-R5/view',
+    schemePage: 'https://prog.scouting.org.hk/cub/training-scheme/'
+  };
   var oldRoute = App.route;
   var oldBook = App.vBook;
   var oldMeetList = App.vMeetList;
@@ -65,7 +72,7 @@
   App.vPlan = function () {
     var ms=DATA.meetings, done=Store.get('done',{}), count=ms.filter(function(m){return done[m.tid];}).length;
     var rows=ms.map(function(m,i){var d=!!done[m.tid];return '<div class="toc-row'+(m.tid===curTid()?' on':'')+'"><span class="toc-no">'+String(i+1).padStart(2,'0')+'</span><a class="toc-mid" href="#prep?tid='+m.tid+'"><b>'+esc(m.n)+'</b><small>'+esc(m.month)+' · '+m.mins+'分鐘 · '+esc(m.badge)+'</small></a><button class="pill '+(d?'on':'')+'" aria-pressed="'+(d?'true':'false')+'" aria-label="'+esc(m.n)+(d?'：已完成':'：未完成')+'" onclick="App.toggleDone(\''+m.tid+'\')">'+(d?'✓ 完成':'未做')+'</button></div>';}).join('');
-    return '<section class="card catalog-hero"><span class="eyebrow">🐺 幼童軍 · 2026 綱要</span><h1>📅 集會目錄</h1><p>撳標題預備，撳狀態改完成。今場集會據幼童軍訓練綱要設計。</p><div class="stat"><div class="s"><b>'+ms.length+'</b>場</div><div class="s"><b>'+count+'</b>完成</div></div><div class="btns"><a class="btn sm ghost" href="https://scout-circulars.vercel.app/" target="_blank" rel="noopener">📨 睇最新通告同活動</a></div></section><section class="card"><div class="catalog-head"><h2>📅 全部集會</h2><span class="mut">'+ms.length+' 場</span></div><div class="toc-list">'+rows+'</div></section>'
+    return '<section class="card catalog-hero"><span class="eyebrow">🐺 幼童軍 · 2026 綱要</span><h1>📅 集會目錄</h1><p>撳標題預備，撳狀態改完成。今場集會據幼童軍訓練綱要設計。</p><div class="stat"><div class="s"><b>'+ms.length+'</b>場</div><div class="s"><b>'+count+'</b>完成</div></div><div class="btns"><a class="btn sm ghost" href="https://scout-circulars.vercel.app/" target="_blank" rel="noopener">📨 睇最新通告同活動</a><a class="btn sm ghost" href="'+OFFICIAL.schemePage+'" target="_blank" rel="noopener">📖 訓練綱要 2026</a><a class="btn sm ghost" href="'+OFFICIAL.packet+'" target="_blank" rel="noopener">📦 官方集會套包</a></div></section><section class="card"><div class="catalog-head"><h2>📅 全部集會</h2><span class="mut">'+ms.length+' 場</span></div><div class="toc-list">'+rows+'</div></section>'
   };
 
   App.vOfficial = function(){
@@ -132,7 +139,7 @@
       if(cur==='apps') return '<div class="info-section"><h3>🔗 相關APP</h3>'+extBtn(badgeUrl,false,'進度追蹤APP','個人獎章記錄')+extBtn(circUrl,false,'通告圖書館','通告與活動資料')+'<h3>本APP即用工具</h3><div class="quick"><button class="btn" onclick="Bag.open()">今場物資庫／執袋</button><a class="btn" href="#tools">集合與安靜訊號</a></div></div>';
       return '<p>請選上方手冊分頁。</p>';
     }
-    var core = '<section class="card handbook"><a class="back" href="#plan">‹ 返回目錄</a><span class="eyebrow">手冊＝幼童軍核心</span><h1>📖 手冊</h1><p class="mut">撳標籤，直接去要找的內容。</p><div class="subtabs">'+subs.map(function(s){return '<button class="subtab '+(cur===s.id?'cur':'')+'" onclick="location.hash=\'#book?sub='+s.id+'\'">'+s.label+'</button>';}).join('')+'</div>'+tabContent()+'<div class="handbook-links"><a class="pill" href="https://cubsbadge.vercel.app/" target="_blank" rel="noopener">🏅 進度追蹤 APP</a><a class="pill" href="https://scout-circulars.vercel.app/" target="_blank" rel="noopener">📨 通告圖書館</a></div></section>';
+    var core = '<section class="card handbook"><a class="back" href="#plan">‹ 返回目錄</a><span class="eyebrow">手冊＝幼童軍核心</span><h1>📖 手冊</h1><p class="mut">撳標籤，直接去要找的內容。</p><div class="subtabs">'+subs.map(function(s){return '<button class="subtab '+(cur===s.id?'cur':'')+'" onclick="location.hash=\'#book?sub='+s.id+'\'">'+s.label+'</button>';}).join('')+'</div>'+tabContent()+'<div class="handbook-links"><a class="pill" href="https://cubsbadge.vercel.app/" target="_blank" rel="noopener">🏅 進度追蹤 APP</a><a class="pill" href="https://scout-circulars.vercel.app/" target="_blank" rel="noopener">📨 通告圖書館</a><a class="pill" href="'+OFFICIAL.schemePdf+'" target="_blank" rel="noopener">📖 訓練綱要 2026</a><a class="pill" href="'+OFFICIAL.schemeDrive+'" target="_blank" rel="noopener">📖 綱要 PDF 副本</a></div></section>';
     /* 教材工具：由各 plugin 註冊，分頁收埋，唔再一路疊落手冊底 */
     var tools = (App.bookPanels && App.bookPanels.length) ? App.bookPanels : [];
     var toolsHtml = '';
