@@ -17,7 +17,9 @@
     "test:browser:review": "node tests/browser-app-review.mjs",
     "test:browser:all": "npm run test:browser && npm run test:browser:print && npm run test:browser:review",
     "test:quickkeys": "node tests/quickkeys.mjs",
-    "test:quality": "node tests/quality.mjs"
+    "test:quality": "node tests/quality.mjs",
+    "audit:meetings": "node tools/meeting-audit.mjs",
+    "audit:meetings:strict": "node tools/meeting-audit.mjs --strict"
   },
   "devDependencies": {
     "playwright": "^1.63.0"

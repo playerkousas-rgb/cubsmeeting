@@ -173,5 +173,39 @@ const Q = (s) => vm.runInContext(s, sb);
   }
 }
 
+/* 9. 每場集會骨幹一致：時間加總、步驟／對白／安全／觀察齊、口語版、實戰包
+   例外：c14 中間一節刻意 nil（保留森林故事原文）；c26／c27 後期加入，實戰包待補。 */
+{
+  const meetings = Q("DATA.meetings");
+  ok(meetings.length >= 25, `場次 ${meetings.length} 場`);
+  const noPractical = new Set(["c26", "c27"]);
+  const keepOriginal = new Set(["c14"]); /* 中間某節保留原文 */
+  const bad = [];
+  meetings.forEach((m) => {
+    const segs = m.segs || [];
+    const sum = segs.reduce((a, x) => a + (Number(x.m) || 0), 0);
+    if (Number(m.mins) !== sum) bad.push(`${m.tid} 時間 ${m.mins}≠${sum}`);
+    if (segs.length < 4) bad.push(`${m.tid} 只有 ${segs.length} 節`);
+    segs.forEach((x, k) => {
+      if (!x.script || !x.safety || !x.watch || !x.rhythm) bad.push(`${m.tid}#${k + 1} 缺 script／safety／watch／rhythm`);
+      if (!x.steps || x.steps.length < 2) bad.push(`${m.tid}#${k + 1} 步驟少於 2 步`);
+    });
+    if (!m.gap) bad.push(`${m.tid} 未寫「本場不涵蓋」`);
+    if (!m.worksheet || !m.worksheet.prompts || m.worksheet.prompts.length < 3) bad.push(`${m.tid} 工作紙少於 3 題`);
+    if (noPractical.has(m.tid)) return;
+    ["opening", "distribute", "confused", "quiet", "few", "missing", "short"].forEach((k) => {
+      if (!m.practical || !m.practical[k]) bad.push(`${m.tid} 實戰包缺 ${k}`);
+    });
+    if (m.practical && (!m.practical.qa || m.practical.qa.length < 2)) bad.push(`${m.tid} 實戰問答少於 2 條`);
+    if (!keepOriginal.has(m.tid)) {
+      const plain = Q(`(PlainContent.lessons[${JSON.stringify(m.tid)}]||{}).steps||[]`);
+      for (let k = 1; k < segs.length - 1; k++) if (!plain[k - 1]) bad.push(`${m.tid}#${k + 1} 缺口語版`);
+    }
+  });
+  ok(bad.length === 0, `27 場骨幹一致${bad.length ? "：" + bad.slice(0, 4).join("、") : ""}`);
+  ok(Q("typeof PlainContent.apply") === "function", "口語版有統一 apply()");
+  ok(!/m\.segs\[4\]/.test(read("js/plain-content.js")), "口語版唔再用硬編碼第 5 節（節數一變就錯位）");
+}
+
 console.log(fail === 0 ? "\nQUALITY PASS" : `\nQUALITY FAIL (${fail})`);
 process.exit(fail === 0 ? 0 : 1);
