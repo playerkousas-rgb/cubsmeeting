@@ -231,5 +231,34 @@ const Q = (s) => vm.runInContext(s, sb);
   ok(Q("FieldVisuals.official.length") === 2, "官方圖只剩兩張位置圖");
 }
 
+/* 12. 📮 意見回報：接 Scout Admin 統一回報（一行 widget＋離線後備） */
+{
+  const html = read("index.html");
+  const tag = (html.match(/<script[^>]*scout-admin-blue\.vercel\.app\/widget\.js[^>]*>/) || [""])[0];
+  ok(tag.includes('src="https://scout-admin-blue.vercel.app/widget.js"'), "有官方統一 widget 腳本");
+  ok(tag.includes('data-app="幼童軍集會"'), "來源名稱係「幼童軍集會」");
+  ok(!/data-app="幼童軍"/.test(tag), "唔用「幼童軍」（會被後台歸入專章系統）");
+  ok(/\bdefer\b/.test(tag), "widget 用 defer，唔阻頁面");
+  ok(Q("App.FEEDBACK.app") === "幼童軍集會", "App.FEEDBACK 記錄來源");
+  ok(Q("App.FEEDBACK.page").includes("report.html?app="), "有網頁版表單後備連結");
+  const book = Q("App.vBook()");
+  ok(book.includes("feedback-card"), "手冊有「📮 意見回報」卡");
+  ok(book.includes("App.feedback"), "卡上有開表單掣");
+  ok(book.includes("私隱") && book.includes("小朋友姓名"), "卡上寫明唔收小朋友個人資料");
+  ok(book.includes("離線都用得"), "卡上寫明離線後備做法");
+  ok(Q("typeof App.feedback") === "function" && Q("typeof App.copyFeedback") === "function", "有 App.feedback／copyFeedback");
+  const tpl = Q("App.feedbackTemplate()");
+  ok(/邊一頁/.test(tpl) && /裝置同瀏覽器/.test(tpl) && /問題回報/.test(tpl), "後備文字模板齊（類別／頁面／裝置）");
+  ok(!/data-app="[^"]*"[^>]*aria-current/.test(html), "外連 script 唔會加 aria-current");
+  const css = read("css/app.css");
+  ok(/#scoutw-fab\{[^}]*bottom:calc\(64px/.test(css), "widget 浮動掣升上底部導覽之上");
+  ok(/#scoutw-fab\{[^}]*min-height:44px/.test(css), "widget 浮動掣 ≥44px");
+  ok(/@media print\{#scoutw-root\{display:none/.test(css), "列印時唔會印 widget");
+  /* 冇 #scoutw-fab（離線／腳本未載入）時，要退回路徑而唔係靜靜失敗 */
+  ok(Q("App.feedback()") === false, "腳本未載入時 feedback() 走後備");
+  ok(els["modal"] && /fb-ta/.test(els["modal"].innerHTML), "後備模態有可複製文字框");
+  ok(els["modal"] && els["modal"].innerHTML.includes("report.html?app="), "後備模態有網頁版連結");
+}
+
 console.log(fail === 0 ? "\nQUALITY PASS" : `\nQUALITY FAIL (${fail})`);
 process.exit(fail === 0 ? 0 : 1);

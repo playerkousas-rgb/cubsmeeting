@@ -171,6 +171,58 @@
     location.reload();
   };
 
+  /* ===== 📮 意見回報：接 Scout Admin 統一回報 =====
+     全站右下角浮動掣由 index.html 的一行 widget 提供（問題回報＋意見回饋）；
+     離線或外部腳本被封時，用手冊呢張卡退回路徑（複製文字／網頁版表單），唔會冇路可走。
+     私隱：只收問題本身，唔收小朋友姓名、班別、地址或相片。 */
+  App.FEEDBACK = {
+    app: '幼童軍集會',
+    source: 'https://scout-admin-blue.vercel.app/widget.js',
+    page: 'https://scout-admin-blue.vercel.app/report.html?app=' + encodeURIComponent('幼童軍集會')
+  };
+  App.feedbackTemplate = function () {
+    return '【' + App.FEEDBACK.app + '｜問題／意見】\n'
+      + '類別：（問題回報／意見回饋）\n'
+      + '邊一頁：（例：#plan／#meet?tid=c04／#book）\n'
+      + '發生咩事：（一句講清楚，例如「撳列印冇反應」）\n'
+      + '裝置同瀏覽器：（例：iPad Safari）\n'
+      + '（可留聯絡方法；唔好填小朋友姓名、班別、地址或相片）';
+  };
+  App.feedback = function () {
+    var fab = document.getElementById('scoutw-fab');
+    if (fab && typeof fab.click === 'function') { fab.click(); return true; }
+    Modal.open('<h2>📮 意見回報</h2>'
+      + '<p class="mut">回報表單未載入（多數係離線，或者網絡擋住外部腳本）。可以先抄低文字，貼去 WhatsApp／電郵畀管理員。</p>'
+      + '<textarea id="fb-ta" class="fb-copy" rows="7" readonly onclick="this.select()">' + esc(App.feedbackTemplate()) + '</textarea>'
+      + '<div class="quick"><button class="btn gr" onclick="App.copyFeedback()">📋 複製回報文字</button>'
+      + '<a class="btn" href="' + App.FEEDBACK.page + '" target="_blank" rel="noopener">🌐 網頁版表單</a></div>'
+      + '<p class="mut">恢復上網之後，右下角會再有「🐛💬 回報 · 意見」掣，用法一樣。</p>'
+      + '<p class="safe">私隱：唔好填小朋友姓名、班別、地址或相片；講問題本身就得。</p>');
+    return false;
+  };
+  App.copyFeedback = function () {
+    var ta = document.getElementById('fb-ta');
+    var text = ta ? ta.value : App.feedbackTemplate();
+    function done() { if (typeof toast === 'function') toast('已複製回報文字'); }
+    function fallback() {
+      if (!ta) return;
+      try { ta.focus(); ta.select(); document.execCommand('copy'); done(); } catch (e) {}
+    }
+    if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, fallback);
+    } else fallback();
+    return true;
+  };
+  App.feedbackCard = function () {
+    return '<section class="card feedback-card"><h2>📮 意見回報</h2>'
+      + '<p class="mut">見到錯處、想加內容、帶會時卡住，直接講；可以匿名，唔使帳戶。</p>'
+      + '<div class="quick"><button class="btn gr" onclick="App.feedback()">💬 開回報表單</button>'
+      + '<a class="btn ghost" href="' + App.FEEDBACK.page + '" target="_blank" rel="noopener">🌐 網頁版表單</a></div>'
+      + '<p class="mut">離線都用得：撳「開回報表單」會出好文字，複製之後貼去 WhatsApp／電郵。</p>'
+      + '<p class="safe">私隱：唔好填小朋友姓名、班別、地址或相片；只講遇到咩問題。</p>'
+      + '<p class="mut">回報會送去 Scout Admin 的統一看板（來源：' + App.FEEDBACK.app + '），同其他童軍系統同一格式。</p></section>';
+  };
+
   App.vBook = function(){
     var subs = [
       {id:'core',label:'誓詞·規律'},
@@ -222,7 +274,7 @@
       }).join('');
       toolsHtml = '<section class="card booktools"><h2>🧰 教材工具</h2><p class="mut">撳標籤直接開教材，唔使一路碌到落底。</p><div class="subtabs booktool-tabs">' + toolTabs + '</div>' + toolPanels + '</section>';
     }
-    return core + toolsHtml;
+    return core + toolsHtml + App.feedbackCard();
 
   };
 
