@@ -60,11 +60,11 @@
   /* === 基礎 vPrep：供 content.js 包裝，包含印教材關鍵字 === */
   App.vPrep = function(){
     var m = curMeet();
-    var h = '<section class="card"><h2>🧭 準備：'+esc(m.n)+'</h2><p class="mut">約'+m.mins+'分鐘 · 據幼童軍訓練綱要設計</p>';
+    var h = '<section class="card"><h1>🧭 準備：'+esc(m.n)+'</h1><p class="mut">約'+m.mins+'分鐘 · 據幼童軍訓練綱要設計</p>';
     h += '<div class="quick"><button class="btn gr" onclick="App.go(\'#pack\')">🖨️ 印齊今場</button><button class="btn" onclick="Bag.open()">🧺 執袋</button><button class="btn" onclick="Venue.open()">📍 設場</button><button class="btn ghost" onclick="App.go(\'#lead\')">▶️ 開始帶領</button></div>';
     h += '<div class="tipcard">流程：揀個範本 → 準備呢場 → 印教材 → 執袋 → 設場 → 帶領。完整出隊包 / 精簡列印 皆可。</div></section>';
     // 用原有 pack/lead/track 快速入口，確保測試字眼存在
-    h += '<section class="card"><h3>📋 今場程序</h3><ol>'+m.segs.map(function(s){return '<li>'+esc(s.n)+'（'+s.m+'分鐘）</li>';}).join('')+'</ol><p class="mut">合計：'+m.segs.map(function(s){return s.m;}).join('＋')+'＝'+m.mins+'分鐘 ✓</p></section>';
+    h += '<section class="card"><h2>📋 今場程序</h2><ol>'+m.segs.map(function(s){return '<li>'+esc(s.n)+'（'+s.m+'分鐘）</li>';}).join('')+'</ol><p class="mut">合計：'+m.segs.map(function(s){return s.m;}).join('＋')+'＝'+m.mins+'分鐘 ✓</p></section>';
     return h;
   };
 
@@ -72,7 +72,7 @@
   App.vPlan = function () {
     var ms=DATA.meetings, done=Store.get('done',{}), count=ms.filter(function(m){return done[m.tid];}).length;
     var rows=ms.map(function(m,i){var d=!!done[m.tid];return '<div class="toc-row'+(m.tid===curTid()?' on':'')+'"><span class="toc-no">'+String(i+1).padStart(2,'0')+'</span><a class="toc-mid" href="#prep?tid='+m.tid+'"><b>'+esc(m.n)+'</b><small>'+esc(m.month)+' · '+m.mins+'分鐘 · '+esc(m.badge)+'</small></a><button class="pill '+(d?'on':'')+'" aria-pressed="'+(d?'true':'false')+'" aria-label="'+esc(m.n)+(d?'：已完成':'：未完成')+'" onclick="App.toggleDone(\''+m.tid+'\')">'+(d?'✓ 完成':'未做')+'</button></div>';}).join('');
-    return '<section class="card catalog-hero"><span class="eyebrow">🐺 幼童軍 · 2026 綱要</span><h1>📅 集會目錄</h1><p>撳標題預備，撳狀態改完成。今場集會據幼童軍訓練綱要設計。</p><div class="stat"><div class="s"><b>'+ms.length+'</b>場</div><div class="s"><b>'+count+'</b>完成</div></div><div class="btns"><a class="btn sm ghost" href="https://scout-circulars.vercel.app/" target="_blank" rel="noopener">📨 睇最新通告同活動</a><a class="btn sm ghost" href="'+OFFICIAL.schemePage+'" target="_blank" rel="noopener">📖 訓練綱要 2026</a><a class="btn sm ghost" href="'+OFFICIAL.packet+'" target="_blank" rel="noopener">📦 官方集會套包</a></div></section><section class="card"><div class="catalog-head"><h2>📅 全部集會</h2><span class="mut">'+ms.length+' 場</span></div><div class="toc-list">'+rows+'</div></section>'
+    return '<section class="card catalog-hero"><span class="eyebrow">🐺 幼童軍 · 2026 綱要</span><h1>📅 集會目錄</h1><p>撳標題預備，撳狀態改完成。今場集會據幼童軍訓練綱要設計，唔使逐頁翻書。</p><div class="stat"><div class="s"><b>'+ms.length+'</b>場</div><div class="s"><b>'+count+'</b>完成</div></div><div class="btns"><a class="btn sm ghost" href="https://scout-circulars.vercel.app/" target="_blank" rel="noopener">📨 睇最新通告同活動</a><a class="btn sm ghost" href="'+OFFICIAL.schemePage+'" target="_blank" rel="noopener">📖 訓練綱要 2026</a><a class="btn sm ghost" href="'+OFFICIAL.packet+'" target="_blank" rel="noopener">📦 官方集會套包</a></div></section><section class="card"><div class="catalog-head"><h2>📅 全部集會</h2><span class="mut">'+ms.length+' 場</span></div><div class="toc-list">'+rows+'</div></section>'
   };
 
   App.vOfficial = function(){
@@ -125,18 +125,18 @@
     function tabContent(){
       if(cur==='core'){
         var hc=Store.get('headcount',24);
-        return '<div class="info-section"><h3>🤝 誓詞</h3><p>'+DATA.facts.promise.map(esc).join('<br>')+'</p><h3>📏 規律</h3><p>'+esc(DATA.facts.law)+'</p><h3>💪 銘言</h3><p>'+esc(DATA.facts.motto)+'</p><p class="mut">正式原文不縮寫；團呼／大聲呼叫請用上方分頁。</p></div>'+
+        return '<div class="info-section"><h2>🤝 誓詞</h2><p>'+DATA.facts.promise.map(esc).join('<br>')+'</p><h2>📏 規律</h2><p>'+esc(DATA.facts.law)+'</p><h2>💪 銘言</h2><p>'+esc(DATA.facts.motto)+'</p><p class="mut">正式原文不縮寫；團呼／大聲呼叫請用上方分頁。</p></div>'+
           '<details class="handbook-more"><summary>獎章路線與適用綱要</summary><p>'+esc(DATA.badges.map(function(b){return b.n;}).join(' → '))+'</p><p>完成活動不等於獲章；個人考驗按適用綱要確認。</p>'+extBtn(DATA.source.url,false,'查看訓練綱要','正式要求以適用版本為準')+'</details>'+
           '<details class="handbook-more"><summary>物資庫：按人數計算</summary><label>人數 <input type="range" min="6" max="48" value="'+hc+'" oninput="App.setHC(this.value)"> <b id="hcN">'+hc+'</b> 人</label><ul id="matlist">'+App.matList(hc)+'</ul><button class="btn" onclick="Bag.open()">只看今場執袋清單</button></details>'+
           '<details class="handbook-more"><summary>相關APP與本機設定</summary>'+extBtn(badgeUrl,false,'進度追蹤APP','個人獎章記錄')+extBtn(circUrl,false,'通告圖書館','查通告與活動')+'<p>記錄保存在這部裝置；離線仍可用教材。</p><button class="btn" onclick="App.clearLocal()">清除本APP本機記錄</button></details>';
       }
-      if(cur==='six') return '<div class="info-section"><h3>🌈 六色小隊</h3>'+App.handbookImage('six-colors','六色小隊的教學插畫；不是制服或徽章位置圖')+'<p>'+esc(DATA.facts.six)+'</p><p class="mut">插畫只用來認顏色，不代表制服款式或必須六隊。</p></div>';
-      if(cur==='roles') return '<div class="info-section"><h3>👥 領袖分工</h3>'+App.handbookImage('leader-roles','設計體驗、安全守護、價值引導、放手嘗試四項教學分工')+'<p>先分好四件事：帶活動、示範、照顧安全、觀察支援。</p><p class="mut">這是教學分工建議；由負責領袖按人手安排，不把森林角色名字當成固定職務。</p></div>';
-      if(cur==='sixer') return '<div class="info-section"><h3>⭐ 隊長帶新隊員</h3>'+App.handbookImage('sixer-training','隊長示範和陪伴新隊員的教學插畫')+'<ol><li>先示範。</li><li>陪他做一次。</li><li>放手讓他試。</li></ol><p>隊長幫忙，不責罵、不代做；安全由成人負責。</p></div>';
-      if(cur==='calls') return '<div class="info-section"><h3>🐺 團呼：先看隊形</h3>'+FieldVisuals.formationSVG()+'<p>先定位，再按已核的團呼逐步卡排練；不使用舊「狼耳」手號圖。</p><div class="quick"><button class="btn" onclick="Ceremony.open(\'howl\')">開團呼逐步卡</button><button class="btn" onclick="FieldVisuals.formation()">隊形與安全安排</button></div></div>';
-      if(cur==='uniform') return '<div class="info-section"><h3>👕 制服：2026 新制</h3>'+(typeof Uniform!=='undefined'&&Uniform.band?Uniform.band():'')+'<p>左右以穿著者為準；位置用2026六區圖。</p><div class="quick"><button class="btn" onclick="Uniform.open()">開制服教學包</button><button class="btn" onclick="FieldVisuals.reference()">官方款式圖</button></div></div>';
-      if(cur==='ceremony') return '<div class="info-section"><h3>🎪 儀式：每次跟一個步驟</h3><p>團呼、展旗、宣誓各有不同程序，不合併成一套「五步」。</p>'+Ceremony.panel()+'</div>';
-      if(cur==='apps') return '<div class="info-section"><h3>🔗 相關APP</h3>'+extBtn(badgeUrl,false,'進度追蹤APP','個人獎章記錄')+extBtn(circUrl,false,'通告圖書館','通告與活動資料')+'<h3>本APP即用工具</h3><div class="quick"><button class="btn" onclick="Bag.open()">今場物資庫／執袋</button><a class="btn" href="#tools">集合與安靜訊號</a></div></div>';
+      if(cur==='six') return '<div class="info-section"><h2>🌈 六色小隊</h2>'+App.handbookImage('six-colors','六色小隊的教學插畫；不是制服或徽章位置圖')+'<p>'+esc(DATA.facts.six)+'</p><p class="mut">插畫只用來認顏色，不代表制服款式或必須六隊。</p></div>';
+      if(cur==='roles') return '<div class="info-section"><h2>👥 領袖分工</h2>'+App.handbookImage('leader-roles','設計體驗、安全守護、價值引導、放手嘗試四項教學分工')+'<p>先分好四件事：帶活動、示範、照顧安全、觀察支援。</p><p class="mut">這是教學分工建議；由負責領袖按人手安排，不把森林角色名字當成固定職務。</p></div>';
+      if(cur==='sixer') return '<div class="info-section"><h2>⭐ 隊長帶新隊員</h2>'+App.handbookImage('sixer-training','隊長示範和陪伴新隊員的教學插畫')+'<ol><li>先示範。</li><li>陪他做一次。</li><li>放手讓他試。</li></ol><p>隊長幫忙，不責罵、不代做；安全由成人負責。</p></div>';
+      if(cur==='calls') return '<div class="info-section"><h2>🐺 團呼：先看隊形</h2>'+FieldVisuals.formationSVG()+'<p>先定位，再按已核的團呼逐步卡排練；不使用舊「狼耳」手號圖。</p><div class="quick"><button class="btn" onclick="Ceremony.open(\'howl\')">開團呼逐步卡</button><button class="btn" onclick="FieldVisuals.formation()">隊形與安全安排</button></div></div>';
+      if(cur==='uniform') return '<div class="info-section"><h2>👕 制服：2026 新制</h2>'+(typeof Uniform!=='undefined'&&Uniform.band?Uniform.band():'')+'<p>左右以穿著者為準；位置用2026六區圖。</p><div class="quick"><button class="btn" onclick="Uniform.open()">開制服教學包</button><button class="btn" onclick="FieldVisuals.reference()">官方款式圖</button></div></div>';
+      if(cur==='ceremony') return '<div class="info-section"><h2>🎪 儀式：每次跟一個步驟</h2><p>團呼、展旗、宣誓各有不同程序，不合併成一套「五步」。</p>'+Ceremony.panel()+'</div>';
+      if(cur==='apps') return '<div class="info-section"><h2>🔗 相關APP</h2>'+extBtn(badgeUrl,false,'進度追蹤APP','個人獎章記錄')+extBtn(circUrl,false,'通告圖書館','通告與活動資料')+'<h3>本APP即用工具</h3><div class="quick"><button class="btn" onclick="Bag.open()">今場物資庫／執袋</button><a class="btn" href="#tools">集合與安靜訊號</a></div></div>';
       return '<p>請選上方手冊分頁。</p>';
     }
     var core = '<section class="card handbook"><a class="back" href="#plan">‹ 返回目錄</a><span class="eyebrow">手冊＝幼童軍核心</span><h1>📖 手冊</h1><p class="mut">撳標籤，直接去要找的內容。</p><div class="subtabs">'+subs.map(function(s){return '<button class="subtab '+(cur===s.id?'cur':'')+'" onclick="location.hash=\'#book?sub='+s.id+'\'">'+s.label+'</button>';}).join('')+'</div>'+tabContent()+'<div class="handbook-links"><a class="pill" href="https://cubsbadge.vercel.app/" target="_blank" rel="noopener">🏅 進度追蹤 APP</a><a class="pill" href="https://scout-circulars.vercel.app/" target="_blank" rel="noopener">📨 通告圖書館</a><a class="pill" href="'+OFFICIAL.schemePdf+'" target="_blank" rel="noopener">📖 訓練綱要 2026</a><a class="pill" href="'+OFFICIAL.schemeDrive+'" target="_blank" rel="noopener">📖 綱要 PDF 副本</a><a class="pill" href="#tools">🎲 快鍵</a></div></section>';
@@ -216,7 +216,7 @@
         var support = typeof SkillArt!=='undefined' && SkillArt.support ? SkillArt.support(m.tid,i) : null;
         cards.push('<div class="activity-card lib-card'+(art?' has-art':'')+'">'+
           (art || '<div class="lib-emoji">'+(s.ic||'📋')+'</div>')+
-          '<h3>'+esc(s.n)+'</h3><p class="mut" style="font-size:12px">'+s.m+'分鐘 · '+esc(m.n)+'</p>'+
+          '<h2>'+esc(s.n)+'</h2><p class="mut" style="font-size:12px">'+s.m+'分鐘 · '+esc(m.n)+'</p>'+
           (s.art?'<span class="lib-tag">步驟圖解</span>':support?'<span class="lib-tag">'+esc(support.label)+'</span>':'<span class="lib-tag plain">文字卡・未有步驟圖</span>')+
           '<div class="quick lib-btns"><button class="btn sm" onclick="App.activity(\''+m.tid+'\','+i+')">▶ 即開帶領卡</button>'+
           ((typeof SkillArt!=='undefined' && SkillArt.print)?'<button class="btn sm ghost" onclick="SkillArt.print(\''+m.tid+'\','+i+')">🖨️ 只印呢張</button>':'')+'</div></div>');
@@ -229,7 +229,7 @@
     var jungleCard = '<section class="card"><h2>🌳 想加一段故事？</h2><a class="btn" href="#jungle">森林故事・角色卡 →</a></section>'
       + '<section class="card"><h2>🎲 集會中途要用嘅快鍵</h2><p class="mut">安靜訊號、集合哨、小隊計分、抽籤、倒數。</p><a class="btn" href="#tools">開快鍵 →</a>'
       + '<a class="btn ghost" href="https://prog.scouting.org.hk/cub/training-scheme/" target="_blank" rel="noopener">📖 訓練綱要 2026（官方）</a></section>';
-    return jungleCard+'<section class="card"><a class="back" href="#plan" style="text-decoration:none;color:var(--ord)">‹ 返回</a><h2>'+title+'</h2><p class="mut">先看圖，再跟住做。安全提醒必讀；可只印所選一張。</p><div class="subtabs"><button class="subtab'+(skills?'':' cur')+'" onclick="App.showLibraryTab(this,\'activity\')">🎮 活動</button><button class="subtab'+(skills?' cur':'')+'" onclick="App.showLibraryTab(this,\'skill\')">🛠️ 技能</button></div><div id="lib-activity" class="manual-grid lib-grid'+(skills?' hidden':'')+'">'+App.libraryCards('activity')+'</div><div id="lib-skill" class="manual-grid lib-grid'+(skills?'':' hidden')+'">'+App.libraryCards('skill')+'</div></section>';
+    return '<section class="card"><a class="back" href="#plan" style="text-decoration:none;color:var(--ord)">‹ 返回</a><h1>'+title+'</h1><p class="mut">先看圖，再跟住做。安全提醒必讀；可只印所選一張。</p><div class="subtabs"><button class="subtab'+(skills?'':' cur')+'" onclick="App.showLibraryTab(this,\'activity\')">🎮 活動</button><button class="subtab'+(skills?' cur':'')+'" onclick="App.showLibraryTab(this,\'skill\')">🛠️ 技能</button></div><div id="lib-activity" class="manual-grid lib-grid'+(skills?' hidden':'')+'" role="group" aria-label="活動帶領卡">'+App.libraryCards('activity')+'</div><div id="lib-skill" role="group" aria-label="技能帶領卡" class="manual-grid lib-grid'+(skills?'':' hidden')+'">'+App.libraryCards('skill')+'</div></section>'+jungleCard;
   };
   App.showLibraryTab = function (btn, key) {
     var root = btn.closest('.card'); if (!root) return;
@@ -245,7 +245,7 @@
       {n:'烹飪', img:'assets/manual/details/cooking.avif', d:'免火煮食，三文治'},
       {n:'營火圈', img:'assets/manual/details/campfire-circle.avif', d:'分享圈，圍圈坐'}
     ];
-    return '<section class="card"><a class="back" href="#plan" style="text-decoration:none;color:var(--ord)">‹ 返回</a><h2>✂️ 工作紙 / 手工</h2><p class="mut">即開即印；全部收錄在素材庫。</p><div class="manual-grid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr))">'+crafts.map(function(c){return '<div class="activity-card" style="border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff"><div style="border-radius:8px;overflow:hidden;max-height:100px;margin-bottom:6px"><img src="'+c.img+'" style="width:100%;height:auto" onerror="this.parentElement.style.display=\'none\'"></div><h3>'+c.n+'</h3><p class="mut" style="font-size:12px">'+c.d+'</p><a class="btn sm" href="#print">▶ 去素材庫</a></div>';}).join('')+'</div><div class="btns" style="margin-top:12px"><a class="btn sm ghost" href="#play">去活動庫 →</a><a class="btn sm ghost" href="#jungle">去森林故事 →</a></div></section>';
+    return '<section class="card"><a class="back" href="#plan" style="text-decoration:none;color:var(--ord)">‹ 返回</a><h1>✂️ 工作紙 / 手工</h2><p class="mut">即開即印；全部收錄在素材庫。</p><div class="manual-grid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr))">'+crafts.map(function(c){return '<div class="activity-card" style="border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff"><div style="border-radius:8px;overflow:hidden;max-height:100px;margin-bottom:6px"><img src="'+c.img+'" style="width:100%;height:auto" onerror="this.parentElement.style.display=\'none\'"></div><h3>'+c.n+'</h3><p class="mut" style="font-size:12px">'+c.d+'</p><a class="btn sm" href="#print">▶ 去素材庫</a></div>';}).join('')+'</div><div class="btns" style="margin-top:12px"><a class="btn sm ghost" href="#play">去活動庫 →</a><a class="btn sm ghost" href="#jungle">去森林故事 →</a></div></section>';
   };
 
   /* 工作紙庫：對應 ghmeeting #print + 舊 #sheets。
@@ -277,7 +277,7 @@
       ? Content.worksheetIndex()
       : '<p class="mut">試卷庫載入中：重新整理一次。</p>';
     var sheets = ((typeof Craft!=='undefined' && Craft.panel) ? Craft.panel() : '<p class="mut">圖紙載入中。</p>') + App.sheetPrintButtons();
-    return '<section class="card"><a class="back" href="#plan">‹ 返回目錄</a><h2>✂️ 素材庫</h2><p class="mut">三個分頁：工作紙、圖紙（模板＋剪卡）、歌曲。即開即印。</p><div class="subtabs compact-tabs"><button class="subtab cur" onclick="App.showMiniTab(this,\'worksheets\')">📝 工作紙</button><button class="subtab" onclick="App.showMiniTab(this,\'sheets\')">✂️ 圖紙</button><button class="subtab" onclick="App.showMiniTab(this,\'songs\')">🎵 歌曲</button></div><div id="mini-worksheets" class="mini-pane">'+worksheets+'</div><div id="mini-sheets" class="hidden mini-pane">'+sheets+'</div><div id="mini-songs" class="hidden mini-pane">'+songs+'</div></section>';
+    return '<section class="card"><a class="back" href="#plan">‹ 返回目錄</a><h1>✂️ 素材庫</h1><p class="mut">三個分頁：工作紙、圖紙（模板＋剪卡）、歌曲。即開即印。</p><div class="subtabs compact-tabs"><button class="subtab cur" onclick="App.showMiniTab(this,\'worksheets\')">📝 工作紙</button><button class="subtab" onclick="App.showMiniTab(this,\'sheets\')">✂️ 圖紙</button><button class="subtab" onclick="App.showMiniTab(this,\'songs\')">🎵 歌曲</button></div><div id="mini-worksheets" class="mini-pane">'+worksheets+'</div><div id="mini-sheets" class="hidden mini-pane">'+sheets+'</div><div id="mini-songs" class="hidden mini-pane">'+songs+'</div></section>';
   };
   App.showMiniTab = function(btn, key){
     if(key==='library') key='worksheets';
@@ -307,7 +307,7 @@
   App.legacyBadgeGroup = function(){return {id:'legacy',name:'舊制章（過渡期）',icon:'🕰️',items:['勞作章','讀圖章','電腦章','體操章']};};
   App.vBadge = function(){
     var groups=App.badgeGroups();
-    return '<section class="card"><a class="back" href="#plan">‹ 返回目錄</a><h2>🏅 活動章工具書</h2><p class="mut">先揀分類，再揀章；每章分「官方要求」及「建議考核」。</p><div class="tipcard">🧰 工具書，不是紀錄冊：不儲存成員考核。要記錄請用進度追蹤系統。</div><div class="badge-group-grid">'+groups.map(function(g){return '<button class="badge-group-card" onclick="App.openBadgeGroup(\''+g.id+'\')"><span>'+g.icon+'</span><b>'+g.name+'</b><small>'+g.items.length+' 個章</small></button>';}).join('')+'</div><div id="badge-library" class="badge-library"><p class="empty">揀一個組別開始。</p></div>'+App.legacySection()+'</section>';
+    return '<section class="card"><a class="back" href="#plan">‹ 返回目錄</a><h1>🏅 活動章工具書</h1><p class="mut">先揀分類，再揀章；每章分「官方要求」及「建議考核」。</p><div class="tipcard">🧰 工具書，不是紀錄冊：不儲存成員考核。要記錄請用進度追蹤系統。</div><div class="badge-group-grid">'+groups.map(function(g){return '<button class="badge-group-card" onclick="App.openBadgeGroup(\''+g.id+'\')"><span>'+g.icon+'</span><b>'+g.name+'</b><small>'+g.items.length+' 個章</small></button>';}).join('')+'</div><div id="badge-library" class="badge-library"><p class="empty">揀一個組別開始。</p></div>'+App.legacySection()+'</section>';
   };
   /* 摺埋嘅舊制章區。用 <details> 所以預設收埋，唔會同 2026 目錄撈亂。 */
   App.legacySection = function(){var g=App.legacyBadgeGroup();return '<details class="badge-legacy"><summary>'+g.icon+' '+g.name+' — '+g.items.length+' 個（撳開）</summary><p class="mut">2026 第十版《幼童軍訓練綱要》活動徽章目錄已經冇呢 '+g.items.length+' 個章。過渡期內舊制活動徽章可並列於左袖並釘左下方位置，直至晉升童軍團。呢度只供查舊制要求；新考核請用上面 2026 目錄。</p><div class="badge-name-grid">'+g.items.map(function(n){return '<button class="badge-name-card legacy" onclick="App.openBadge(\''+esc(n)+'\')"><span>🎖️</span><b>'+n+'</b><small>舊制要求 ›</small></button>';}).join('')+'</div></details>';};
@@ -529,20 +529,20 @@
     var max = (typeof Tools!=='undefined' && Tools.max) ? Tools.max() : 12;
     var roster = (typeof Store!=='undefined') ? Store.get('roster',[]) : [];
     var useName = (typeof Store!=='undefined') ? !!Store.get('pickuse',false) : false;
-    return '<section class="card"><a class="back" href="#plan" style="text-decoration:none;color:var(--ord)">‹ 返回</a><h2>🎲 快鍵（集會中途即用）</h2><p class="mut">即撳即用，唔影響今場流程：發訊號、抽籤、計分、倒數。</p>'
+    return '<section class="card"><a class="back" href="#plan" style="text-decoration:none;color:var(--ord)">‹ 返回</a><h1>🎲 快鍵（集會中途即用）</h1><p class="mut">即撳即用，唔影響今場流程：發訊號、抽籤、計分、倒數。</p>'
       + '<div class="tk-grid">'
       + '<button class="tk-btn" onclick="Lead.whistle()"><b>🤫 安靜訊號</b><small>響兩下・5秒望住我</small></button>'
       + '<button class="tk-btn" onclick="Lead.horn()"><b>📣 集合</b><small>吹哨・全體集合</small></button>'
       + '<a class="tk-btn" href="#teams"><b>🐾 小隊計分</b><small>預設4隊・可加隊改名</small></a>'
       + '<button class="tk-btn" onclick="Tools.pick()"><b>🎲 抽籤</b><small>自設號碼數量・即抽一個</small></button>'
       + '</div>'
-      + '<h3>🎲 抽籤</h3><p class="mut">自己設定有幾個號碼，撳一下抽出一個。</p>'
+      + '<h2>🎲 抽籤</h2><p class="mut">自己設定有幾個號碼，撳一下抽出一個。</p>'
       + '<div class="dr-draw"><label class="dr-field">號碼 1 至 <input id="toolPickMax" type="number" min="1" max="200" step="1" value="' + max + '" onchange="Tools.setMax(this.value)" oninput="Tools.setMax(this.value)"></label>'
       + (roster.length ? '<label class="dr-check"><input id="toolUseRoster" type="checkbox" ' + (useName ? 'checked ' : '') + 'onchange="Tools.setUseRoster(this.checked)"> 改用名單姓名（' + roster.length + '人）</label>' : '<span class="mut">未填名單；要抽姓名就先喺出隊包頁填名單。</span>')
       + '<button class="btn gr" onclick="Tools.pick()">🎲 抽一個</button></div>'
       + '<div id="toolpick" class="toolpick" role="status" aria-live="polite">未抽。</div>'
       + '<div class="dr-info" id="toolpickinfo"></div>'
-      + '<h3>⏱️ 倒數計時</h3><div class="dr-draw"><label class="dr-field">分鐘 <input id="toolMinutes" type="number" min="1" max="120" value="5" onchange="Tools.reset()"></label><div id="toolClock" role="status" class="tool-clock">05:00</div><button class="btn gr" onclick="Tools.start()">開始</button></div><div class="btns"><button class="btn" onclick="Tools.stop()">暫停</button><button class="btn ghost" onclick="Tools.reset()">重設</button></div></section>';
+      + '<h2>⏱️ 倒數計時</h2><div class="dr-draw"><label class="dr-field">分鐘 <input id="toolMinutes" type="number" min="1" max="120" value="5" onchange="Tools.reset()"></label><div id="toolClock" role="status" class="tool-clock">05:00</div><button class="btn gr" onclick="Tools.start()">開始</button></div><div class="btns"><button class="btn" onclick="Tools.stop()">暫停</button><button class="btn ghost" onclick="Tools.reset()">重設</button></div></section>';
   };
 
   /* === 路由：對齊 ghmeeting 的 5+5，同時兼容舊連結，保留 sheets/skills 獨立 tab === */

@@ -2784,3 +2784,13 @@ details.map-self[open]>summary{border-bottom:1px dashed #b8a98f}
 details.map-self>*:not(summary){margin:10px 12px}
 details.map-self .mut{font-size:.82rem}
 @media print{details.map-self{break-inside:avoid}}
+
+/* 下方導覽第5粒係官方外連：加箭咀提示會開新分頁（唔改 HTML 文案） */
+#tabbar a.external-link{position:relative}
+#tabbar a.external-link::after{content:"↗";position:absolute;top:4px;right:6px;font-size:9px;font-weight:700;color:var(--ord);opacity:.9}
+@media print{#tabbar a.external-link::after{content:""}}
+
+/* 導覽列每格最少 44px 高，手指易撳中（頂欄原本約 42px） */
+#topnav .navrow a{min-height:44px;justify-content:center}
+#tabbar .navrow a{min-height:44px}
+@media print{#topnav .navrow a,#tabbar .navrow a{min-height:0}}

@@ -211,13 +211,13 @@ var App = {
   },
   vMeetDetail: function (m) {
     var waHref = "https://wa.me/?text=" + encodeURIComponent("🐺幼童軍團通知｜" + m.n + "｜" + m.month + "｜" + m.notice);
-    var h = '<section class="card"><a class="back" href="#plan">‹ 返行事曆</a><h2>' + esc(m.n) + "</h2>" +
+    var h = '<section class="card"><a class="back" href="#plan">‹ 返行事曆</a><h1>' + esc(m.n) + "</h1>" +
       '<p class="mut">' + esc(m.month) + "・" + esc(m.badge) + '・<b>約' + m.mins + '分鐘（自動加總）</b></p>' +
       '<div class="quick"><button class="btn gr" onclick="App.go(\'#lead\')">▶ 投影帶領</button>' +
       '<button class="btn" onclick="App.go(\'#pack\')">🖨️ 印齊呢場</button>' +
       '<button class="btn ghost" onclick="Bag.open()">🧺 執袋</button>' +
       '<button class="btn ghost" onclick="Venue.open()">📍 設場</button></div></section>';
-    h += '<section class="card"><h3>📋 今場程序</h3>';
+    h += '<section class="card"><h2>📋 今場程序</h2>';
     m.segs.forEach(function (s, i) {
       var g = (typeof Guide !== "undefined") ? Guide.forStage(s) : null;
       h += '<details class="seg" ' + (i === 0 ? "open" : "") + '><summary><span class="t">' + (i + 1) + ". " + esc(s.n) + '</span><span class="mins">' + s.m + '分鐘</span></summary>' +
@@ -230,11 +230,11 @@ var App = {
         "</div></details>";
     });
     h += '<p class="mut">⏱️ 合計：' + m.segs.map(function (s) { return s.m; }).join("＋") + "＝" + m.mins + '分鐘 ✓</p></section>';
-    h += '<section class="card"><h3>🧺 物資＋設場</h3><p>人數 ' + esc(String(Store.get("headcount", 24))) + '（喺手冊改）；物資自動換算。</p><ul>' +
+    h += '<section class="card"><h2>🧺 物資＋設場</h2><p>人數 ' + esc(String(Store.get("headcount", 24))) + '（喺手冊改）；物資自動換算。</p><ul>' +
       m.bag.map(function (b) { return "<li>" + esc(b) + "</li>"; }).join("") + "</ul>" +
       '<div class="quick"><button class="btn sm" onclick="Bag.open()">🧺 開執袋單（APP剔）</button><button class="btn sm ghost" onclick="Venue.open()">📍 睇設場圖</button></div>' +
       "<p><b>設場要點：</b>" + m.venue.map(esc).join("；") + "。</p></section>";
-    h += '<section class="card"><h3>📨 家長通知（一撳複製）</h3><p class="notice">' + esc(m.notice) + "</p>" +
+    h += '<section class="card"><h2>📨 家長通知（一撳複製）</h2><p class="notice">' + esc(m.notice) + "</p>" +
       '<div class="quick"><button class="btn sm" onclick="App.copyNotice()">📋 複製去WhatsApp</button>' +
       '<a class="btn sm ghost" id="waLink" href="' + waHref + '" target="_blank" rel="noopener">↗ 開WhatsApp貼上</a></div></section>';
     return h;
