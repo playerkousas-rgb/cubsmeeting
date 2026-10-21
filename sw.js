@@ -1,5 +1,5 @@
 /* 🐺 幼童軍團集會助手 — Service Worker (offline first，cache齊) */
-var CACHE = "cubhub-v41-wrap-20261022";
+var CACHE = "cubhub-v42-drive-scheme-20261022";
 /* 第一階段（安裝時）：只有文字、樣式、程式同細圖。約 0.8MB，裝得快。 */
 var ASSETS = [
   "./", "./index.html", "./manifest.webmanifest", "./css/app.css",
@@ -9,7 +9,7 @@ var ASSETS = [
   "./js/salute-lab.js", "./js/salute-positions.js", "./js/tracking-kit.js", "./js/material-desk.js",
   "./js/plain-content.js", "./js/worksheet-guides.js", "./js/exam-papers.js", "./js/skill-art.js",
   "./js/craft-sheets.js", "./js/songbook.js", "./assets/reference/cub-uniform-boy.avif", "./assets/reference/cub-uniform-girl.avif",
-  "./assets/reference/cub-badge-map-2026.avif", "./assets/reference/cub-badge-map-2025.avif", "./assets/reference/rally-flag-party-2025.avif", "./assets/teaching/right-hand-salute.avif",
+  "./assets/reference/cub-badge-map-2026.avif", "./assets/reference/cub-badge-map-2025.avif", "./assets/teaching/right-hand-salute.avif",
   "./icons/icon-192.png", "./icons/icon-512.png"
 ];
 /* 第二階段（背景補齊）：教學大圖。安裝完成後由頁面發 "CACHE_EXTRA" 訊息才下載，

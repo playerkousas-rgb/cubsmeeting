@@ -46,7 +46,7 @@
     {id:'play', icon:'🎮', title:'活動', desc:'遊戲·技能·帶領卡', color:'#1565C0', img:'assets/manual/games.avif', hint:'即開即用'},
     {id:'badge', icon:'🏅', title:'活動章', desc:'分類·內容·考核建議', color:'#6A1B9A', img:'assets/manual/songs.avif', hint:'逐章查看'},
     {id:'jungle', icon:'🌳', title:'森林故事', desc:'11角色·5故事·逐段帶', color:'#2E7D32', img:'', hint:'逐段閱讀'},
-    {id:'scheme', icon:'📖', title:'訓練綱要', desc:'官方綱要·直接開', color:'#C62828', img:'assets/manual/handbook.avif', hint:'官方', external:true, url:'https://prog.scouting.org.hk/cub/training-scheme/'}
+    {id:'scheme', icon:'📖', title:'訓練綱要', desc:'官方綱要·直接開', color:'#C62828', img:'assets/manual/handbook.avif', hint:'官方', external:true, url:'https://drive.google.com/file/d/19StE5sobEUb8DOSkW0e57T0j784S6-R5/view'}
   ];
 
   function manualCard(m){
@@ -114,7 +114,7 @@
         + '<button class="pill '+(d?'on':'')+'" aria-pressed="'+(d?'true':'false')+'" aria-label="'+esc(m.n)+(d?'：已完成':'：未完成')+'" onclick="App.toggleDone(\''+m.tid+'\')">'+(d?'✓ 完成':'未做')+'</button></div>';
     }).join('');
     if (!rows) rows = '<p class="mut empty-note">呢個篩選暫時冇集會。撳「全部」睇返 27 場。</p>';
-    return '<section class="card catalog-hero"><span class="eyebrow">🐺 幼童軍 · 2026 綱要</span><h1>📅 集會目錄</h1><p>撳標題預備，撳狀態改完成。今場集會據幼童軍訓練綱要設計，唔使逐頁翻書。</p><div class="stat"><div class="s"><b>'+ms.length+'</b>場</div><div class="s"><b>'+count+'</b>完成</div></div><div class="btns"><a class="btn sm ghost" href="https://scout-circulars.vercel.app/" target="_blank" rel="noopener">📨 睇最新通告同活動</a><a class="btn sm ghost" href="'+OFFICIAL.schemePage+'" target="_blank" rel="noopener">📖 訓練綱要 2026</a><a class="btn sm ghost" href="'+OFFICIAL.packet+'" target="_blank" rel="noopener">📦 官方集會套包</a></div></section>'
+    return '<section class="card catalog-hero"><span class="eyebrow">🐺 幼童軍 · 2026 綱要</span><h1>📅 集會目錄</h1><p>撳標題預備，撳狀態改完成。今場集會據幼童軍訓練綱要設計，唔使逐頁翻書。</p><div class="stat"><div class="s"><b>'+ms.length+'</b>場</div><div class="s"><b>'+count+'</b>完成</div></div><div class="btns"><a class="btn sm ghost" href="https://scout-circulars.vercel.app/" target="_blank" rel="noopener">📨 睇最新通告同活動</a><a class="btn sm ghost" href="'+OFFICIAL.schemeDrive+'" target="_blank" rel="noopener">📖 訓練綱要 2026</a><a class="btn sm ghost" href="'+OFFICIAL.packet+'" target="_blank" rel="noopener">📦 官方集會套包</a></div></section>'
       + App.resumeCard()
       + '<section class="card"><div class="catalog-head"><h2>📅 全部集會</h2><span class="mut">' + shown.length + ' / ' + ms.length + ' 場</span></div>'
       + '<div class="subtabs plan-filter" role="group" aria-label="篩選集會">' + chips + '</div>'
@@ -257,7 +257,7 @@
       + (typeof Uniform !== 'undefined' && Uniform.panel ? Uniform.panel() : '')
       + '<section class="card"><h2>📖 綱要原文</h2><p class="mut">領袖要睇原文就撳；制服及徽章佩戴喺第一章（十一）第6–7頁。</p>'
       + ((typeof Uniform !== 'undefined' && Uniform.schemeLinks) ? Uniform.schemeLinks()
-         : '<div class="quick"><a class="btn" href="https://prog.scouting.org.hk/cub/wp-content/uploads/2026/08/ChiCub-Scout-Section-Training-Scheme_20260809.pdf" target="_blank" rel="noopener">📖 開綱要</a></div>')
+         : '<div class="quick"><a class="btn" href="https://drive.google.com/file/d/19StE5sobEUb8DOSkW0e57T0j784S6-R5/view" target="_blank" rel="noopener">📖 開綱要</a></div>')
       + '<details class="map-self"><summary>自繪示意圖（A–F 字母，唔係官方圖）</summary>'
       + ((typeof Uniform !== 'undefined' && Uniform.svg) ? Uniform.svg() : '')
       + '<p class="mut">呢張係本APP自己畫嘅示意圖，只幫你記位；正確樣式一律以官方圖及實物為準。</p></details></section>'
@@ -267,10 +267,9 @@
   };
   App.vCeremony = function(){
     return '<section class="card"><a class="back" href="#plan">‹ 返回目錄</a><span class="eyebrow">事前準備・必用</span><h1>🎪 集會儀式</h1><p class="mut">團呼、口令、展旗、宣誓、敬禮及開始結束；逐步卡可開可印。</p></section>'
-      + ((typeof FieldVisuals !== 'undefined' && FieldVisuals.officialPanel) ? FieldVisuals.officialPanel('📸 真實場合參考','2025大會操相片：旗隊持旗步操（童軍支部）。只參考整齊度；幼童軍程序跟下面逐步卡（KT/37/25及2026第五章）。',['rally']) : '')
       + (typeof Ceremony !== 'undefined' && Ceremony.panel ? Ceremony.panel() : '')
       + ((typeof Ceremony !== 'undefined' && Ceremony.sources && Ceremony.sources.scheme2026)
-        ? '<section class="card"><h2>📖 綱要原文：第五章 典禮與儀式</h2><p class="mut">第73–75頁；逐句程序以原文為準。</p><div class="quick"><a class="btn" href="' + Ceremony.sources.scheme2026.url + '" target="_blank" rel="noopener">📖 開綱要第五章</a><a class="btn ghost" href="https://prog.scouting.org.hk/cub/training-scheme/" target="_blank" rel="noopener">🌐 綱要網上版</a></div></section>' : '')
+        ? '<section class="card"><h2>📖 綱要原文：第五章 典禮與儀式</h2><p class="mut">第73–75頁；逐句程序以原文為準。</p><div class="quick"><a class="btn" href="' + Ceremony.sources.scheme2026.url + '" target="_blank" rel="noopener">📖 開綱要第五章</a><a class="btn ghost" href="https://drive.google.com/file/d/19StE5sobEUb8DOSkW0e57T0j784S6-R5/view" target="_blank" rel="noopener">📄 全份綱要（Drive）</a></div></section>' : '')
       + (typeof FormalKit !== 'undefined' && FormalKit.get ? '<section class="card"><h2>🚩 升旗・國歌・旗幟核對卡</h2><div class="quick">'
         + ['respect','flags'].map(function(id){var c=FormalKit.get(id);return c?'<button class="btn" onclick="FormalKit.open(\''+id+'\')">'+esc(c.title)+'</button>':'';}).join('')
         + '</div><p class="mut">升旗／國歌／旗架屬正式程序，開卡核對來源；摺旗繫旗仍未核閱，不當已完成。</p></section>' : '');
@@ -370,7 +369,7 @@
     var skillHtml = App.librarySlice('skill', 0);
     var jungleCard = '<section class="card"><h2>🌳 想加一段故事？</h2><a class="btn" href="#jungle">森林故事・角色卡 →</a></section>'
       + '<section class="card"><h2>🎲 集會中途要用嘅快鍵</h2><p class="mut">安靜訊號、集合哨、小隊計分、抽籤、倒數。</p><a class="btn" href="#tools">開快鍵 →</a>'
-      + '<a class="btn ghost" href="https://prog.scouting.org.hk/cub/training-scheme/" target="_blank" rel="noopener">📖 訓練綱要 2026（官方）</a></section>';
+      + '<a class="btn ghost" href="https://drive.google.com/file/d/19StE5sobEUb8DOSkW0e57T0j784S6-R5/view" target="_blank" rel="noopener">📖 訓練綱要 2026（官方文件）</a></section>';
     return '<section class="card"><a class="back" href="#plan" style="text-decoration:none;color:var(--ord)">‹ 返回</a><h1>' + title + '</h1><p class="mut">先看圖，再跟住做。安全提醒必讀；可只印所選一張。</p>'
       + '<div class="lib-search"><input id="libsearch" type="search" class="search-input" placeholder="搵活動：繩結、急救、地圖、分享…" aria-label="搵活動或技能卡" oninput="App.libSearch(this)"></div>'
       + '<div class="subtabs"><button class="subtab' + (skills ? '' : ' cur') + '" onclick="App.showLibraryTab(this,\'activity\')">🎮 活動</button>'

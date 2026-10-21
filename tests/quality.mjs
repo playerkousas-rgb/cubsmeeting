@@ -207,5 +207,29 @@ const Q = (s) => vm.runInContext(s, sb);
   ok(!/m\.segs\[4\]/.test(read("js/plain-content.js")), "口語版唔再用硬編碼第 5 節（節數一變就錯位）");
 }
 
+/* 10. 訓練綱要一律直開官方文件（Drive），唔再要人喺官網再撳幾層 */
+{
+  const DRIVE = "https://drive.google.com/file/d/19StE5sobEUb8DOSkW0e57T0j784S6-R5/view";
+  const html = read("index.html");
+  const nav = (html.match(/<a href="([^"]+)"[^>]*data-tab="scheme"[^>]*>/) || [])[1] || "";
+  ok(nav === DRIVE, `底部導覽「訓練綱要」直開官方文件（${nav.slice(0, 46)}…）`);
+  ok(/target="_blank"/.test(html.match(/<a href="[^"]*"[^>]*data-tab="scheme"[^>]*>/)[0]) && /rel="noopener"/.test(html.match(/<a href="[^"]*"[^>]*data-tab="scheme"[^>]*>/)[0]), "新分頁＋noopener");
+  ok(Q("App.vPlan()").includes(DRIVE), "集會目錄的綱要掣直開官方文件");
+  ok(Q("App.vBook()").includes(DRIVE), "手冊的綱要連結直開官方文件");
+  ok(Q("Uniform.schemeLinks()").includes(DRIVE), "制服頁的綱要掣直開官方文件");
+  ok(Q("DATA.source.url") === DRIVE, "全站來源 DATA.source.url 指向官方文件");
+  ok(!/<a href="https:\/\/prog\.scouting\.org\.hk\/cub\/training-scheme\/"[^>]*data-tab="scheme"/.test(html), "底部導覽唔再落官網首頁");
+}
+
+/* 11. 「真實場合參考」相片已移除（童軍支部大會操，對幼童軍帶領冇用） */
+{
+  const cer = Q("App.vCeremony()");
+  ok(!cer.includes("真實場合參考"), "儀式頁冇「真實場合參考」卡");
+  ok(!cer.includes("rally-flag-party"), "儀式頁冇大會操相片");
+  ok(!fs.existsSync(path.join(root, "assets/reference/rally-flag-party-2025.avif")), "相片檔已刪");
+  ok(!read("sw.js").includes("rally-flag-party"), "預快取唔再載入該相片");
+  ok(Q("FieldVisuals.official.length") === 2, "官方圖只剩兩張位置圖");
+}
+
 console.log(fail === 0 ? "\nQUALITY PASS" : `\nQUALITY FAIL (${fail})`);
 process.exit(fail === 0 ? 0 : 1);
