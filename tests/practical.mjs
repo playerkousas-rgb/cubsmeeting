@@ -104,7 +104,8 @@ assert(!fieldParts[1].includes('uniform-reference-sheet'));assert(!fieldParts[1]
 assert.equal((ctx.Uniform.sheets(false).match(/class="psheet/g)||[]).length,1);
 assert(FieldVisuals.sourceNote('howl').includes('2025比賽表'));assert.equal(FieldVisuals.sourceNote('invalid'),'');
 /* 官方圖／真實相片：只用官方或政府來源；唔准自繪制服 */
-assert.equal(FieldVisuals.official.length,3);
+/* 2026-10-22：真實相片（大會操旗隊）已按用戶指示移除，只剩兩張官方位置圖。 */
+assert.equal(FieldVisuals.official.length,2);
 for(const o of FieldVisuals.official){assert(fs.existsSync(o.file),o.id+' file');assert(fs.statSync(o.file).size<120*1024,o.id+' size');assert(fs.readFileSync('sw.js','utf8').includes(o.file),o.id+' precached');assert(o.original.startsWith('https://'),o.id+' original url');assert(o.page.url.startsWith('https://'),o.id+' page url');assert(o.alt.length>25&&o.limit.length>20&&o.use.length>15,o.id+' photo/limit copy');assert(!/自繪|AI/.test(o.credit),o.id+' credit must be a real source, not own artwork');}
 const officialFigure=FieldVisuals.officialFigure('badgemap');
 assert(officialFigure.includes('cub-badge-map-2025.avif')&&officialFigure.includes('香港童軍總會'), '官方圖卡連檔名同出處');
@@ -116,7 +117,10 @@ html='';FieldVisuals.officialZoom('nope');assert.equal(html,'', '唔存在的圖
 FieldVisuals.printOfficial();assert.equal(ctx.PackPrint.activeTid,null);assert(html.includes('leader-sheet'), '官方圖只用領袖紙印');
 assert(App.vUniform().includes('cub-badge-map-2026.avif'), '制服頁貼2026官方位置圖');
 assert(App.vUniform().includes('cub-badge-map-2025.avif'), '制服頁保留2025舊版對照');
-assert(App.vCeremony().includes('rally-flag-party-2025.avif'), '儀式頁貼真實大會操相片');
+/* 用戶指示（2026-10-22）：「真實場合參考」對幼童軍帶領冇用（相片係童軍支部大會操），
+   已整段移除；儀式頁只保留逐步卡同綱要原文連結。 */
+assert(!App.vCeremony().includes('rally-flag-party-2025.avif'), '儀式頁已移除童軍支部大會操相片');
+assert(!App.vCeremony().includes('真實場合參考'), '儀式頁唔再有「真實場合參考」卡');
 html='';Uniform.open();assert(html.includes('cub-badge-map-2025.avif'), '制服教學包入面有官方圖');
 assert(!Uniform.sheets(false).includes('cub-badge-map-2025.avif'), '成員題紙唔貼官方位置圖（會漏答案）');
 assert(Uniform.sheets(true).includes('cub-badge-map-2025.avif'), '領袖紙有官方位置圖核對');

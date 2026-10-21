@@ -17,14 +17,7 @@ var FieldVisuals = {
    credit:'香港童軍總會幼童軍天地（2025-09上載）；圖源為《儀容與制服手冊》',
    alt:'官方2025年徽章佩戴位置圖：上方穿制服的正面圖標示宗教章、童軍先修章、進度性獎章、會員章、香港章、服務年星及活動徽章的佩戴位置；下方分開右袖（旅章、地域章與區章）及左袖（幼童軍活動徽章）。',
    limit:'官方圖只定位置，唔等於車縫尺寸；未顯示2026核心範疇章及副隊長章。新制依2026綱要第一章及P022/26。',
-   use:'先認位置，再用實物恤衫核對；不按螢幕圖直接車縫。'},
-  {id:'rally',title:'大會操旗隊（2025真實相片）',file:'assets/reference/rally-flag-party-2025.avif',
-   original:'https://gia.info.gov.hk/general/202510/26/P2025102600277_photo_1315827t.jpg',
-   page:{url:'https://www.info.gov.hk/gia/general/202510/26/P2025102600277.htm',title:'政府新聞處：香港童軍大會操2025（2025-10-26）'},
-   credit:'相片：政府新聞處（香港童軍大會操2025，香港大球場）',
-   alt:'真實相片：香港童軍大會操2025的旗隊持旗步操，成員穿整齊制服、戴帽及旅巾，前排成員行敬禮。',
-   limit:'相片係童軍支部大會操場合，唔係幼童軍團集會示範；幼童軍展旗、團呼同集會程序跟本APP逐步卡（KT/37/25及2026第五章）。',
-   use:'睇真實場合嘅制服整齊度、持旗步操同隊列要求；幼童軍做嘅係簡化程序，唔加升旗步驟。'}
+   use:'先認位置，再用實物恤衫核對；不按螢幕圖直接車縫。'}
  ],
  officialGet:function(id){return FieldVisuals.official.find(function(x){return x.id===id;});},
  officialFigure:function(id,cls){var o=FieldVisuals.officialGet(id);if(!o)return '';

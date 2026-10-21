@@ -5,7 +5,7 @@ var Uniform = {
   scheme2026:{title:'2026綱要第一章（十一）：制服及徽章佩戴（第6–7頁）',url:'https://prog.scouting.org.hk/cub/wp-content/uploads/2026/08/ChiCub-Scout-Section-Training-Scheme_20260809.pdf'},
   transition:{title:'P022/26：2026-08-15生效及過渡安排',url:'https://www.scout.org.hk/uploads/tc/circulars/23585/p022-26.pdf'},
   schemePage:{title:'幼童軍訓練綱要 2026：官方網上版',url:'https://prog.scouting.org.hk/cub/training-scheme/'},
-  schemeDrive:{title:'幼童軍訓練綱要 2026（PDF副本）',url:'https://drive.google.com/file/d/19StE5sobEUb8DOSkW0e57T0j784S6-R5/view'},
+  schemeDrive:{title:'幼童軍訓練綱要 2026 第十版（官方文件全文）',url:'https://drive.google.com/file/d/19StE5sobEUb8DOSkW0e57T0j784S6-R5/view'},
   uniformPage:{title:'幼童軍天地：制服及徽章佩戴（官方圖）',url:'https://prog.scouting.org.hk/cub/uniform/'},
   base:{title:'制服手冊：幼童軍制服，第28–29頁',url:'https://uniform.scouting.org.hk/wp-content/uploads/2017/03/uniformhandbook_p28-29.pdf'},
   scarf:{title:'制服手冊：領巾與巾圈，第107–114頁',url:'https://uniform.scouting.org.hk/wp-content/uploads/2017/03/uniformhandbook_p107-114.pdf'},
@@ -45,7 +45,9 @@ var Uniform = {
  },
  officialMap:function(){if(typeof FieldVisuals==='undefined'||!FieldVisuals.officialFigure)return '';var now=FieldVisuals.officialGet&&FieldVisuals.officialGet('badgemap2026')?FieldVisuals.officialFigure('badgemap2026'):'';var old=(FieldVisuals.officialGet&&FieldVisuals.officialGet('badgemap'))?FieldVisuals.officialFigure('badgemap'):'';return now+(old?'<details class="map-legacy"><summary>舊版位置圖（2025-09）只作對照</summary>'+old+'</details>':'');},
  /* 領袖要睇綱要原文：一撳直開官方PDF；Drive副本作後備。 */
- schemeLinks:function(){return '<div class="quick"><a class="btn" href="'+Uniform.sources.scheme2026.url+'" target="_blank" rel="noopener">📖 開綱要（第一章（十一））</a><a class="btn ghost" href="'+Uniform.sources.schemeDrive.url+'" target="_blank" rel="noopener">📖 綱要PDF副本</a><a class="btn ghost" href="'+Uniform.sources.schemePage.url+'" target="_blank" rel="noopener">🌐 綱要網上版</a></div>';},
+ /* 領袖要睇原文：主掣一律直開官方《訓練綱要》2026 第十版文件（Drive）；
+    需要第一章頁碼時用第二粒（PDF 第6–7頁），網上版只作最後後備。 */
+ schemeLinks:function(){return '<div class="quick"><a class="btn" href="'+Uniform.sources.schemeDrive.url+'" target="_blank" rel="noopener">📖 開綱要（全份・官方文件）</a><a class="btn ghost" href="'+Uniform.sources.scheme2026.url+'" target="_blank" rel="noopener">第一章（十一）第6–7頁</a><a class="btn ghost" href="'+Uniform.sources.schemePage.url+'" target="_blank" rel="noopener">🌐 網上版</a></div>';},
  links:function(keys){return keys.map(function(k){var s=Uniform.sources[k];return extBtn(s.url,false,s.title,'綱要及生效修訂優先');}).join('');},
  whatsNew:function(){return '<ul class="uniform-news"><li><b>新制</b>4個核心範疇章，戴左袖。</li><li><b>左袋</b>隊長章／副隊長章在會員章下方。</li><li><b>核心章</b>每範疇分初級（銅選）／中級（銀選）／高級（金選）。</li><li><b>活動章</b>改6色；舊章並列左袖左下方，直至晉升童軍團。</li><li><b>右袖</b>旅／區／地域章，世界童軍組織／積極公民系列，優異旅團章。</li></ul>';},
  panel:function(){return '<section class="card"><span class="eyebrow">2026 新版・2026-08-15 生效</span><h2>制服：位置與穿戴</h2><p>2026新制4個核心範疇章、6色活動章；另有隊長章、旅巾及自查。</p><div class="quick"><button class="btn gr" onclick="Uniform.open()">開制服教學包</button><button class="btn" onclick="Uniform.startQuiz()">徽章位置配對</button><button class="btn" onclick="Uniform.print(false)">印成員題紙</button></div></section>';},
