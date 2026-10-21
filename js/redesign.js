@@ -46,7 +46,7 @@
     {id:'play', icon:'🎮', title:'活動', desc:'遊戲·技能·帶領卡', color:'#1565C0', img:'assets/manual/games.avif', hint:'即開即用'},
     {id:'badge', icon:'🏅', title:'活動章', desc:'分類·內容·考核建議', color:'#6A1B9A', img:'assets/manual/songs.avif', hint:'逐章查看'},
     {id:'jungle', icon:'🌳', title:'森林故事', desc:'11角色·5故事·逐段帶', color:'#2E7D32', img:'', hint:'逐段閱讀'},
-    {id:'tools', icon:'🎲', title:'快鍵', desc:'安靜·集合·計分·倒數', color:'#4E342E', img:'assets/manual/safety.avif', hint:'必備'}
+    {id:'scheme', icon:'📖', title:'訓練綱要', desc:'官方綱要·直接開', color:'#C62828', img:'assets/manual/handbook.avif', hint:'官方', external:true, url:'https://prog.scouting.org.hk/cub/training-scheme/'}
   ];
 
   function manualCard(m){
@@ -139,7 +139,7 @@
       if(cur==='apps') return '<div class="info-section"><h3>🔗 相關APP</h3>'+extBtn(badgeUrl,false,'進度追蹤APP','個人獎章記錄')+extBtn(circUrl,false,'通告圖書館','通告與活動資料')+'<h3>本APP即用工具</h3><div class="quick"><button class="btn" onclick="Bag.open()">今場物資庫／執袋</button><a class="btn" href="#tools">集合與安靜訊號</a></div></div>';
       return '<p>請選上方手冊分頁。</p>';
     }
-    var core = '<section class="card handbook"><a class="back" href="#plan">‹ 返回目錄</a><span class="eyebrow">手冊＝幼童軍核心</span><h1>📖 手冊</h1><p class="mut">撳標籤，直接去要找的內容。</p><div class="subtabs">'+subs.map(function(s){return '<button class="subtab '+(cur===s.id?'cur':'')+'" onclick="location.hash=\'#book?sub='+s.id+'\'">'+s.label+'</button>';}).join('')+'</div>'+tabContent()+'<div class="handbook-links"><a class="pill" href="https://cubsbadge.vercel.app/" target="_blank" rel="noopener">🏅 進度追蹤 APP</a><a class="pill" href="https://scout-circulars.vercel.app/" target="_blank" rel="noopener">📨 通告圖書館</a><a class="pill" href="'+OFFICIAL.schemePdf+'" target="_blank" rel="noopener">📖 訓練綱要 2026</a><a class="pill" href="'+OFFICIAL.schemeDrive+'" target="_blank" rel="noopener">📖 綱要 PDF 副本</a></div></section>';
+    var core = '<section class="card handbook"><a class="back" href="#plan">‹ 返回目錄</a><span class="eyebrow">手冊＝幼童軍核心</span><h1>📖 手冊</h1><p class="mut">撳標籤，直接去要找的內容。</p><div class="subtabs">'+subs.map(function(s){return '<button class="subtab '+(cur===s.id?'cur':'')+'" onclick="location.hash=\'#book?sub='+s.id+'\'">'+s.label+'</button>';}).join('')+'</div>'+tabContent()+'<div class="handbook-links"><a class="pill" href="https://cubsbadge.vercel.app/" target="_blank" rel="noopener">🏅 進度追蹤 APP</a><a class="pill" href="https://scout-circulars.vercel.app/" target="_blank" rel="noopener">📨 通告圖書館</a><a class="pill" href="'+OFFICIAL.schemePdf+'" target="_blank" rel="noopener">📖 訓練綱要 2026</a><a class="pill" href="'+OFFICIAL.schemeDrive+'" target="_blank" rel="noopener">📖 綱要 PDF 副本</a><a class="pill" href="#tools">🎲 快鍵</a></div></section>';
     /* 教材工具：由各 plugin 註冊，分頁收埋，唔再一路疊落手冊底 */
     var tools = (App.bookPanels && App.bookPanels.length) ? App.bookPanels : [];
     var toolsHtml = '';
@@ -226,7 +226,9 @@
   };
   App.vLibrary = function (skills) {
     var title = '🎮 活動・技能帶領卡';
-    var jungleCard = '<section class="card"><h2>🌳 想加一段故事？</h2><a class="btn" href="#jungle">森林故事・角色卡 →</a></section>';
+    var jungleCard = '<section class="card"><h2>🌳 想加一段故事？</h2><a class="btn" href="#jungle">森林故事・角色卡 →</a></section>'
+      + '<section class="card"><h2>🎲 集會中途要用嘅快鍵</h2><p class="mut">安靜訊號、集合哨、小隊計分、抽籤、倒數。</p><a class="btn" href="#tools">開快鍵 →</a>'
+      + '<a class="btn ghost" href="https://prog.scouting.org.hk/cub/training-scheme/" target="_blank" rel="noopener">📖 訓練綱要 2026（官方）</a></section>';
     return jungleCard+'<section class="card"><a class="back" href="#plan" style="text-decoration:none;color:var(--ord)">‹ 返回</a><h2>'+title+'</h2><p class="mut">先看圖，再跟住做。安全提醒必讀；可只印所選一張。</p><div class="subtabs"><button class="subtab'+(skills?'':' cur')+'" onclick="App.showLibraryTab(this,\'activity\')">🎮 活動</button><button class="subtab'+(skills?' cur':'')+'" onclick="App.showLibraryTab(this,\'skill\')">🛠️ 技能</button></div><div id="lib-activity" class="manual-grid lib-grid'+(skills?' hidden':'')+'">'+App.libraryCards('activity')+'</div><div id="lib-skill" class="manual-grid lib-grid'+(skills?'':' hidden')+'">'+App.libraryCards('skill')+'</div></section>';
   };
   App.showLibraryTab = function (btn, key) {

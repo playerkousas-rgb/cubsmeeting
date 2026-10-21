@@ -99,3 +99,14 @@
 | 集會儀式頁 | 📖 開綱要第五章、🌐 網上版 |
 
 全部 `target="_blank"` ＋ `rel="noopener"`，離線時自動變灰。已用 jsdom 實頁確認 5 個頁面嘅外連屬性齊全，官方套包頁仍然只有原本 2 張卡、冇任何新增內容。
+
+## 十、2026-10-22 第三輪：下方導覽改為直連《訓練綱要》
+
+用戶指示：「下方不要快捷，換成訓練綱要，和官方套包一樣是直連官方資料。」
+
+- **下方導覽第 5 粒**由「🎲 快鍵（#tools）」改為「📖 訓練綱要」，`target="_blank" rel="noopener"`，直開官方 `https://prog.scouting.org.hk/cub/training-scheme/`（官方綱要頁，內含最新版 PDF 下載，改版時不會失效）。
+- 外連掣唔會加 `aria-current`／`cur`，避免讀屏誤報「目前頁」；離線時由 `handleOffline()` 變灰並提示「要上網先用得」。
+- **快鍵功能冇消失**：`#tools` 路由保留（舊書籤照開），入口移至「🎮 活動」頁新增卡「🎲 集會中途要用嘅快鍵」及手冊底部「🎲 快鍵」。
+- 測試同步升級：`tests/ui.mjs`、`tests/nav.mjs` 支援 `external:true` 的導覽項（驗證直連網址、新分頁、noopener、不當內部路由），並新增兩條棘輪——下方導覽唔可以再佔位放快鍵、`#tools` 路由必須保留。
+
+jsdom 實頁核對：底欄 5 粒為 素材庫／活動／活動章／森林故事／訓練綱要；第 5 粒 `href=https://prog.scouting.org.hk/cub/training-scheme/`、`target=_blank`；活動頁及手冊均有快鍵入口；`#tools` 仍可開。
