@@ -110,5 +110,10 @@ try {
   document.getElementById("view").innerHTML = "<p>出錯，重新整理試下。</p>";
 }
 </script>
+<!-- Scout Admin 統一回報 widget：一行接入，APP 唔需要後端。
+     全站右下角「🐛💬 回報 · 意見」浮動掣＝問題回報＋意見回饋；資料送到 Scout Admin 的 Apps Script。
+     來源名稱固定「幼童軍集會」（唔好用「幼童軍」，會被歸入專章系統）。
+     離線時外部腳本載入唔到，會自動退回路徑：手冊 →「📮 意見回報」。 -->
+<script src="https://scout-admin-blue.vercel.app/widget.js" data-app="幼童軍集會" defer></script>
 </body>
 </html>

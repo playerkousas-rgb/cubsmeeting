@@ -2830,3 +2830,23 @@ details.seg-lead[open]>summary::before{content:"▾"}
 /* 頁面層 h1（投影帶領、試卷庫）：原本用 h2，改成 h1 之後保持同樣份量同品牌色 */
 .lead-page>h1,.exam-page>h1{font-size:1.25rem;color:var(--ord);margin:.2em 0 .4em;line-height:1.3}
 .lead-page>h1 small,.exam-page>h1 small{font-size:.8rem;color:var(--mute);font-weight:500}
+
+/* ===== 📮 Scout Admin 統一回報 widget（外部一行腳本）=====
+   只調位置同大細，唔改對方樣式：預設 FAB 係 right:18px / bottom:18px，
+   會蓋住本 APP 底部導覽（#tabbar），所以升上導覽之上，並保持 44px 撳得中。 */
+#scoutw-fab{
+  right:12px !important;
+  bottom:calc(64px + env(safe-area-inset-bottom, 0px)) !important;
+  min-height:44px !important;
+  padding:10px 14px !important;
+  font-size:13px !important;
+  line-height:1.1 !important;
+  max-width:calc(100vw - 24px);
+}
+@media(min-width:900px){#scoutw-fab{bottom:24px !important}}
+@media print{#scoutw-root{display:none !important}}
+/* 離線後備：手冊內的回報卡同可複製文字框 */
+.feedback-card{background:linear-gradient(135deg,#fff8e1,#fff)}
+.fb-copy{width:100%;box-sizing:border-box;font:inherit;font-size:.86rem;line-height:1.5;
+  border:1.5px solid var(--line);border-radius:12px;padding:10px;margin:8px 0;background:#fff;color:var(--ink);resize:vertical}
+.fb-copy:focus{outline:3px solid #FFB74D;outline-offset:1px}
