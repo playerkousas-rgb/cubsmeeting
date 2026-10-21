@@ -49,9 +49,19 @@ var PrintScope = {
   restore: function () {
     PrintScope.excluded.forEach(function (el) { el.removeAttribute('data-print-exclude'); });
     PrintScope.excluded = [];
+    (PrintScope._closed || []).forEach(function (d) { if (d && d.removeAttribute) d.removeAttribute('open'); });
+    PrintScope._closed = [];
   },
   prepare: function () {
     PrintScope.restore();
+    /* 收埋嘅 details（家長通知、物資、領袖卡）列印時要開返，否則印出來少一段。 */
+    PrintScope._closed = [];
+    try {
+      Array.prototype.forEach.call(document.querySelectorAll('details:not([open])'), function (d) {
+        PrintScope._closed.push(d);
+        d.setAttribute('open', '');
+      });
+    } catch (e) {}
     var node = PrintScope.target();
     if (!node) return;
     while (node && node !== document.body) {
@@ -226,17 +236,17 @@ var App = {
         '<p><b>點做：</b>' + esc(s.how || "") + "</p>" +
         '<p><b>節奏：</b>' + esc(s.rhythm || "") + "</p>" +
         '<p class="safe">⛑️ 安全：' + esc(s.safety || "") + "</p>" +
-        (g ? "<p class='lead'><b>🟢 領袖卡：</b>" + esc(g.lead) + "</p><ol class='lsteps'>" + g.steps.map(function (x) { return "<li><b>" + esc(x[2]) + "</b> — " + esc(x[3]) + "</li>"; }).join("") + "</ol>" : "") +
+        (g ? "<details class='seg-lead'><summary>🟢 領袖卡（帶法及 3 個步驟）</summary><p class='lead'>" + esc(g.lead) + "</p><ol class='lsteps'>" + g.steps.map(function (x) { return "<li><b>" + esc(x[2]) + "</b> — " + esc(x[3]) + "</li>"; }).join("") + "</ol></details>" : "") +
         "</div></details>";
     });
     h += '<p class="mut">⏱️ 合計：' + m.segs.map(function (s) { return s.m; }).join("＋") + "＝" + m.mins + '分鐘 ✓</p></section>';
-    h += '<section class="card"><h2>🧺 物資＋設場</h2><p>人數 ' + esc(String(Store.get("headcount", 24))) + '（喺手冊改）；物資自動換算。</p><ul>' +
+    h += '<details class="card meet-more"><summary>🧺 物資＋設場（撳開睇清單）</summary><p>人數 ' + esc(String(Store.get("headcount", 24))) + '（喺手冊改）；物資自動換算。</p><ul>' +
       m.bag.map(function (b) { return "<li>" + esc(b) + "</li>"; }).join("") + "</ul>" +
       '<div class="quick"><button class="btn sm" onclick="Bag.open()">🧺 開執袋單（APP剔）</button><button class="btn sm ghost" onclick="Venue.open()">📍 睇設場圖</button></div>' +
-      "<p><b>設場要點：</b>" + m.venue.map(esc).join("；") + "。</p></section>";
-    h += '<section class="card"><h2>📨 家長通知（一撳複製）</h2><p class="notice">' + esc(m.notice) + "</p>" +
+      "<p><b>設場要點：</b>" + m.venue.map(esc).join("；") + "。</p></details>";
+    h += '<details class="card meet-more"><summary>📨 家長通知（一撳複製）</summary><p class="notice">' + esc(m.notice) + "</p>" +
       '<div class="quick"><button class="btn sm" onclick="App.copyNotice()">📋 複製去WhatsApp</button>' +
-      '<a class="btn sm ghost" id="waLink" href="' + waHref + '" target="_blank" rel="noopener">↗ 開WhatsApp貼上</a></div></section>';
+      '<a class="btn sm ghost" id="waLink" href="' + waHref + '" target="_blank" rel="noopener">↗ 開WhatsApp貼上</a></div></details>';
     return h;
   },
   copyNotice: function () {
@@ -273,7 +283,7 @@ var App = {
   /* ---------- 投影帶領 ---------- */
   vLead: function () {
     var m = curMeet();
-    return '<section class="card"><h2>▶️ 投影帶領 <small>' + esc(m.n) + '</small></h2>' +
+    return '<section class="card lead-page"><h1>▶️ 投影帶領 <small>' + esc(m.n) + '</small></h1>' +
       '<p class="mut">全螢幕、大字、計時、抽籤點名。</p>' +
       '<div class="quick"><button class="btn gr" onclick="Lead.full()">⛶ 全螢幕帶領</button>' +
       '<button class="btn" onclick="Lead.pick()">🎲 抽籤點名</button>' +
@@ -381,6 +391,35 @@ var Bag = {
     if (typeof Flow !== "undefined") { Flow.mark("bag"); Flow.render(); }
     App.route();
   }
+};
+
+/* ---------- 模組擴充登記處：唔好再各自覆寫 App.vXxx ----------
+   舊做法：每個檔自己 var prev = App.vLead; App.vLead = function(){…prev()};
+   靠 <script> 次序串成一條隱形鏈，次序一改就靜靜壞（測試以外睇唔出）。
+   新做法：一律經 App.wrap(名, function(prev){ return function(){…prev()…}; }) 登記，
+   會記住每層疊咗幾次，測試可以斷言成條鏈。 */
+App._wrapChain = {};
+App.wrap = function (name, fn) {
+  if (typeof fn !== "function") throw new Error("App.wrap('" + name + "') 需要傳入函式");
+  var prev = App[name];
+  if (typeof prev !== "function") prev = function () { return ""; };
+  var wrapped = fn(prev);
+  if (typeof wrapped !== "function") throw new Error("App.wrap('" + name + "') 必須回傳函式");
+  App[name] = wrapped;
+  App._wrapChain[name] = (App._wrapChain[name] || 0) + 1;
+  return wrapped;
+};
+/* 同一個手法用喺其他模組（Practical、SessionPack 等）嘅方法上。 */
+App.wrapOn = function (obj, name, fn, label) {
+  if (!obj || typeof obj[name] !== "function") throw new Error("App.wrapOn 找唔到方法：" + name);
+  var key = (label || "module") + "." + name;
+  if (typeof fn !== "function") throw new Error("App.wrapOn('" + key + "') 需要傳入函式");
+  var prev = obj[name];
+  var wrapped = fn(prev);
+  if (typeof wrapped !== "function") throw new Error("App.wrapOn('" + key + "') 必須回傳函式");
+  obj[name] = wrapped;
+  App._wrapChain[key] = (App._wrapChain[key] || 0) + 1;
+  return wrapped;
 };
 
 /* ---------- 設場：設場圖＋執袋清單 ---------- */

@@ -197,8 +197,10 @@ var ExamPapers = {
       return h + '</li>';
     }).join('') + '</ol>';
   },
-  panel: function () {
-    return '<section class="card"><h2>📝 試卷・問題卷（獨立列印）</h2>' +
+  /* asPage：獨立頁（#sheets）用 <h1>；嵌入素材庫時用 <h2>，避免一頁兩個 h1。 */
+  panel: function (asPage) {
+    var tag = asPage ? 'h1' : 'h2';
+    return '<section class="card' + (asPage ? ' exam-page' : '') + '"><' + tag + '>📝 試卷・問題卷（獨立列印）</' + tag + '>' +
       '<p class="mut">唔跟集會編號：邊份啱用就印邊份。每份卷分開「成員卷」同「領袖答案」兩張印，答案唔會混入成員卷。印一份母本，按人數自行影印。</p>' +
       '<div class="exam-grid">' + ExamPapers.papers.map(function (p) {
         return '<article class="exam-card"><b>📝 ' + esc(p.title) + '</b>' +

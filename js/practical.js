@@ -32,12 +32,11 @@ var Followup = {
   save:function(tid){if(!DATA.followupContent[tid])return;var date=document.getElementById('followup-date').value;if(!Followup.validDate(date)){toast('請填寫有效回顧日期');return false;}var all=Store.get('followupNotes',{});if(!all||typeof all!=='object'||Array.isArray(all))all={};all[tid]={due:date,note:String(document.getElementById('followup-note').value||'').trim().slice(0,1000),reviewed:!!document.getElementById('followup-reviewed').checked};if(!Practical.persist('followupNotes',all))return false;Modal.close();App.route();toast('✓ 已儲存回顧安排；不會自動標示獎章達標');return true;},
 };
 (function(){
- var prep=App.vPrep,detail=App.vMeetDetail,lead=App.vLead,act=App.activity;
- App.vPrep=function(){return Practical.summary(curMeet())+prep()+Followup.panel(curMeet());};
- App.vMeetDetail=function(m){return Practical.summary(m)+detail(m)+Followup.panel(m);};
- App.vLead=function(){return Practical.summary(curMeet())+lead();};
+ App.wrap('vPrep',function(next){return function(){return Practical.summary(curMeet())+next()+Followup.panel(curMeet());};});
+ App.wrap('vMeetDetail',function(next){return function(m){return Practical.summary(m)+next(m)+Followup.panel(m);};});
+ App.wrap('vLead',function(next){return function(){return Practical.summary(curMeet())+next();};});
   App.registerBookPanel('plain-text','📋','文字材料',function(){return '<section class="card"><h2>📋 開場前可直接用的文字材料</h2><div class="quick"><button class="btn" onclick="Practical.deck(\'troop\')">我的旅團四資料</button>'+Object.keys(DATA.fieldDecks).map(function(k){return '<button class="btn" onclick="Practical.deck(\''+k+'\')">'+esc(DATA.fieldDecks[k].title)+'</button>';}).join('')+'</div><p class="mut">文字材料已內置，可離線用；正式動作、圖樣及考驗要求仍需合適領袖核對。</p></section>';});
- App.activity=function(tid,i){var m=Practical.meeting(tid);if(!m||!m.segs[i])return;if(!m.practical){act(tid,i);return;}var s=m.segs[i];Modal.open('<h2>'+esc(s.n)+'</h2><p class="mut">'+s.m+'分鐘 · '+esc(m.n)+'</p><p class="say">📢 '+esc(s.script)+'</p><ol class="lsteps">'+s.steps.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ol><p class="safe">'+esc(s.safety)+'</p><details><summary>本節物資／觀察／節奏</summary><p>'+esc(s.mats.join('、')||'無額外物資')+'</p><p>'+esc(s.watch)+'</p><p>'+esc(s.rhythm)+'</p></details><div class="quick"><button class="btn" onclick="Practical.open(\''+tid+'\')">今場少人／冷場／缺物資點接</button><button class="btn" onclick="Practical.quiz(\''+tid+'\')">今場問題卡</button></div>');};
+ App.wrap('activity',function(act){return function(tid,i){var m=Practical.meeting(tid);if(!m||!m.segs[i])return;if(!m.practical){act(tid,i);return;}var s=m.segs[i];Modal.open('<h2>'+esc(s.n)+'</h2><p class="mut">'+s.m+'分鐘 · '+esc(m.n)+'</p><p class="say">📢 '+esc(s.script)+'</p><ol class="lsteps">'+s.steps.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ol><p class="safe">'+esc(s.safety)+'</p><details><summary>本節物資／觀察／節奏</summary><p>'+esc(s.mats.join('、')||'無額外物資')+'</p><p>'+esc(s.watch)+'</p><p>'+esc(s.rhythm)+'</p></details><div class="quick"><button class="btn" onclick="Practical.open(\''+tid+'\')">今場少人／冷場／缺物資點接</button><button class="btn" onclick="Practical.quiz(\''+tid+'\')">今場問題卡</button></div>');};});
 })();
 
 /* A portable packet: no online detail needed once the selected text pack is printed. */
@@ -57,8 +56,8 @@ var SessionPack = {
   },
   overview:function(){Modal.open('<h2>整套內容總覽</h2><p>據2026綱要設計，將訓練目標化成即用集會、教材及帶領支援。</p><p><b>'+DATA.meetings.length+'場集會・'+DATA.meetings.reduce(function(n,m){return n+m.segs.length;},0)+'節帶法・'+DATA.meetings.length+'份工作紙</b><br>25場有實戰後備、50題問答及完整出隊包；2場森林故事保留文字版。</p><h3>同一條使用路線</h3><p>選集會 → 完整出隊包／精簡列印 → 執袋 → 設場 → 逐節帶領 → 出席與真實觀察 → 需要時一週後回顧。</p><p>儀式、實物辨認及考驗須按已核教材及合適領袖安排；出席不自動換章。</p>'+DATA.meetings.filter(function(m){return m.practical;}).map(function(m){return '<details><summary>'+esc(m.n)+'</summary><p>'+esc(m.goal)+'</p><p>對應：'+esc(m.refs.join('／'))+'</p><p>仍需跟進：'+esc(m.gap)+'</p><button class="btn" onclick="SessionPack.open(\''+m.tid+'\')">開完整出隊包</button></details>';}).join('')+'<p class="mut">部分來源核對未完成；實地帶領按環境調整。</p>');}
 };
-(function(){var pack=App.vPack,summary=Practical.summary;
- App.vPack=function(){return SessionPack.panel(curMeet())+pack();};
+(function(){var summary=Practical.summary;
+ App.wrap('vPack',function(next){return function(){return SessionPack.panel(curMeet())+next();};});
  Practical.summary=function(m){return summary(m)+(m.practical?'<div class="quick"><button class="btn" onclick="SessionPack.open(\''+m.tid+'\')">完整出隊包・一次印齊</button></div>':'');};
  App.registerBookPanel('full','📦','完整版本',function(){return '<section class="card"><h2>完整版本，一次掌握</h2><p>查看全部主題、使用路線及每場尚需實作的部分。</p><button class="btn gr" onclick="SessionPack.overview()">整套內容總覽</button></section>';});
 })();

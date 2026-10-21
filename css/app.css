@@ -2803,3 +2803,30 @@ details.map-self .mut{font-size:.82rem}
 
 /* 活動／技能卡：分批顯示，避免一次過畫 160 幾個掣 */
 .lib-more{text-align:center;margin:10px 0 2px}
+
+/* 集會詳情：次要區塊用 details 收埋，減少一次過要掃的字 */
+details.meet-more>summary{cursor:pointer;list-style:none;min-height:44px;display:flex;align-items:center;font-weight:700;font-size:1rem;color:#5d4037}
+details.meet-more>summary::-webkit-details-marker{display:none}
+details.meet-more>summary::after{content:"▾";margin-left:auto;font-size:.8rem;color:var(--mute)}
+details.meet-more[open]>summary{border-bottom:1px solid var(--line);margin-bottom:8px}
+details.meet-more>summary:focus-visible{outline:3px solid var(--ord);outline-offset:-3px;border-radius:8px}
+details.seg-lead>summary{cursor:pointer;list-style:none;min-height:40px;display:flex;align-items:center;gap:6px;font-weight:700;color:#2E7D32}
+details.seg-lead>summary::-webkit-details-marker{display:none}
+details.seg-lead>summary::before{content:"▸";font-size:.75rem}
+details.seg-lead[open]>summary::before{content:"▾"}
+@media print{details.meet-more>summary::after,details.seg-lead>summary::before{content:""}}
+
+/* 活動頁：關鍵字搜尋 */
+.lib-search{margin:10px 0 6px}
+.search-input{width:100%;box-sizing:border-box;min-height:44px;padding:10px 12px;border:1.5px solid var(--line);border-radius:12px;font-family:inherit;font-size:16px;background:#fff}
+.search-input:focus-visible{outline:3px solid var(--ord);outline-offset:1px}
+.lib-count{text-align:center;padding:6px 0}
+
+/* 新手詞彙表 */
+.glossary-list{margin:6px 0 2px;font-size:.86rem;line-height:1.55}
+.glossary-list dt{font-weight:700;color:#5d4037;margin-top:8px}
+.glossary-list dd{margin:1px 0 0 0;color:var(--mute)}
+
+/* 頁面層 h1（投影帶領、試卷庫）：原本用 h2，改成 h1 之後保持同樣份量同品牌色 */
+.lead-page>h1,.exam-page>h1{font-size:1.25rem;color:var(--ord);margin:.2em 0 .4em;line-height:1.3}
+.lead-page>h1 small,.exam-page>h1 small{font-size:.8rem;color:var(--mute);font-weight:500}

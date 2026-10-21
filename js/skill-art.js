@@ -1387,8 +1387,7 @@ var SkillArt = {
 SkillArt.apply();
 /* 活動卡（#play／#skills）同即用活動視窗都睇到圖，並可單印一張。 */
 (function () {
-  var act = App.activity;
-  App.activity = function (tid, i) {
+  App.wrap('activity', function (act) { return function (tid, i) {
     var meeting = DATA.meetings.find(function (m) { return m.tid === tid; });
     if (!meeting || !meeting.segs[i]) return;
     act(tid, i);
@@ -1420,7 +1419,7 @@ SkillArt.apply();
     var meta = heading && heading.nextElementSibling;
     if (meta) meta.insertAdjacentHTML('afterend', extra);
     else box.insertAdjacentHTML('afterbegin', extra);
-  };
+  }; });
   SkillArt.zoom = function (tid, i) {
     var a = SkillArt.get(tid, i);
     if (!a) return;

@@ -32,9 +32,9 @@
   };
   DATA.meetings.forEach(function(m){m.worksheet.prompts=prompts[m.tid]||m.worksheet.prompts;});
   function learning(m){return '<section class="card learning-card"><h3>🎯 今場學習重點</h3><p>'+esc(m.goal)+'</p><p class="mut">'+esc(m.badge)+' · '+esc(m.refs.join('／'))+'</p><details><summary>領袖要觀察甚麼？還要跟進甚麼？</summary><h4>觀察與記錄</h4><p>'+esc(m.evidence)+'</p><h4>未涵蓋／後續實踐</h4><p>'+esc(m.gap)+'</p><h4>需要多一點支援</h4><p>'+esc(m.adapt.easy)+'</p><h4>準備好再挑戰</h4><p>'+esc(m.adapt.hard)+'</p><p class="mut">活動完成及出席不等於考獲獎章。沿用的舊出席／完成狀態不作新版內容已達標的證明。</p></details></section>';}
-  var prep=App.vPrep,detail=App.vMeetDetail;
-  App.vPrep=function(){return learning(curMeet())+prep();};
-  App.vMeetDetail=function(m){return learning(m)+detail(m);};
+  /* 經 App.wrap 登記，唔再自己捕獲上一個版本（見 app.js 模組擴充登記處）。 */
+  App.wrap('vPrep',function(next){return function(){return learning(curMeet())+next();};});
+  App.wrap('vMeetDetail',function(next){return function(m){return learning(m)+next(m);};});
   App.registerBookPanel('training','📚','訓練基準',function(){return '<section class="card"><h2>📚 訓練內容基準</h2><p>'+esc(DATA.facts.age)+'</p><p>四個核心範疇：'+esc(DATA.domains.slice(0,4).join('、'))+'。三個興趣範疇：'+esc(DATA.domains.slice(4).join('、'))+'。</p><details><summary>版本及核對範圍</summary><p>'+esc(DATA.source.verified)+'</p>'+extBtn(DATA.source.url,false,'幼童軍訓練綱要 · '+DATA.source.version,'查看正式要求；不是官方集會套包。')+'</details></section>';});
   /* 工作紙索引：單一來源。#sheets 同「工作紙＋歌曲」頁嘅工作紙分頁共用，
      每張獨立預覽／列印（點哪張印哪張），領袖參考答案由 worksheet-guides 補鈕。 */
@@ -44,7 +44,7 @@
   Content.worksheetBase=worksheetBase;
   /* #sheets 工作紙頁：改出獨立試卷庫（唔跟集會）；試卷模組未載入先退回舊索引。 */
   Content.worksheetIndex=Content.worksheetIndex||function(){return ExamPapers.panel();};
-  App.vSheets=function(){return (typeof ExamPapers!=='undefined'&&ExamPapers.panel)?ExamPapers.panel():worksheetBase();};
+  App.vSheets=function(){return (typeof ExamPapers!=='undefined'&&ExamPapers.panel)?ExamPapers.panel(true):worksheetBase();};
   App.vPack=function(){var m=curMeet(),roster=Store.get('roster',[]),n=roster.length||1;return '<section class="card"><h2>🖨️ 今場文字教材 · 精簡列印</h2><p>'+esc(m.n)+'</p><p class="mut">一頁流程摘要＋成員工作紙。要離開螢幕帶領，可選完整出隊包；未填名單預設印1份。</p><div class="quick"><button class="btn gr" onclick="PackPrint.open(\'all\')">印流程摘要＋分隔頁＋工作紙（'+n+'份）</button><button class="btn" onclick="PackPrint.open(\'leader\')">只印領袖流程</button><button class="btn" onclick="PackPrint.open(\'sheet\')">只印工作紙</button><button class="btn ghost" onclick="App.editRoster()">✏️ 改名單（'+roster.length+'人）</button></div></section>'+learning(m)+'<section class="card"><h3>🧺 執袋／設場唔使印</h3><div class="quick"><button class="btn" onclick="Bag.open()">執袋清單</button><button class="btn" onclick="Venue.open()">設場清單</button></div></section>';};
   App.activity=function(tid,i){var m=DATA.meetings.find(function(x){return x.tid===tid;}),s=m.segs[i];Modal.open('<h2>'+esc(s.n)+'</h2><p class="mut">'+s.m+'分鐘 · '+esc(m.n)+'</p><p class="say">📢 '+esc(s.script)+'</p><ol class="lsteps">'+s.steps.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ol><p class="safe">⛑️ '+esc(s.safety)+'</p><details><summary>物資、觀察及節奏</summary><p>物資：'+esc(s.mats.join('、')||'無額外物資')+'</p><p>觀察：'+esc(s.watch)+'</p><p>'+esc(s.rhythm)+'</p><p>未涵蓋：'+esc(m.gap)+'</p></details>');};
   PackPrint.open=function(mode,tid){

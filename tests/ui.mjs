@@ -22,7 +22,7 @@ const flowCode = read("js/flow.js");
   ok(tn === 5, `上面入口列 ${tn} 粒（5）`);
   ok(bot.includes('href="#jungle"') && bot.includes('森林故事'), '下方有森林故事直接入口');
   ok(!bot.includes('href="#teams"'), '小隊不再佔下方入口');
-  ok(read('js/jungle.js').includes("a.getAttribute('href')==='#jungle'"), '森林故事頁高亮自己的入口');
+  ok(/jungle: function\(\)/.test(read('js/redesign.js')) && /aria-current/.test(read('js/redesign.js')), '森林故事頁由統一路由負責渲染同 aria-current 高亮');
   ok(bn === 5, `下面工具箱 ${bn} 粒（5）`);
   ok(!/一二三四|步驟一|Step 1/.test(top + bot), "導覽掣無標一二三四扮流程");
   /* 下方導覽必須同 js/redesign.js 的 BOTTOM 一模一樣（防止兩邊漂移） */

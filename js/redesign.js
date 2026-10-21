@@ -141,6 +141,24 @@
     return base;
   };
 
+  /* 新領袖最常撞到嘅名詞，一句解釋，唔使查書 */
+  App.GLOSSARY = [
+    ['亞基拿（Akela）','帶領團呼嘅領袖角色名；出自森林故事，唔係職級。'],
+    ['旅巾／巾圈','頸上嘅三角巾同固定用嘅圈；旅巾戴法同尺寸見制服頁。'],
+    ['小隊（Six）','幼童軍分小組嘅單位，由隊長協助帶領。'],
+    ['隊長／副隊長','由成員擔任，協助點名、收物資、帶小隊；位置見制服左胸袋。'],
+    ['團呼（Grand Howl）','集會開始／結束嘅歡呼儀式，蹲下呼號後立正。'],
+    ['展旗','展示團旗嘅程序；邊個持旗、邊個敬禮有既定次序。'],
+    ['進度性獎章','會員章 → 體驗章 → 歷奇章 → 高級歷奇章 → 金紫荊獎章。'],
+    ['核心範疇章','童軍技能／關己愛人／國家與社區／童軍家庭，分初級（銅選）／中級（銀選）／高級（金選）。'],
+    ['活動徽章','興趣範疇嘅章，例如體適能章、園藝章；按成員興趣選。'],
+    ['考核','由領袖核實要求；本APP只提供帶法同觀察重點，唔會代簽。']
+  ];
+  App.glossary = function(){
+    return '<dl class="glossary-list">' + App.GLOSSARY.map(function(g){
+      return '<dt>' + esc(g[0]) + '</dt><dd>' + esc(g[1]) + '</dd>';
+    }).join('') + '</dl>';
+  };
   App.handbookImage = function(id,alt){
     return '<figure class="handbook-figure"><img src="assets/manual/details/'+id+'.avif" alt="'+esc(alt)+'" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><figcaption hidden>圖片未能載入，請按下方文字帶領。</figcaption></figure>';
   };
@@ -172,6 +190,7 @@
       if(cur==='core'){
         var hc=Store.get('headcount',24);
         return '<div class="info-section"><h2>🤝 誓詞</h2><p>'+DATA.facts.promise.map(esc).join('<br>')+'</p><h2>📏 規律</h2><p>'+esc(DATA.facts.law)+'</p><h2>💪 銘言</h2><p>'+esc(DATA.facts.motto)+'</p><p class="mut">正式原文不縮寫；團呼／大聲呼叫請用上方分頁。</p></div>'+
+          '<details class="handbook-more glossary"><summary>🔤 新手詞彙（唔識就撳開）</summary>' + App.glossary() + '</details>' +
           '<details class="handbook-more"><summary>獎章路線與適用綱要</summary><p>'+esc(DATA.badges.map(function(b){return b.n;}).join(' → '))+'</p><p>完成活動不等於獲章；個人考驗按適用綱要確認。</p>'+extBtn(DATA.source.url,false,'查看訓練綱要','正式要求以適用版本為準')+'</details>'+
           '<details class="handbook-more"><summary>物資庫：按人數計算</summary><label>人數 <input type="range" min="6" max="48" value="'+hc+'" oninput="App.setHC(this.value)"> <b id="hcN">'+hc+'</b> 人</label><ul id="matlist">'+App.matList(hc)+'</ul><button class="btn" onclick="Bag.open()">只看今場執袋清單</button></details>'+
           '<details class="handbook-more"><summary>相關APP與本機設定</summary>'+extBtn(badgeUrl,false,'進度追蹤APP','個人獎章記錄')+extBtn(circUrl,false,'通告圖書館','查通告與活動')+'<p>記錄保存在這部裝置；離線仍可用教材。</p><button class="btn" onclick="App.clearLocal()">清除本APP本機記錄</button></details>';
@@ -272,7 +291,8 @@
         if (i === 0 || i === m.segs.length - 1) return; // 略過集合／回顧例行段
         var art = (typeof SkillArt!=='undefined' && SkillArt.thumb) ? SkillArt.thumb(m.tid,i) : '';
         var support = typeof SkillArt!=='undefined' && SkillArt.support ? SkillArt.support(m.tid,i) : null;
-        cards.push('<div class="activity-card lib-card'+(art?' has-art':'')+'">'+
+        var kw = (s.n + ' ' + (m.n || '') + ' ' + (m.badge || '') + ' ' + (s.how || '') + ' ' + (s.script || '') + ' ' + (s.ic || '')).toLowerCase();
+        cards.push('<div class="activity-card lib-card'+(art?' has-art':'')+'" data-kw="' + esc(kw) + '">'+
           (art || '<div class="lib-emoji">'+(s.ic||'📋')+'</div>')+
           '<h2>'+esc(s.n)+'</h2><p class="mut" style="font-size:12px">'+s.m+'分鐘 · '+esc(m.n)+'</p>'+
           (s.art?'<span class="lib-tag">步驟圖解</span>':support?'<span class="lib-tag">'+esc(support.label)+'</span>':'<span class="lib-tag plain">文字卡・未有步驟圖</span>')+
@@ -283,6 +303,45 @@
     return cards;
   };
   App.libraryCards = function (kind) { return App.libraryList(kind).join(''); };
+  /* 關鍵字搵活動／技能卡：搵到幾多張就畫幾多張，唔使靠「睇多啲」掃落去。 */
+  App.matchLibrary = function (kind, q) {
+    var list = App.libraryList(kind);
+    var k = String(q || '').trim().toLowerCase();
+    if (!k) return list.slice(0, App.LIB_STEP);
+    var re = null;
+    try { re = new RegExp(k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'); } catch (e) { re = null; }
+    return list.filter(function (html) {
+      var m = html.match(/data-kw="([^"]*)"/);
+      if (!m) return false;
+      return re ? re.test(m[1]) : m[1].indexOf(k) >= 0;
+    }).slice(0, 80);
+  };
+  App.libSearch = function (box) {
+    var q = box && box.value ? box.value : '';
+    var hits = { activity: App.matchLibrary('activity', q), skill: App.matchLibrary('skill', q) };
+    var totals = { activity: App.libraryList('activity').length, skill: App.libraryList('skill').length };
+    ['activity', 'skill'].forEach(function (kind) {
+      var grid = document.getElementById('lib-' + kind);
+      var more = document.querySelector('.lib-more[data-for="' + kind + '"]');
+      if (!grid) return;
+      var items = hits[kind];
+      var other = (kind === 'activity') ? hits.skill.length : hits.activity.length;
+      if (items.length) grid.innerHTML = items.join('');
+      else if (q && other > 0) grid.innerHTML = '';   /* 另一邊有結果，唔使喺呢邊再喊搵唔到 */
+      else grid.innerHTML = '<p class="mut empty-note">搵唔到「' + esc(q) + '」。試下其他字，例如：繩結、急救、地圖、分享。</p>';
+      if (more) {
+        more.setAttribute('data-q', String(q));
+        if (q) more.innerHTML = '<p class="mut lib-count">' + (kind === 'activity' ? '活動' : '技能') + ' ' + items.length + ' 張（共 ' + totals[kind] + ' 張）</p>';
+        else more.innerHTML = App.libMore(kind);
+      }
+    });
+    /* 有搜尋字時，自動跳去有結果嗰個分頁，唔好要人自己撳 */
+    if (q) {
+      var want = (hits.activity.length || !hits.skill.length) ? 'activity' : 'skill';
+      var tabBtn = document.querySelector('.subtabs .subtab[onclick*="' + want + '"]');
+      if (tabBtn) App.showLibraryTab(tabBtn, want);
+    }
+  };
   App.librarySlice = function (kind, start, n) {
     return App.libraryList(kind).slice(start || 0, (start || 0) + (n || App.LIB_STEP)).join('');
   };
@@ -313,6 +372,7 @@
       + '<section class="card"><h2>🎲 集會中途要用嘅快鍵</h2><p class="mut">安靜訊號、集合哨、小隊計分、抽籤、倒數。</p><a class="btn" href="#tools">開快鍵 →</a>'
       + '<a class="btn ghost" href="https://prog.scouting.org.hk/cub/training-scheme/" target="_blank" rel="noopener">📖 訓練綱要 2026（官方）</a></section>';
     return '<section class="card"><a class="back" href="#plan" style="text-decoration:none;color:var(--ord)">‹ 返回</a><h1>' + title + '</h1><p class="mut">先看圖，再跟住做。安全提醒必讀；可只印所選一張。</p>'
+      + '<div class="lib-search"><input id="libsearch" type="search" class="search-input" placeholder="搵活動：繩結、急救、地圖、分享…" aria-label="搵活動或技能卡" oninput="App.libSearch(this)"></div>'
       + '<div class="subtabs"><button class="subtab' + (skills ? '' : ' cur') + '" onclick="App.showLibraryTab(this,\'activity\')">🎮 活動</button>'
       + '<button class="subtab' + (skills ? ' cur' : '') + '" onclick="App.showLibraryTab(this,\'skill\')">🛠️ 技能</button></div>'
       + '<div id="lib-activity" class="manual-grid lib-grid' + (skills ? ' hidden' : '') + '" role="group" aria-label="活動帶領卡">' + actHtml + '</div>'
@@ -683,12 +743,11 @@
       plan: App.vPlan,
       meet: function(){
         var q = {};
-        (location.hash.split('?')[1]||'').split('&').forEach(function(p){var kv=p.split('=');if(kv[0]) q[kv[0]]=decodeURIComponent(kv[1]||'');});
-        if(q.tid) {
-          var m = DATA.meetings.find(function(x){return x.tid===q.tid});
-          if(m && typeof App.vMeetDetail!=='undefined') return App.vMeetDetail(m);
-        }
-        if(typeof App.vMeetList!=='undefined') return App.vMeetList();
+        (location.hash.split('?')[1]||'').split('&').forEach(function(p){var kv=p.split('=');if(kv[0]) q[kv[0]]=decodeURIComponent(kv[1]||'')});
+        var m = q.tid ? DATA.meetings.find(function(x){return x.tid===q.tid}) : null;
+        if (m && typeof App.vMeetDetail!=='undefined') return App.vMeetDetail(m);
+        /* 冇 tid／tid 唔存在：唔好出一版冇入口連得到的「範本庫」，直接返目錄。 */
+        try { location.hash = '#plan'; } catch (e) {}
         return App.vPlan();
       },
       lead: function(){ return App.vLead(); },

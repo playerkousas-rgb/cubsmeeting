@@ -1,5 +1,5 @@
 /* 🐺 幼童軍團集會助手 — Service Worker (offline first，cache齊) */
-var CACHE = "cubhub-v40-warm-cache-20261022";
+var CACHE = "cubhub-v41-wrap-20261022";
 /* 第一階段（安裝時）：只有文字、樣式、程式同細圖。約 0.8MB，裝得快。 */
 var ASSETS = [
   "./", "./index.html", "./manifest.webmanifest", "./css/app.css",

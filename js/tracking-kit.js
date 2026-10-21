@@ -25,11 +25,10 @@ var TrackingKit = {
  panel:function(){return '<section class="card"><h2>追蹤符號實戰教材</h2><p>六款看圖配對、無答案剪卡、三站安全帶法及成員符號圖表。</p><button class="btn gr" onclick="TrackingKit.open()">開追蹤符號教材</button></section>';}
 };
 (function(){
- var summary=Practical.summary,activity=App.activity,build=SessionPack.build;
  App.registerBookPanel('tracking','🔍','追蹤教材',function(){return TrackingKit.panel();});
- Practical.summary=function(m){return summary(m)+(m.tid==='c18'?TrackingKit.panel():'');};
- App.activity=function(tid,i){if(tid==='c18'&&!Practical.meeting(tid).segs[i])return;activity(tid,i);if(tid==='c18'){var el=document.getElementById('modal');if(el&&el.querySelector){var box=el.querySelector('.mbox');if(box)box.insertAdjacentHTML('beforeend','<button class="btn gr" onclick="TrackingKit.open()">開追蹤圖卡與三站帶法</button>');}}};
- SessionPack.build=function(m,n,children){var html=build(m,n,children);if(!html||m.tid!=='c18')return html;var marker='<section class="psheet divider">',extra=TrackingKit.sheets('guide');html=html.includes(marker)?html.replace(marker,extra+marker):html+extra;return children?html+TrackingKit.sheets('cards'):html;};
+ App.wrapOn(Practical,'summary',function(summary){return function(m){return summary(m)+(m.tid==='c18'?TrackingKit.panel():'');};},'Practical');
+ App.wrap('activity',function(activity){return function(tid,i){if(tid==='c18'&&!Practical.meeting(tid).segs[i])return;activity(tid,i);if(tid==='c18'){var el=document.getElementById('modal');if(el&&el.querySelector){var box=el.querySelector('.mbox');if(box)box.insertAdjacentHTML('beforeend','<button class="btn gr" onclick="TrackingKit.open()">開追蹤圖卡與三站帶法</button>');}}};});
+ App.wrapOn(SessionPack,'build',function(build){return function(m,n,children){var html=build(m,n,children);if(!html||m.tid!=='c18')return html;var marker='<section class="psheet divider">',extra=TrackingKit.sheets('guide');html=html.includes(marker)?html.replace(marker,extra+marker):html+extra;return children?html+TrackingKit.sheets('cards'):html;};},'SessionPack');
  var m=Practical.meeting('c18');
  m.gap='已附六款追蹤圖卡、配對及三站帶法。六個符號名稱已核對官方《幼童軍獎章—追蹤》工作紙；圖形屬自繪，官方原圖見上方連結。官方另有四個符號未收錄。正式考驗由領袖確認。室內練習不代替郊野守則的郊野公園活動要求。';
  m.segs[1].steps[0]='開追蹤符號教材，先教前進、此路不通及結束三圖；需要時才加左右轉及信物。說明圖樣來源與待核範圍，正式考驗須另由領袖確認。';
