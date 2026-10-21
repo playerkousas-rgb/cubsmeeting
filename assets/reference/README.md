@@ -31,3 +31,17 @@ Pages: https://prog.scouting.org.hk/cub/uniform/ and https://www.info.gov.hk/gia
 Processing: the badge map was kept at its retrieved pixel size (500×550, official original is larger); the rally photo was resized to 1000×667. Both re-encoded to AVIF quality 68／62, 4:4:4, under 120KB, and precached. The JPEGs are source records only.
 
 Limits shown in the app: the official map states badge placement, not sewing measurements or badge artwork, and later amendments (制服手冊, P013-23, the applicable training scheme) remain the source for those. The rally photograph is a Scout Section rally, not a Cub Scout pack ceremony, so it is only a real-world reference for uniform tidiness, flag-bearer drill and formation; Cub flag/howl procedures follow the app's step cards (KT/37/25 and 2026 scheme chapter five). Source artwork and photographic rights remain with their providers; no open licence is asserted.
+
+## 2026-10-22：2026 版官方位置圖
+
+| Local file | Official original | What it is |
+|---|---|---|
+| cub-badge-map-2026.jpg／.avif | https://prog.scouting.org.hk/cub/wp-content/uploads/2026/08/ChiCub-Scout-Section-Training-Scheme_20260809.pdf | 《幼童軍訓練綱要》2026 第十版 第一章（十一）「制服標誌及徽章佩戴」（第6–7頁）官方插圖：正面六區、右袖及左袖 |
+
+圖由領袖提供（由官方 PDF 該頁截取），並逐項對回綱要文字：`宗教章或公教章／紀念章／童軍先修章`、`香港章／服務年星`、`進度性獎章（體驗／歷奇／高級歷奇／金紫荊）`、`會員章／和平使者章`、`隊長章／副隊長章`、`旅章／區章／地域章`、`世界童軍組織系列／積極公民獎章系列`、`優異旅團`、`核心範疇章（童軍技能綠／關己愛人紅／國家與社區黃／童軍家庭紫）`、`初級／中級／高級`、`幼童軍活動徽章六色`，以及過渡期句 `如成員於過渡期或之前已考獲舊制的幼童軍活動徽章，可同時並列於左袖並釘左下方位置，直至晉升童軍團。`
+
+Processing: 只裁切該頁插圖、等比壓縮（AVIF quality 80, 4:4:4, 687×583, 28.8 KB），沒有重畫、改色或改動任何徽章；`.jpg`（quality 92）為源檔紀錄，不部署、不 precache。
+
+Limits shown in the app: 圖只定位置及分類，不等於車縫尺寸或徽章圖樣；初級／中級／高級的實際金屬色、副隊長章及個別章形仍要按實物與綱要核對。2025-09 版位置圖保留作舊制對照，並明示未顯示 2026 核心範疇章及優異旅團章。
+
+Source artwork rights remain with the Scout Association of Hong Kong; no open licence is asserted.

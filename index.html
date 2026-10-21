@@ -3,12 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#FF6F00">
-<title>🐺 幼童軍團集會助手 Cub Hub</title>
-<meta name="description" content="據幼童軍訓練綱要設計，上方事前準備，下方即開即用，5支部統一排版。">
+<title>🐺 幼童軍團集會助手 · Cub Hub</title>
+<meta name="description" content="幼童軍團集會助手：2026綱要、27場集會、教材列印、投影帶領；離線可用，不記錄個人獎章進度。">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-title" content="幼童軍助手">
 <link rel="stylesheet" href="css/app.css">
 <script>
   window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
@@ -16,11 +19,11 @@
 <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
-<div id="netbar" style="display:none">📴 而家離線：套包照帶到；官方套包及相關APP要上網先用得，掣已變灰。</div>
+<div id="netbar" role="status" style="display:none">📴 而家離線：教材照用；官方套包及相關APP要上網，掣已變灰。</div>
 <div id="app">
   <div id="stickytop">
     <header id="topbar">
-      <div class="brand" onclick="location.hash='#plan'">🐺 幼童軍團集會助手 <span class="branch-tag">CUBS</span></div>
+      <a class="brand" href="#plan" aria-label="幼童軍助手，返回集會目錄">🐺 幼童軍助手 <span class="branch-tag">CUBS</span></a>
       <div class="topbtns">
         <button class="iconbtn" onclick="if(typeof App!=='undefined'&&App.searchOpen){App.searchOpen()}else{location.hash='#book'}" title="🔍 全站搵嘢" aria-label="搜尋">🔍</button>
         <button class="iconbtn" onclick="window.open('https://cubsbadge.vercel.app/','_blank','noopener')" title="🏅 幼童軍進度追蹤" aria-label="幼童軍進度追蹤">🏅</button>
@@ -29,7 +32,7 @@
     </header>
     <!-- 🅰️ 上方＝事前準備：跟 ghmeeting 同一套 5 入口 -->
     <nav id="topnav" aria-label="事前準備">
-      <div class="navcap a">🅰️ 上：由目錄到帶領（事前準備）</div>
+      <div class="navcap a">🅰️ 事前準備</div>
       <div class="navrow">
         <a href="#plan" data-tab="plan"><span>📅</span>集會目錄</a>
         <a href="#ceremony" data-tab="ceremony"><span>🎪</span>集會儀式</a>
@@ -39,25 +42,25 @@
       </div>
     </nav>
   </div>
-  <main id="view"></main>
+  <main id="view"><noscript><section class="card"><h2>要開 JavaScript</h2><p>呢個助手要用 JavaScript 先開到；教材及離線功能都需要。</p></section></noscript></main>
   <!-- 🧭 逐步預備嚮導條 -->
   <div id="flowbar"></div>
   <!-- 🅱️ 下方＝即插即用：集會途中先撳 -->
   <nav id="tabbar" aria-label="即插即用">
-    <div class="navcap b">🅱️ 下：即插即用（集會中途撳）</div>
+    <div class="navcap b">🅱️ 集會即用</div>
     <div class="navrow">
       <a href="#print" data-tab="print"><span>✂️</span>素材庫</a>
       <a href="#play" data-tab="play"><span>🎮</span>活動</a>
       <a href="#badge" data-tab="badge"><span>🏅</span>活動章</a>
       <a href="#jungle" data-tab="jungle"><span>🌳</span>森林故事</a>
-      <a href="#tools" data-tab="tools"><span>🎲</span>快鍵</a>
+      <a href="https://prog.scouting.org.hk/cub/training-scheme/" target="_blank" rel="noopener" class="official external-link" data-tab="scheme"><span>📖</span>訓練綱要</a>
     </div>
-    <div class="site-footer"><small>© 2026 Scout System・非官方輔助工具・一切以香港童軍總會公佈為準・v5.1</small></div>
+    <div class="site-footer"><small>© 2026 Scout System・非官方・以總會公布為準・v10.1</small></div>
   </nav>
 </div>
 <div id="leadroot" class="hidden"></div>
 <div id="modal"></div>
-<div id="toast"></div>
+<div id="toast" role="status" aria-live="polite"></div>
 <script src="js/data.js"></script>
 <script src="js/jungle-data.js"></script>
 <script src="js/practical-data.js"></script>
@@ -84,7 +87,20 @@
 /* PWA + 啟動，與 ghmeeting 同步 */
 if ("serviceWorker" in navigator) {
   addEventListener("load", function () {
-    try { navigator.serviceWorker.register("sw.js").catch(function () {}); } catch (e) {}
+    try {
+      navigator.serviceWorker.register("sw.js").then(function () {
+        /* 安裝包只有文字同細圖；教學大圖等頁面閒置時才背景補齊，唔搶首次載入頻寬。 */
+        var warm = function () {
+          if (navigator.onLine === false) return;
+          navigator.serviceWorker.ready.then(function (reg) {
+            var sw = reg.active || navigator.serviceWorker.controller;
+            if (sw) sw.postMessage({ type: "CACHE_EXTRA" });
+          }).catch(function () {});
+        };
+        if (window.requestIdleCallback) requestIdleCallback(warm, { timeout: 8000 });
+        else setTimeout(warm, 4000);
+      }).catch(function () {});
+    } catch (e) {}
   });
 }
 try {

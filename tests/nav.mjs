@@ -10,8 +10,8 @@ const read = (f) => fs.readFileSync(path.join(root, f), "utf8");
 
 const html = read("index.html");
 const bot = (html.match(/<nav id="tabbar"[\s\S]*?<\/nav>/) || [""])[0];
-const btns = [...bot.matchAll(/<a href="([^"]+)" data-tab="([^"]+)"><span>([^<]*)<\/span>([^<]+)<\/a>/g)]
-  .map((m) => ({ href: m[1], tab: m[2], icon: m[3], label: m[4] }));
+const btns = [...bot.matchAll(/<a href="([^"]+)"([^>]*)data-tab="([^"]+)"([^>]*)><span>([^<]*)<\/span>([^<]+)<\/a>/g)]
+  .map((m) => ({ href: m[1], tab: m[3], icon: m[5], label: m[6], external: /^https?:/.test(m[1]) }));
 
 /* 最細但夠用嘅 DOM：#view 要留低 innerHTML 先讀到渲染結果 */
 const mem = {};
@@ -46,10 +46,15 @@ const expect = {
   "#play":   ["活動・技能帶領卡", "森林故事・角色卡"],
   "#badge":  ["活動章工具書", "badge-group-grid"],
   "#jungle": ["森林故事"],
-  "#tools":  ["快鍵"],
 };
 ok(btns.length === 5, `index.html 下方導覽 ${btns.length} 粒（5）`);
 for (const b of btns) {
+  if (b.external) {
+    /* 官方資料直連：唔應該有內部路由，亦唔應該被當成「目前頁」 */
+    ok(b.href.startsWith('https://'), `撳「${b.icon}${b.label}」→ 直連官方 ${b.href}`);
+    ok(!/#/.test(b.href), `撳「${b.icon}${b.label}」→ 唔係內部 hash`);
+    continue;
+  }
   Q(`location.hash='${b.href}'; App.route()`);
   const out = view.innerHTML;
   ok(Q("App.tab") === b.tab, `撳「${b.icon}${b.label}」→ App.tab='${b.tab}'（實際 '${Q("App.tab")}'）`);
@@ -67,6 +72,9 @@ for (const b of btns) {
   ok(BOTTOM.length === btns.length, `BOTTOM ${BOTTOM.length} 項 vs tabbar ${btns.length} 粒`);
   BOTTOM.forEach((b, i) => {
     const a = btns[i] || {};
+    if (b.external) {
+      ok(a.href === b.url, `第${i + 1}粒直連官方 '${a.href}'（BOTTOM '${b.url}'）`);
+    }
     ok(a.tab === b.id, `第${i + 1}粒 id '${a.tab}'（BOTTOM '${b.id}'）`);
     ok(String(a.icon) === String(b.icon), `第${i + 1}粒 icon '${a.icon}'（BOTTOM '${b.icon}'）`);
     ok(String(a.label).includes(b.title), `第${i + 1}粒 title '${a.label}'（BOTTOM '${b.title}'）`);

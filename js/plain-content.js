@@ -28,9 +28,10 @@ var PlainContent = {
  c25:{steps:[['領袖先畫簡圖，唔寫真實門牌或樓層。','用符號標家、學校或旅部、公園。','連線講位置：簡圖唔按實際比例，唔作導航。'],['揀一條常用路線，講步行定搭咩車。','指出起點、終點，同一個要停低留意嘅地方。','唔肯定點行？搵同行大人確認，唔自行試路。'],['讀等車、走廊、排隊三個情境。','口述點慢行、輪候、唔推撞同讓路。','圖旁記一項安全或禮貌，下次同大人出門試做。']],prompts:['畫家、學校或旅部、公園，唔寫真實地址。','我點由起點去終點？步行定搭車？','出門要記住邊項安全或禮貌？']}
  },
  apply:function(){Object.keys(PlainContent.lessons).forEach(function(tid){var m=Practical.meeting(tid),copy=PlainContent.lessons[tid];if(!m||!m.practical)return;
- m.segs[0].steps=['領袖點名，私下核實健康需要同接送安排。','講今日做咩，示範「停」訊號，再指出活動界線。','分好取物、記錄、分享角色；需要支援就安排另一領袖陪同。'];
- m.segs[4].steps=['一人講、畫或示範一樣做到嘅事，領袖記低要跟進嘅地方。','照清單點數、收拾；領袖查有冇遺留物同危險。','講下次安排，逐個按旅團約定交接。未交接留喺領袖照顧範圍；正式散會另按程序。'];
- copy.steps.forEach(function(steps,i){if(steps)m.segs[i+1].steps=steps.slice();});
+ var firstSeg=m.segs[0],lastSeg=m.segs[m.segs.length-1];
+ firstSeg.steps=['領袖點名，私下核實健康需要同接送安排。','講今日做咩，示範「停」訊號，再指出活動界線。','分好取物、記錄、分享角色；需要支援就安排另一領袖陪同。'];
+ lastSeg.steps=['一人講、畫或示範一樣做到嘅事，領袖記低要跟進嘅地方。','照清單點數、收拾；領袖查有冇遺留物同危險。','講下次安排，逐個按旅團約定交接。未交接留喺領袖照顧範圍；正式散會另按程序。'];
+ copy.steps.forEach(function(steps,i){if(steps&&m.segs[i+1])m.segs[i+1].steps=steps.slice();});
  m.segs.forEach(function(s){s.how=s.steps.map(function(x,i){return (i+1)+'. '+x;}).join(' ');});
  m.worksheet.prompts=copy.prompts.map(function(p,i){return p===null?m.worksheet.prompts[i]:p;});
  });}

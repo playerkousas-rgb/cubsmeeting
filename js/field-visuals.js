@@ -4,13 +4,20 @@ var FieldVisuals = {
  /* 官方圖／真實相片：唔係自繪制服圖。位置圖只用來認位置，縫製尺寸另依手冊及修訂；
     大會操相片係真實場合，唔當幼童軍團集會程序示範。 */
  official:[
-  {id:'badgemap',title:'官方徽章佩戴位置圖（2025）',file:'assets/reference/cub-badge-map-2025.avif',
+  {id:'badgemap2026',title:'官方徽章佩戴位置圖（2026）',file:'assets/reference/cub-badge-map-2026.avif',
+   original:'https://prog.scouting.org.hk/cub/wp-content/uploads/2026/08/ChiCub-Scout-Section-Training-Scheme_20260809.pdf',
+   page:{url:'https://prog.scouting.org.hk/cub/uniform/',title:'幼童軍天地：制服標誌及徽章佩戴'},
+   credit:'香港童軍總會《幼童軍訓練綱要》2026第十版 第一章（十一）「制服標誌及徽章佩戴」（第6–7頁）官方插圖；只裁切及壓縮，無改畫。',
+   alt:'官方2026年徽章佩戴位置圖：正面標示右胸袋上方的宗教章或公教章、紀念章及童軍先修章，右胸袋的進度性獎章四枚，左胸袋的會員章或和平使者章及隊長章或副隊長章，左袋上方的香港章及服務年星；下方分開右袖（旅章、區章、地域章、世界童軍組織系列／積極公民獎章系列、優異旅團章）及左袖（四個核心範疇章初級中級高級、六色幼童軍活動徽章，以及舊制活動章並列位置）。',
+   limit:'官方圖一併列出初級（銅選）／中級（銀選）／高級（金選）；但圖只定位置及分類，唔等於車縫尺寸或徽章圖樣。章形、大小、條數同實物金屬色仍要對實物。',
+   use:'先認位置，再用實物恤衫核對；過渡期舊活動章並列於左袖左下方，直至晉升童軍團。'},
+  {id:'badgemap',title:'官方徽章佩戴位置圖（2025-09）',file:'assets/reference/cub-badge-map-2025.avif',
    original:'https://prog.scouting.org.hk/cub/wp-content/uploads/2025/09/Uniform-CUB.jpg',
    page:{url:'https://prog.scouting.org.hk/cub/uniform/',title:'幼童軍天地：制服標誌及徽章佩戴'},
    credit:'香港童軍總會幼童軍天地（2025-09上載）；圖源為《儀容與制服手冊》',
    alt:'官方2025年徽章佩戴位置圖：上方穿制服的正面圖標示宗教章、童軍先修章、進度性獎章、會員章、香港章、服務年星及活動徽章的佩戴位置；下方分開右袖（旅章、地域章與區章）及左袖（幼童軍活動徽章）。',
-   limit:'官方圖只定佩戴位置，唔等於車縫尺寸；縫製位置及最新修訂仍以制服手冊、P013-23及適用綱要完整圖為準。',
-   use:'位置核對：先睇官方圖認位置，再用實物恤衫核對；唔按螢幕圖直接車縫。'},
+   limit:'官方圖只定位置，唔等於車縫尺寸；未顯示2026核心範疇章及副隊長章。新制依2026綱要第一章及P022/26。',
+   use:'先認位置，再用實物恤衫核對；不按螢幕圖直接車縫。'},
   {id:'rally',title:'大會操旗隊（2025真實相片）',file:'assets/reference/rally-flag-party-2025.avif',
    original:'https://gia.info.gov.hk/general/202510/26/P2025102600277_photo_1315827t.jpg',
    page:{url:'https://www.info.gov.hk/gia/general/202510/26/P2025102600277.htm',title:'政府新聞處：香港童軍大會操2025（2025-10-26）'},
@@ -30,10 +37,10 @@ var FieldVisuals = {
   return '<section class="card official-card"><h2>'+esc(heading)+'</h2><p>'+(lead||'')+'</p>'+list.map(function(id){return FieldVisuals.officialFigure(id);}).join('')+
    '<div class="quick"><button class="btn" onclick="FieldVisuals.officialZoom(\''+list[0]+'\')">放大睇圖</button><button class="btn gr" onclick="FieldVisuals.printOfficial()">印位置圖（領袖用）</button></div>'+
    '<p class="mut">官方圖同真實相片只用嚟核對位置及場合，唔會代替實物核對；本APP唔會自己畫制服。</p></section>';},
- officialSheet:function(){return '<section class="psheet leader-sheet official-sheet"><h2>官方徽章佩戴位置圖（領袖核對用）</h2>'+FieldVisuals.officialFigure('badgemap')+'<p>位置依官方2025年上載圖；車縫尺寸、圖樣及最新修訂依制服手冊、P013-23及適用綱要。實物恤衫核對比分紙重要。</p></section>';},
+ officialSheet:function(){return '<section class="psheet leader-sheet official-sheet"><h2>官方位置圖（2026）｜領袖核對</h2>'+FieldVisuals.officialFigure('badgemap2026')+'<p>2026新制：左袖4個核心範疇章（初級／中級／高級）＋6色活動徽章；右袖旅、區、地域、世界童軍組織系列及優異旅團。過渡期舊活動章並列左袖左下方，直至晉升童軍團。</p></section>'+'<section class="psheet leader-sheet official-sheet"><h2>舊版位置圖（2025-09）｜對照</h2>'+FieldVisuals.officialFigure('badgemap')+'<p>只作舊制位置對照；新制位置依2026綱要第一章，車縫尺寸依制服手冊。實物核對比分紙重要。</p></section>';},
  printOfficial:function(){Practical.printModal('官方徽章佩戴位置圖',FieldVisuals.officialSheet());},
  source:'https://www.scout.org.hk/tc/youth-members/cub-scouts/index.html?sid=2',
- referenceHTML:function(){return '<div class="uniform-reference-grid">'+FieldVisuals.refs.map(function(r){return '<figure><img src="'+r.file+'" alt="'+esc(r.alt)+'" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><p class="safe" hidden>款式圖片未能載入。請勿把空白頁當作教材印好；可重新載入或查看來源。</p><figcaption>'+esc(r.title)+'</figcaption></figure>';}).join('')+'</div><p class="reference-credit">圖片：香港童軍總會幼童軍制服頁；本APP只縮小及壓縮，沒有生成或改畫制服／徽章。圖版只用於款式觀察，不能按比例車縫；旅巾顏色按本旅，精確佩戴方法依制服手冊，徽章位置依其後生效修訂及適用綱要。</p>';},
+ referenceHTML:function(){return '<div class="uniform-reference-grid">'+FieldVisuals.refs.map(function(r){return '<figure><img src="'+r.file+'" alt="'+esc(r.alt)+'" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><p class="safe" hidden>款式圖片未能載入。請勿把空白頁當作教材印好；可重新載入或查看來源。</p><figcaption>'+esc(r.title)+'</figcaption></figure>';}).join('')+'</div><p class="reference-credit">圖片：香港童軍總會幼童軍制服頁；只縮小及壓縮，沒有生成或改畫。圖版只作款式觀察，不能按比例車縫；徽章位置依2026綱要及生效修訂。</p>';},
  referenceSheet:function(){return '<section class="psheet uniform-reference-sheet"><h2>幼童軍制服｜款式觀察</h2>'+FieldVisuals.referenceHTML()+'<p><b>依次找：</b>帽、恤衫、旅巾／巾圈、腰帶、短褲／裙褲、襪、鞋。</p><p><b>再比較：</b>說出兩款帽及下裝的不同；指出兩項相同配件。只觀察，不拉扯同伴衣服。</p><p class="reference-credit">來源：www.scout.org.hk → 青少年成員 → 幼童軍 → 制服。圖片權利屬原提供者。</p></section>';},
  zoom:function(id){var r=FieldVisuals.refs.find(function(x){return x.id===id;});if(!r)return;Modal.open('<h2>'+esc(r.title)+'</h2><img class="uniform-reference-zoom" src="'+r.file+'" alt="'+esc(r.alt)+'"><p class="reference-credit">香港童軍總會款式參考圖；不是新版徽章位置或縫製尺寸指引。圖片權利屬原提供者。</p><button class="btn" onclick="FieldVisuals.reference()">回款式對照</button>');},
  reference:function(){Modal.open('<h2>先看清楚幼童軍款式</h2>'+FieldVisuals.referenceHTML()+'<div class="quick"><button class="btn" onclick="FieldVisuals.zoom(\'boy\')">放大男款圖</button><button class="btn" onclick="FieldVisuals.zoom(\'girl\')">放大女款圖</button><button class="btn gr" onclick="FieldVisuals.printReference()">印款式觀察紙</button><button class="btn" onclick="Uniform.startQuiz()">再做位置配對</button></div>'+extBtn(FieldVisuals.source,false,'官方款式圖來源','穿戴以制服手冊與最新修訂為準'));handleOffline();},
@@ -55,7 +62,7 @@ var FieldVisuals = {
  meeting.segs[1].steps[0]='先看官方款式觀察紙，比較兩款帽及下裝，再展示旅巾與正確制服樣本，分清穿著者左右；只看、先問才碰。';
  meeting.segs[1].how=meeting.segs[1].steps.map(function(x,i){return (i+1)+'. '+x;}).join(' ');
  var uniformPanel=Uniform.panel,uniformSheets=Uniform.sheets,ceremonyPanel=Ceremony.panel,ceremonyRender=Ceremony.render,ceremonySheets=Ceremony.sheets;
- Uniform.panel=function(){return uniformPanel().replace('</section>','<div class="quick"><button class="btn" onclick="FieldVisuals.reference()">看官方款式圖・印觀察紙</button><button class="btn" onclick="FieldVisuals.officialZoom(\'badgemap\')">官方徽章位置圖（2025）</button></div></section>');};
+ Uniform.panel=function(){return uniformPanel().replace('</section>','<div class="quick"><button class="btn" onclick="FieldVisuals.reference()">看官方款式圖・印觀察紙</button><button class="btn" onclick="FieldVisuals.officialZoom(\'badgemap\')">官方位置圖（2025-09）</button></div></section>');};
  Uniform.sheets=function(teacher){return (teacher?FieldVisuals.referenceSheet()+FieldVisuals.officialSheet():'')+uniformSheets(teacher);};
  Ceremony.panel=function(){return ceremonyPanel().replace('</section>','<div class="quick"><button class="btn" onclick="FieldVisuals.formation()">團呼隊形・角色提示紙</button></div></section>');};
  // Keep provenance visible during live use, not only hidden in a collapsed details block.

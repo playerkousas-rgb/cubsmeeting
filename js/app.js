@@ -11,8 +11,30 @@ var Store = {
   set: function (k, v) { try { localStorage.setItem("cub_" + k, JSON.stringify(v)); } catch (e) {} }
 };
 var Modal = {
-  open: function (html) { var m = document.getElementById("modal"); if (!m) return; m.innerHTML = '<div class="mbox" role="dialog" aria-modal="true" onclick="if(event.target===this)Modal.close()"><button class="mx" onclick="Modal.close()" aria-label="關閉">✕</button><div class="modal-content">' + html + "</div></div>"; m.className = "on"; if (document.body && document.body.classList) document.body.classList.add("modal-open"); },
-  close: function () { var m = document.getElementById("modal"); if (m) { m.className = ""; m.innerHTML = ""; } if (document.body && document.body.classList) document.body.classList.remove("modal-open"); }
+  _last: null,
+  open: function (html) {
+    var m = document.getElementById("modal"); if (!m) return;
+    try { Modal._last = document.activeElement || null; } catch (e) { Modal._last = null; }
+    m.innerHTML = '<div class="mbox" role="dialog" aria-modal="true" aria-label="內容" onclick="if(event.target===this)Modal.close()"><button class="mx" onclick="Modal.close()" aria-label="關閉">✕</button><div class="modal-content">' + html + "</div></div>";
+    m.className = "on";
+    if (document.body && document.body.classList) document.body.classList.add("modal-open");
+    try {
+      var hd = m.querySelector(".modal-content h1,.modal-content h2");
+      var box = m.querySelector(".mbox");
+      if (hd && box) box.setAttribute("aria-label", String(hd.textContent || "").trim().slice(0, 60) || "內容");
+      ["app", "leadroot"].forEach(function (id) { var r = document.getElementById(id); if (r) r.setAttribute("inert", ""); });
+    } catch (e) {}
+    try { var x = m.querySelector(".mx"); if (x && x.focus) x.focus(); } catch (e) {}
+  },
+  close: function () {
+    var m = document.getElementById("modal");
+    if (m) { m.className = ""; m.innerHTML = ""; }
+    if (document.body && document.body.classList) document.body.classList.remove("modal-open");
+    try { ["app", "leadroot"].forEach(function (id) { var r = document.getElementById(id); if (r) r.removeAttribute("inert"); }); } catch (e) {}
+    var last = Modal._last;
+    Modal._last = null;
+    try { if (last && last.focus && document.contains && document.contains(last)) last.focus(); } catch (e) {}
+  }
 };
 /* 列印只留目前目標的祖先路徑；不用 visibility:hidden（會留下空白頁）。
    不自動展開 details：收合的其他教材／領袖補充不應突然出紙。 */
@@ -27,9 +49,19 @@ var PrintScope = {
   restore: function () {
     PrintScope.excluded.forEach(function (el) { el.removeAttribute('data-print-exclude'); });
     PrintScope.excluded = [];
+    (PrintScope._closed || []).forEach(function (d) { if (d && d.removeAttribute) d.removeAttribute('open'); });
+    PrintScope._closed = [];
   },
   prepare: function () {
     PrintScope.restore();
+    /* 收埋嘅 details（家長通知、物資、領袖卡）列印時要開返，否則印出來少一段。 */
+    PrintScope._closed = [];
+    try {
+      Array.prototype.forEach.call(document.querySelectorAll('details:not([open])'), function (d) {
+        PrintScope._closed.push(d);
+        d.setAttribute('open', '');
+      });
+    } catch (e) {}
     var node = PrintScope.target();
     if (!node) return;
     while (node && node !== document.body) {
@@ -101,7 +133,8 @@ var App = {
   tab: "plan",
   go: function (h) { location.hash = h; },
   init: function () {
-    if (!localStorage.getItem("cub_tid")) { Store.set("tid", "c01"); try { localStorage.setItem("cub_tid", "c01"); } catch (e) {} }
+    var known = (typeof DATA !== "undefined" && DATA.meetings) ? DATA.meetings.some(function (m) { return m.tid === curTid(); }) : true;
+    if (!localStorage.getItem("cub_tid") || !known) { Store.set("tid", "c01"); try { localStorage.setItem("cub_tid", "c01"); } catch (e) {} }
     if (!Store.get("headcount", null)) Store.set("headcount", 24);
     window.addEventListener("hashchange", App.route);
     App.route();
@@ -173,27 +206,28 @@ var App = {
     if (i < 0) return;
     var j = (i + 1) % ms.length;
     var t = ms[i]; ms[i] = ms[j]; ms[j] = t;
-    toast("🔀 已同下一場調位（今季專用，唔影響原裝順序）"); App.route();
+    toast("🔀 已同下一場調位（重新載入會還原）"); App.route();
   },
   toggleDone: function (tid) { var d = Store.get("done", {}); d[tid] = !d[tid]; if (!d[tid]) delete d[tid]; Store.set("done", d); App.route(); },
   finishAll: function () { var d = {}; DATA.meetings.forEach(function (m) { d[m.tid] = 1; }); Store.set("done", d); App.route(); },
 
   /* ---------- 集會範本庫 ---------- */
   vMeetList: function () {
-    var h = '<section class="card"><h2>🧩 集會範本庫 <small>22場・每場自動加總時間</small></h2><p class="mut">揀個範本，撳入去睇程序＋照讀口令＋圖解。撳標題準備呢場，STEP BY STEP 跟住做。</p><div class="meetlist">';
+    var h = '<section class="card"><h2>🧩 集會範本庫 <small>'+DATA.meetings.length+'場・時間自動加總</small></h2><p class="mut">揀個範本，睇程序、口令及圖解；撳標題準備呢場。</p><div class="meetlist">';
     DATA.meetings.forEach(function (m, i) {
-      h += '<a class="meetrow" href="#meet?tid=' + m.tid + '"><span class="mno">' + (i + 1) + '</span><span class="mmain"><b>' + esc(m.n) + "</b><small>" + esc(m.badge) + "・" + esc(m.tags) + "・約" + m.mins + "分鐘</small></span><span class='go'>▶</span></a>";
+      h += '<a class="meetrow" href="#meet?tid=' + m.tid + '"><span class="mno">' + (i + 1) + '</span><span class="mmain"><b>' + esc(m.n) + "</b><small>" + esc(m.month) + "・" + esc(m.badge) + "・約" + m.mins + "分鐘</small></span><span class='go'>▶</span></a>";
     });
     return h + "</div></section>";
   },
   vMeetDetail: function (m) {
-    var h = '<section class="card"><a class="back" href="#plan">‹ 返行事曆</a><h2>' + esc(m.n) + "</h2>" +
-      '<p class="mut">' + esc(m.month) + "・" + esc(m.badge) + "・" + esc(m.tags) + '・<b>約' + m.mins + '分鐘（自動加總）</b></p>' +
+    var waHref = "https://wa.me/?text=" + encodeURIComponent("🐺幼童軍團通知｜" + m.n + "｜" + m.month + "｜" + m.notice);
+    var h = '<section class="card"><a class="back" href="#plan">‹ 返行事曆</a><h1>' + esc(m.n) + "</h1>" +
+      '<p class="mut">' + esc(m.month) + "・" + esc(m.badge) + '・<b>約' + m.mins + '分鐘（自動加總）</b></p>' +
       '<div class="quick"><button class="btn gr" onclick="App.go(\'#lead\')">▶ 投影帶領</button>' +
       '<button class="btn" onclick="App.go(\'#pack\')">🖨️ 印齊呢場</button>' +
       '<button class="btn ghost" onclick="Bag.open()">🧺 執袋</button>' +
       '<button class="btn ghost" onclick="Venue.open()">📍 設場</button></div></section>';
-    h += '<section class="card"><h3>📋 今場程序（跟住做就得）</h3>';
+    h += '<section class="card"><h2>📋 今場程序</h2>';
     m.segs.forEach(function (s, i) {
       var g = (typeof Guide !== "undefined") ? Guide.forStage(s) : null;
       h += '<details class="seg" ' + (i === 0 ? "open" : "") + '><summary><span class="t">' + (i + 1) + ". " + esc(s.n) + '</span><span class="mins">' + s.m + '分鐘</span></summary>' +
@@ -202,17 +236,17 @@ var App = {
         '<p><b>點做：</b>' + esc(s.how || "") + "</p>" +
         '<p><b>節奏：</b>' + esc(s.rhythm || "") + "</p>" +
         '<p class="safe">⛑️ 安全：' + esc(s.safety || "") + "</p>" +
-        (g ? "<p class='lead'><b>🟢 領袖卡：</b>" + esc(g.lead) + "</p><ol class='lsteps'>" + g.steps.map(function (x) { return "<li><b>" + esc(x[2]) + "</b> — " + esc(x[3]) + "</li>"; }).join("") + "</ol>" : "") +
+        (g ? "<details class='seg-lead'><summary>🟢 領袖卡（帶法及 3 個步驟）</summary><p class='lead'>" + esc(g.lead) + "</p><ol class='lsteps'>" + g.steps.map(function (x) { return "<li><b>" + esc(x[2]) + "</b> — " + esc(x[3]) + "</li>"; }).join("") + "</ol></details>" : "") +
         "</div></details>";
     });
-    h += '<p class="mut">⏱️ 合計：' + m.segs.map(function (s) { return s.m; }).join("＋") + "＝" + m.mins + '分鐘 ✓（時間自動加總）</p></section>';
-    h += '<section class="card"><h3>🧺 物資＋設場</h3><p>人數 ' + esc(String(Store.get("headcount", 24))) + ' 人（喺手冊改）。物資跟人數自動換算。</p><ul>' +
+    h += '<p class="mut">⏱️ 合計：' + m.segs.map(function (s) { return s.m; }).join("＋") + "＝" + m.mins + '分鐘 ✓</p></section>';
+    h += '<details class="card meet-more"><summary>🧺 物資＋設場（撳開睇清單）</summary><p>人數 ' + esc(String(Store.get("headcount", 24))) + '（喺手冊改）；物資自動換算。</p><ul>' +
       m.bag.map(function (b) { return "<li>" + esc(b) + "</li>"; }).join("") + "</ul>" +
       '<div class="quick"><button class="btn sm" onclick="Bag.open()">🧺 開執袋單（APP剔）</button><button class="btn sm ghost" onclick="Venue.open()">📍 睇設場圖</button></div>' +
-      "<p><b>設場要點：</b>" + m.venue.map(esc).join("；") + "。</p></section>";
-    h += '<section class="card"><h3>📨 家長通知（一撳複製）</h3><p class="notice">' + esc(m.notice) + "</p>" +
+      "<p><b>設場要點：</b>" + m.venue.map(esc).join("；") + "。</p></details>";
+    h += '<details class="card meet-more"><summary>📨 家長通知（一撳複製）</summary><p class="notice">' + esc(m.notice) + "</p>" +
       '<div class="quick"><button class="btn sm" onclick="App.copyNotice()">📋 複製去WhatsApp</button>' +
-      '<a class="btn sm ghost" id="waLink" href="https://wa.me/?text=" target="_blank" rel="noopener">↗ 開WhatsApp貼上</a></div></section>';
+      '<a class="btn sm ghost" id="waLink" href="' + waHref + '" target="_blank" rel="noopener">↗ 開WhatsApp貼上</a></div></details>';
     return h;
   },
   copyNotice: function () {
@@ -221,7 +255,6 @@ var App = {
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, function () { fallback(); });
     else fallback();
     function fallback() { var ta = document.createElement("textarea"); ta.value = txt; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); ok(); } catch (e) { toast("複製唔到，長撳文字自己抄"); } ta.remove(); }
-    var a = document.getElementById("waLink"); if (a) a.href = "https://wa.me/?text=" + encodeURIComponent(txt);
   },
 
   /* ---------- 印教材：一撳印齊 ---------- */
@@ -238,11 +271,11 @@ var App = {
       '<button class="btn ghost" onclick="Venue.open()">📍 設場（唔使印）</button>' +
       '<button class="btn ghost" onclick="App.editRoster()">✏️ 改名單（而家 ' + roster.length + ' 人）</button></div>' +
       '<p class="mut">一疊過張數 ＝ 教案 1 ＋ 分隔頁 1 ＋ 圖紙 ' + m.sheets.length + " ＝ " + (2 + m.sheets.length) + " 款（圖紙再×份數）。</p></section>";
-    h += '<section class="card"><h3>📄 打印預覽（撳入去剔）</h3><div class="printlist">' +
-      "<label><input type='checkbox' checked disabled> 領袖教案（程序＋口令＋時間）</label>" +
-      "<label><input type='checkbox' checked disabled> 分隔頁（小朋友圖紙之前嗰張）</label>" +
-      m.sheets.map(function (s) { return "<label><input type='checkbox' checked> 小朋友圖紙：" + esc(s) + " × " + copies + " 份</label>"; }).join("") +
-      "</div></section>";
+    h += '<section class="card"><h3>📄 會印出乜</h3><ul class="printlist">' +
+      "<li>領袖教案（程序＋口令＋時間）</li>" +
+      "<li>分隔頁（圖紙之前一張）</li>" +
+      m.sheets.map(function (s) { return "<li>成員圖紙：" + esc(s) + " × " + copies + " 份</li>"; }).join("") +
+      "</ul><p class=\"mut\">份數跟名單；想改就撳「改名單」。</p></section>";
     h += '<section class="card"><h3>🧺 執袋＋設場（喺APP剔，唔使印）</h3><div class="quick"><button class="btn sm" onclick="Bag.open()">🧺 開執袋清單</button><button class="btn sm ghost" onclick="Venue.open()">📍 開設場圖</button></div></section>';
     return h;
   },
@@ -250,8 +283,8 @@ var App = {
   /* ---------- 投影帶領 ---------- */
   vLead: function () {
     var m = curMeet();
-    return '<section class="card"><h2>▶️ 投影帶領 <small>' + esc(m.n) + '</small></h2>' +
-      '<p class="mut">全螢幕・大字・計時・音效・分組計分・抽籤點名。撳下面開全螢幕投影。</p>' +
+    return '<section class="card lead-page"><h1>▶️ 投影帶領 <small>' + esc(m.n) + '</small></h1>' +
+      '<p class="mut">全螢幕、大字、計時、抽籤點名。</p>' +
       '<div class="quick"><button class="btn gr" onclick="Lead.full()">⛶ 全螢幕帶領</button>' +
       '<button class="btn" onclick="Lead.pick()">🎲 抽籤點名</button>' +
       '<button class="btn ghost" onclick="Lead.whistle()">🤫 5秒安靜</button>' +
@@ -311,7 +344,7 @@ var App = {
     h += '<section class="card"><h3>🔗 相關APP（網上服務・要上網先用得）</h3>' +
       extBtn(badgeUrl, true, "🏅 幼童軍進度追蹤系統", "記每個團員獎章進度（會員章至金紫荊）、活動履歷（服務／活動／訓練班，家長申報領袖審批）、金紫荊申請表。分工：套包只帶集會；出席同長期獎章進度交畀佢。") +
       extBtn(circUrl, false, "📨 童軍通告圖書館", "搵總會／地區／區通告同活動報名資料。入去揀層級＋時間（今天／七天／三十天）；搵唔到就放寬時間或者轉全港搜尋。") + "</section>";
-    h += '<section class="card"><h3>⚙️ 設定</h3><div class="quick"><button class="btn sm ghost" onclick="if(confirm(\'清晒所有記錄？\')){localStorage.clear();location.reload()}">🗑 清除本機記錄</button></div>' +
+    h += '<section class="card"><h3>⚙️ 設定</h3><div class="quick"><button class="btn sm ghost" onclick="if(confirm(\'清除本APP記錄？\')){App.clearLocal(true)}">🗑 清除本機記錄</button></div>' +
       '<p class="mut">離線PWA：無網都帶到集會；兩個相關APP係網上服務，離線會變灰。</p></section>';
     return h;
   },
@@ -358,6 +391,35 @@ var Bag = {
     if (typeof Flow !== "undefined") { Flow.mark("bag"); Flow.render(); }
     App.route();
   }
+};
+
+/* ---------- 模組擴充登記處：唔好再各自覆寫 App.vXxx ----------
+   舊做法：每個檔自己 var prev = App.vLead; App.vLead = function(){…prev()};
+   靠 <script> 次序串成一條隱形鏈，次序一改就靜靜壞（測試以外睇唔出）。
+   新做法：一律經 App.wrap(名, function(prev){ return function(){…prev()…}; }) 登記，
+   會記住每層疊咗幾次，測試可以斷言成條鏈。 */
+App._wrapChain = {};
+App.wrap = function (name, fn) {
+  if (typeof fn !== "function") throw new Error("App.wrap('" + name + "') 需要傳入函式");
+  var prev = App[name];
+  if (typeof prev !== "function") prev = function () { return ""; };
+  var wrapped = fn(prev);
+  if (typeof wrapped !== "function") throw new Error("App.wrap('" + name + "') 必須回傳函式");
+  App[name] = wrapped;
+  App._wrapChain[name] = (App._wrapChain[name] || 0) + 1;
+  return wrapped;
+};
+/* 同一個手法用喺其他模組（Practical、SessionPack 等）嘅方法上。 */
+App.wrapOn = function (obj, name, fn, label) {
+  if (!obj || typeof obj[name] !== "function") throw new Error("App.wrapOn 找唔到方法：" + name);
+  var key = (label || "module") + "." + name;
+  if (typeof fn !== "function") throw new Error("App.wrapOn('" + key + "') 需要傳入函式");
+  var prev = obj[name];
+  var wrapped = fn(prev);
+  if (typeof wrapped !== "function") throw new Error("App.wrapOn('" + key + "') 必須回傳函式");
+  obj[name] = wrapped;
+  App._wrapChain[key] = (App._wrapChain[key] || 0) + 1;
+  return wrapped;
 };
 
 /* ---------- 設場：設場圖＋執袋清單 ---------- */
@@ -461,7 +523,19 @@ var Lead = {
     list.splice(i, 1); delete Lead.scores[name];
     Lead.saveTeams(); Lead.renderScore();
   },
-  mount: function () { Lead.stopTimer(); Lead.idx = 0; Lead.render(); Lead.renderScore(); },
+  mount: function () {
+    Lead.stopTimer();
+    var t = curTid();
+    if (Lead._tid !== t) {
+      Lead._tid = t;
+      var saved = Store.get("leadidx_" + t, 0);
+      Lead.idx = (Number.isInteger(saved) && saved >= 0 && saved <= curMeet().segs.length) ? saved : 0;
+    }
+    if (Lead.idx > curMeet().segs.length) Lead.idx = 0;
+    Lead.render(); Lead.renderScore();
+  },
+  saveIdx: function () { try { Store.set("leadidx_" + curTid(), Lead.idx); } catch (e) {} },
+  restart: function () { Lead.stopTimer(); Lead.idx = 0; Lead.saveIdx(); Lead.render(); toast("↺ 由第一段再帶"); },
   full: function () {
     var el = document.documentElement;
     try { if (el.requestFullscreen) el.requestFullscreen(); else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen(); } catch (e) {}
@@ -470,7 +544,11 @@ var Lead = {
   },
   beep: function (f, d) {
     try {
-      var ctx = new (window.AudioContext || window.webkitAudioContext)();
+      var Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      if (!Lead._ac) Lead._ac = new Ctx();
+      var ctx = Lead._ac;
+      if (ctx.state === "suspended" && ctx.resume) ctx.resume();
       var o = ctx.createOscillator(), g = ctx.createGain();
       o.connect(g); g.connect(ctx.destination); o.frequency.value = f || 880; o.type = "sine";
       g.gain.value = 0.2; o.start(); o.stop(ctx.currentTime + (d || 0.3));
@@ -506,15 +584,16 @@ var Lead = {
     var pool = (typeof Tools !== "undefined" && Tools.pool) ? Tools.pool()
       : ["1號", "2號", "3號", "4號", "5號", "6號", "7號", "8號", "9號", "10號", "11號", "12號"];
     var n = pool[Math.floor(Math.random() * pool.length)];
+    var byName = (typeof Tools !== "undefined" && Tools.useRoster) ? Tools.useRoster() : false;
     Lead.beep(1200, 0.3);
     toast("🎲 抽中：" + n + "！出嚟！");
     var el = document.getElementById("leadstage");
-    if (el) el.innerHTML = "<div class='picked'>🎲 抽中：<b>" + esc(n) + "</b>！出嚟答／表演！（號碼數量喺「快鍵」頁設定）</div>" + el.innerHTML;
+    if (el) el.innerHTML = "<div class='picked'>🎲 抽中：<b>" + esc(n) + "</b>！出嚟答／表演！（" + (byName ? "抽名單姓名" : "號碼數量喺「快鍵」頁設定") + "）</div>" + el.innerHTML;
   },
   render: function () {
     var st = document.getElementById("leadstage"); if (!st) return;
     var m = curMeet(), s = m.segs[Lead.idx];
-    if (!s) { st.innerHTML = "<div class='picked'>🎉 今場帶完！已自動喺集會目錄剔低「✓ 做咗」。<br><button class='btn gr' onclick=\"App.go('#plan')\">📅 返集會目錄</button></div>"; return; }
+    if (!s) { st.innerHTML = "<div class='picked'>🎉 今場帶完！已自動喺集會目錄剔低「✓ 做咗」。<br><button class='btn gr' onclick=\"App.go('#plan')\">📅 返集會目錄</button> <button class='btn ghost' onclick='Lead.restart()'>↺ 由頭再帶</button></div>"; return; }
     st.innerHTML = "<div class='leadcard'><div class='lhead'>第" + (Lead.idx + 1) + "/" + m.segs.length + "段・" + esc(s.n) + "・" + s.m + "分鐘</div>" +
       "<div class='ldia'>" + (s.svg || "") + "</div>" +
       "<div class='lsay'>📢 " + esc(s.script || "") + "</div>" +
@@ -534,19 +613,26 @@ var Lead = {
   },
   stopTimer: function () { if (Lead.timer) clearInterval(Lead.timer); Lead.timer = null; },
   next: function () {
-    Lead.stopTimer(); Lead.beep(880, 0.2); Lead.idx++; Lead.render();
+    Lead.stopTimer(); Lead.beep(880, 0.2); Lead.idx++; Lead.saveIdx(); Lead.render();
     if (Lead.idx >= curMeet().segs.length) {
       /* 呢個套包唯一要記嘅嘢：今場集會用過咗。剔落集會目錄，唔做出席／獎章紀錄。 */
       var d = Store.get("done", {}); d[curTid()] = 1; Store.set("done", d);
       if (typeof Flow !== "undefined") Flow.mark("lead");
     }
   },
-  prev: function () { Lead.stopTimer(); Lead.idx = Math.max(0, Lead.idx - 1); Lead.render(); }
+  prev: function () { Lead.stopTimer(); Lead.idx = Math.max(0, Lead.idx - 1); Lead.saveIdx(); Lead.render(); }
 };
 /* ESC always closes the active dialog; useful on desktop and prevents modal dead ends. */
 if (typeof document !== "undefined" && typeof document.addEventListener === "function") document.addEventListener("keydown", function (e) {
-  if (e.key === "Escape") {
-    var m = document.getElementById("modal");
-    if (m && m.classList.contains("on")) Modal.close();
+  var m = document.getElementById("modal");
+  var open = !!(m && m.classList && m.classList.contains("on"));
+  if (!open) return;
+  if (e.key === "Escape") { Modal.close(); return; }
+  if (e.key === "Tab" && m.querySelectorAll) {
+    var f = Array.prototype.filter.call(m.querySelectorAll("a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex='-1'])"), function (el) { return el.offsetParent !== null || el === m.querySelector(".mx"); });
+    if (!f.length) return;
+    var first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   }
 });

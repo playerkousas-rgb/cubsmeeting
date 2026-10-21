@@ -1,89 +1,67 @@
 /* 🐺 幼童軍團集會助手 — Service Worker (offline first，cache齊) */
-var CACHE = "cubhub-v37-exam-papers-20260915";
+var CACHE = "cubhub-v41-wrap-20261022";
+/* 第一階段（安裝時）：只有文字、樣式、程式同細圖。約 0.8MB，裝得快。 */
 var ASSETS = [
   "./", "./index.html", "./manifest.webmanifest", "./css/app.css",
-  "./js/data.js", "./js/guide.js", "./js/flow.js", "./js/app.js", "./js/redesign.js", "./js/content.js", "./js/jungle-data.js", "./js/jungle.js", "./js/practical-data.js", "./js/practical.js", "./js/uniform-ceremony.js", "./js/field-visuals.js", "./js/salute-lab.js", "./js/salute-positions.js", "./js/tracking-kit.js", "./js/material-desk.js", "./js/plain-content.js", "./js/worksheet-guides.js", "./js/exam-papers.js", "./js/skill-art.js", "./js/craft-sheets.js", "./js/songbook.js",
-  "./assets/manual/official.avif", "./assets/manual/catalog.avif", "./assets/manual/handbook.avif", "./assets/manual/ceremony.avif", "./assets/manual/games.avif", "./assets/manual/craft.avif", "./assets/manual/songs.avif", "./assets/manual/safety.avif",
-  "./assets/manual/details/six-colors.avif", "./assets/manual/details/leader-roles.avif", "./assets/manual/details/sixer-training.avif", "./assets/manual/details/pack-call-hands.avif", "./assets/manual/details/flag-steps.avif", "./assets/manual/details/oath.avif", "./assets/manual/details/knots.avif", "./assets/manual/details/tracking-symbols.avif", "./assets/manual/details/first-aid.avif", "./assets/manual/details/map-compass.avif", "./assets/manual/details/campfire-circle.avif", "./assets/manual/details/cooking.avif", "./assets/manual/details/friendship-bracelet.avif", "./assets/manual/details/ram-checklist.avif", "./assets/manual/details/recycled-paper.avif", "./assets/manual/details/sfh-principles.avif", "./assets/manual/details/sharing-circle.avif", "./assets/manual/details/weather.avif",
-  "./assets/skills/backpack-scene.avif",
-  "./assets/skills/beanbag-scene.avif",
-  "./assets/skills/boundary-scene.avif",
-  "./assets/skills/circle-paper-scene.avif",
-  "./assets/skills/cup-tower-scene.avif",
-  "./assets/skills/handover-scene.avif",
-  "./assets/skills/help-call-scene.avif",
-  "./assets/skills/help-steps-scene.avif",
-  "./assets/skills/knot-choose.avif",
-  "./assets/skills/overhand.avif",
-  "./assets/skills/reef.avif",
-  "./assets/skills/senses-scene.avif",
-  "./assets/skills/snack-box-scene.avif",
-  "./assets/skills/wound-scene.avif",
-  "./assets/skills/nosebleed-scene.avif",
-  "./assets/skills/promise-reading-scene.avif",
-  "./assets/skills/group-card-scene.avif",
-  "./assets/skills/festival-discovery-scene.avif",
-  "./assets/skills/next-questions-scene.avif",
-  "./assets/skills/ask-leader-scene.avif",
-  "./assets/skills/food-check-scene.avif",
-  "./assets/skills/snack-tidy-scene.avif",
-  "./assets/skills/hike-kit-scene.avif",
-  "./assets/skills/exploration-art-scene.avif",
-  "./assets/skills/tracking-walk-scene.avif",
-  "./assets/skills/help-practice-scene.avif",
-  "./assets/skills/gentle-warmup-scene.avif",
-  "./assets/skills/helping-review-scene.avif",
-  "./assets/skills/community-manners-scene.avif",
-  "./assets/skills/model-plan-scene.avif",
-  "./assets/skills/waste-choice-scene.avif",
-  "./assets/skills/waste-week-scene.avif",
-  "./assets/skills/bridge-report-scene.avif",
-  "./assets/skills/park-facility-scene.avif",
-  "./assets/skills/kit-choice-scene.avif",
-  "./assets/skills/card-making-scene.avif",
-  "./assets/skills/festival-art-scene.avif",
-  "./assets/skills/festival-safety-scene.avif",
-  "./assets/skills/departure-check-scene.avif",
-  "./assets/skills/return-check-scene.avif",
-  "./assets/skills/weather-stop-scene.avif",
-  "./assets/skills/activity-clothes-scene.avif",
-  "./assets/skills/safe-helping-scene.avif",
-  "./assets/skills/help-network-scene.avif",
-  "./assets/skills/kindness-scene.avif",
-  "./assets/reference/cub-uniform-boy.avif", "./assets/reference/cub-uniform-girl.avif",
-  "./assets/reference/cub-badge-map-2025.avif",
-  "./assets/reference/rally-flag-party-2025.avif",
-  "./assets/jungle/slides/jungle-night-tiger.avif",
-  "./assets/jungle/slides/jungle-wolf-carry.avif",
-  "./assets/jungle/slides/jungle-tiger-cave.avif",
-  "./assets/jungle/slides/jungle-den-family.avif",
-  "./assets/jungle/slides/jungle-council.avif",
-  "./assets/jungle/slides/jungle-presented.avif",
-  "./assets/jungle/slides/jungle-water-snake.avif",
-  "./assets/jungle/slides/jungle-monkeys.avif",
-  "./assets/jungle/slides/jungle-kite-message.avif",
-  "./assets/jungle/slides/jungle-baloo-lesson.avif",
-  "./assets/jungle/slides/jungle-bees-bat.avif",
-  "./assets/jungle/slides/jungle-hunting-grounds.avif",
-  "./assets/jungle/slides/jungle-kaa-rescue.avif",
-  "./assets/jungle/slides/jungle-forest-rules.avif",
-  "./assets/jungle/slides/jungle-pack-split.avif",
-  "./assets/jungle/slides/jungle-red-flower.avif",
-  "./assets/jungle/slides/jungle-farewell.avif",
-  "./assets/jungle/slides/jungle-village.avif",
-  "./assets/jungle/slides/jungle-two-homes.avif",
-  "./assets/jungle/slides/jungle-faceoff.avif",
-  "./assets/jungle/slides/jungle-fire-branch.avif",
-  "./assets/jungle/slides/jungle-tiger-return.avif",
-  "./assets/jungle/slides/jungle-herd-plan.avif",
-  "./assets/jungle/slides/jungle-carry-on.avif",
-  "./assets/teaching/right-hand-salute.avif",
-  "./icons/icon-192.png", "./icons/icon-512.png",
-  "./assets/jungle/mowgli.avif", "./assets/jungle/raksha.avif", "./assets/jungle/akela.avif", "./assets/jungle/baloo.avif",
-  "./assets/jungle/bagheera.avif", "./assets/jungle/sherekhan.avif", "./assets/jungle/kaa.avif", "./assets/jungle/chil.avif", "./assets/jungle/banderlog.avif", "./assets/jungle/hathi.avif", "./assets/jungle/tabaqui.avif"
+  "./js/data.js", "./js/guide.js", "./js/flow.js", "./js/app.js",
+  "./js/redesign.js", "./js/content.js", "./js/jungle-data.js", "./js/jungle.js",
+  "./js/practical-data.js", "./js/practical.js", "./js/uniform-ceremony.js", "./js/field-visuals.js",
+  "./js/salute-lab.js", "./js/salute-positions.js", "./js/tracking-kit.js", "./js/material-desk.js",
+  "./js/plain-content.js", "./js/worksheet-guides.js", "./js/exam-papers.js", "./js/skill-art.js",
+  "./js/craft-sheets.js", "./js/songbook.js", "./assets/reference/cub-uniform-boy.avif", "./assets/reference/cub-uniform-girl.avif",
+  "./assets/reference/cub-badge-map-2026.avif", "./assets/reference/cub-badge-map-2025.avif", "./assets/reference/rally-flag-party-2025.avif", "./assets/teaching/right-hand-salute.avif",
+  "./icons/icon-192.png", "./icons/icon-512.png"
+];
+/* 第二階段（背景補齊）：教學大圖。安裝完成後由頁面發 "CACHE_EXTRA" 訊息才下載，
+   唔會同首次開頁爭頻寬；補齊之後一樣完全離線。 */
+var EXTRA = [
+  "./assets/manual/official.avif", "./assets/manual/catalog.avif", "./assets/manual/handbook.avif", "./assets/manual/ceremony.avif",
+  "./assets/manual/games.avif", "./assets/manual/craft.avif", "./assets/manual/songs.avif", "./assets/manual/safety.avif",
+  "./assets/manual/details/six-colors.avif", "./assets/manual/details/leader-roles.avif", "./assets/manual/details/sixer-training.avif", "./assets/manual/details/pack-call-hands.avif",
+  "./assets/manual/details/flag-steps.avif", "./assets/manual/details/oath.avif", "./assets/manual/details/knots.avif", "./assets/manual/details/tracking-symbols.avif",
+  "./assets/manual/details/first-aid.avif", "./assets/manual/details/map-compass.avif", "./assets/manual/details/campfire-circle.avif", "./assets/manual/details/cooking.avif",
+  "./assets/manual/details/friendship-bracelet.avif", "./assets/manual/details/ram-checklist.avif", "./assets/manual/details/recycled-paper.avif", "./assets/manual/details/sfh-principles.avif",
+  "./assets/manual/details/sharing-circle.avif", "./assets/manual/details/weather.avif", "./assets/skills/backpack-scene.avif", "./assets/skills/beanbag-scene.avif",
+  "./assets/skills/boundary-scene.avif", "./assets/skills/circle-paper-scene.avif", "./assets/skills/cup-tower-scene.avif", "./assets/skills/handover-scene.avif",
+  "./assets/skills/help-call-scene.avif", "./assets/skills/help-steps-scene.avif", "./assets/skills/knot-choose.avif", "./assets/skills/overhand.avif",
+  "./assets/skills/reef.avif", "./assets/skills/senses-scene.avif", "./assets/skills/snack-box-scene.avif", "./assets/skills/wound-scene.avif",
+  "./assets/skills/nosebleed-scene.avif", "./assets/skills/promise-reading-scene.avif", "./assets/skills/group-card-scene.avif", "./assets/skills/festival-discovery-scene.avif",
+  "./assets/skills/next-questions-scene.avif", "./assets/skills/ask-leader-scene.avif", "./assets/skills/food-check-scene.avif", "./assets/skills/snack-tidy-scene.avif",
+  "./assets/skills/hike-kit-scene.avif", "./assets/skills/exploration-art-scene.avif", "./assets/skills/tracking-walk-scene.avif", "./assets/skills/help-practice-scene.avif",
+  "./assets/skills/gentle-warmup-scene.avif", "./assets/skills/helping-review-scene.avif", "./assets/skills/community-manners-scene.avif", "./assets/skills/model-plan-scene.avif",
+  "./assets/skills/waste-choice-scene.avif", "./assets/skills/waste-week-scene.avif", "./assets/skills/bridge-report-scene.avif", "./assets/skills/park-facility-scene.avif",
+  "./assets/skills/kit-choice-scene.avif", "./assets/skills/card-making-scene.avif", "./assets/skills/festival-art-scene.avif", "./assets/skills/festival-safety-scene.avif",
+  "./assets/skills/departure-check-scene.avif", "./assets/skills/return-check-scene.avif", "./assets/skills/weather-stop-scene.avif", "./assets/skills/activity-clothes-scene.avif",
+  "./assets/skills/safe-helping-scene.avif", "./assets/skills/help-network-scene.avif", "./assets/skills/kindness-scene.avif", "./assets/jungle/slides/jungle-night-tiger.avif",
+  "./assets/jungle/slides/jungle-wolf-carry.avif", "./assets/jungle/slides/jungle-tiger-cave.avif", "./assets/jungle/slides/jungle-den-family.avif", "./assets/jungle/slides/jungle-council.avif",
+  "./assets/jungle/slides/jungle-presented.avif", "./assets/jungle/slides/jungle-water-snake.avif", "./assets/jungle/slides/jungle-monkeys.avif", "./assets/jungle/slides/jungle-kite-message.avif",
+  "./assets/jungle/slides/jungle-baloo-lesson.avif", "./assets/jungle/slides/jungle-bees-bat.avif", "./assets/jungle/slides/jungle-hunting-grounds.avif", "./assets/jungle/slides/jungle-kaa-rescue.avif",
+  "./assets/jungle/slides/jungle-forest-rules.avif", "./assets/jungle/slides/jungle-pack-split.avif", "./assets/jungle/slides/jungle-red-flower.avif", "./assets/jungle/slides/jungle-farewell.avif",
+  "./assets/jungle/slides/jungle-village.avif", "./assets/jungle/slides/jungle-two-homes.avif", "./assets/jungle/slides/jungle-faceoff.avif", "./assets/jungle/slides/jungle-fire-branch.avif",
+  "./assets/jungle/slides/jungle-tiger-return.avif", "./assets/jungle/slides/jungle-herd-plan.avif", "./assets/jungle/slides/jungle-carry-on.avif", "./assets/jungle/mowgli.avif",
+  "./assets/jungle/raksha.avif", "./assets/jungle/akela.avif", "./assets/jungle/baloo.avif", "./assets/jungle/bagheera.avif",
+  "./assets/jungle/sherekhan.avif", "./assets/jungle/kaa.avif", "./assets/jungle/chil.avif", "./assets/jungle/banderlog.avif",
+  "./assets/jungle/hathi.avif", "./assets/jungle/tabaqui.avif"
 ];
 self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(ASSETS); }).then(function () { return self.skipWaiting(); }));
+});
+/* 背景補齊大圖：逐張存，任何一張失敗都唔影響其餘。 */
+function cacheExtra() {
+  return caches.open(CACHE).then(function (c) {
+    return Promise.all(EXTRA.map(function (u) {
+      return c.match(u).then(function (hit) {
+        if (hit) return null;
+        return fetch(u, { credentials: "same-origin" }).then(function (r) {
+          if (r && r.ok) return c.put(u, r);
+          return null;
+        }).catch(function () { return null; });
+      });
+    }));
+  });
+}
+self.addEventListener("message", function (e) {
+  if (e.data && e.data.type === "CACHE_EXTRA") e.waitUntil(cacheExtra());
 });
 self.addEventListener("activate", function (e) {
   e.waitUntil(caches.keys().then(function (ks) {
@@ -117,7 +95,11 @@ self.addEventListener("fetch", function (e) {
         var copy = res.clone();
         caches.open(CACHE).then(function (c) { try { c.put(e.request, copy); } catch (_) {} });
         return res;
-      }).catch(function () { return caches.match("./index.html"); });
+      }).catch(function () {
+        /* 圖片失敗就回 404，交由 onerror 顯示替代文字；唔好回 index.html（HTML 當圖會更亂） */
+        if (e.request.destination === "image") return new Response("", { status: 404, statusText: "offline" });
+        return caches.match("./index.html");
+      });
     })
   );
 });
