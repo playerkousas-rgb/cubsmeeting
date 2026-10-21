@@ -2794,3 +2794,12 @@ details.map-self .mut{font-size:.82rem}
 #topnav .navrow a{min-height:44px;justify-content:center}
 #tabbar .navrow a{min-height:44px}
 @media print{#topnav .navrow a,#tabbar .navrow a{min-height:0}}
+
+/* 集會目錄：篩選 + 繼續上次 */
+.plan-filter{margin:8px 0 10px}
+.resume-card{border-left:4px solid var(--gr)}
+.resume-title{font-size:1.05rem;margin:2px 0 4px}
+.empty-note{padding:14px 4px;text-align:center}
+
+/* 活動／技能卡：分批顯示，避免一次過畫 160 幾個掣 */
+.lib-more{text-align:center;margin:10px 0 2px}

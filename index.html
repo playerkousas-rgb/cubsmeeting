@@ -87,7 +87,20 @@
 /* PWA + 啟動，與 ghmeeting 同步 */
 if ("serviceWorker" in navigator) {
   addEventListener("load", function () {
-    try { navigator.serviceWorker.register("sw.js").catch(function () {}); } catch (e) {}
+    try {
+      navigator.serviceWorker.register("sw.js").then(function () {
+        /* 安裝包只有文字同細圖；教學大圖等頁面閒置時才背景補齊，唔搶首次載入頻寬。 */
+        var warm = function () {
+          if (navigator.onLine === false) return;
+          navigator.serviceWorker.ready.then(function (reg) {
+            var sw = reg.active || navigator.serviceWorker.controller;
+            if (sw) sw.postMessage({ type: "CACHE_EXTRA" });
+          }).catch(function () {});
+        };
+        if (window.requestIdleCallback) requestIdleCallback(warm, { timeout: 8000 });
+        else setTimeout(warm, 4000);
+      }).catch(function () {});
+    } catch (e) {}
   });
 }
 try {

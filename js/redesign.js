@@ -69,10 +69,56 @@
   };
 
   /* === 主頁：集會目錄 + 上5下5定位 + 目錄列表 === */
+  App.planFilter = 'all';
+  App.setPlanFilter = function (k) {
+    App.planFilter = (['all','todo','done','month'].indexOf(k) >= 0) ? k : 'all';
+    App.route();
+  };
+  App.monthName = function () {
+    try { return (new Date().getMonth() + 1) + '月'; } catch (e) { return ''; }
+  };
+  /* 首頁「繼續上次」：講清楚上次帶到邊段，一撳返去。 */
+  App.resumeCard = function () {
+    var m = curMeet();
+    if (!m) return '';
+    var segs = m.segs.length;
+    var saved = Store.get('leadidx_' + m.tid, 0);
+    var idx = (Number.isInteger(saved) && saved >= 0 && saved < segs) ? saved : 0;
+    var doneFlag = !!Store.get('done', {})[m.tid];
+    var label = idx > 0 ? ('上次帶到第 ' + (idx + 1) + '/' + segs + ' 段') : (doneFlag ? '呢場已記完成' : '仲未開始');
+    return '<section class="card resume-card"><span class="eyebrow">⏯️ 繼續上次</span><h2 class="resume-title">' + esc(m.n) + '</h2>'
+      + '<p class="mut">' + esc(m.month) + ' · 約' + m.mins + '分鐘 · ' + esc(label) + '</p>'
+      + '<div class="quick"><button class="btn gr" onclick="App.go(\'#lead\')">▶ 繼續帶領</button>'
+      + '<a class="btn ghost" href="#prep?tid=' + m.tid + '">睇準備頁</a></div></section>';
+  };
+
   App.vPlan = function () {
     var ms=DATA.meetings, done=Store.get('done',{}), count=ms.filter(function(m){return done[m.tid];}).length;
-    var rows=ms.map(function(m,i){var d=!!done[m.tid];return '<div class="toc-row'+(m.tid===curTid()?' on':'')+'"><span class="toc-no">'+String(i+1).padStart(2,'0')+'</span><a class="toc-mid" href="#prep?tid='+m.tid+'"><b>'+esc(m.n)+'</b><small>'+esc(m.month)+' · '+m.mins+'分鐘 · '+esc(m.badge)+'</small></a><button class="pill '+(d?'on':'')+'" aria-pressed="'+(d?'true':'false')+'" aria-label="'+esc(m.n)+(d?'：已完成':'：未完成')+'" onclick="App.toggleDone(\''+m.tid+'\')">'+(d?'✓ 完成':'未做')+'</button></div>';}).join('');
-    return '<section class="card catalog-hero"><span class="eyebrow">🐺 幼童軍 · 2026 綱要</span><h1>📅 集會目錄</h1><p>撳標題預備，撳狀態改完成。今場集會據幼童軍訓練綱要設計，唔使逐頁翻書。</p><div class="stat"><div class="s"><b>'+ms.length+'</b>場</div><div class="s"><b>'+count+'</b>完成</div></div><div class="btns"><a class="btn sm ghost" href="https://scout-circulars.vercel.app/" target="_blank" rel="noopener">📨 睇最新通告同活動</a><a class="btn sm ghost" href="'+OFFICIAL.schemePage+'" target="_blank" rel="noopener">📖 訓練綱要 2026</a><a class="btn sm ghost" href="'+OFFICIAL.packet+'" target="_blank" rel="noopener">📦 官方集會套包</a></div></section><section class="card"><div class="catalog-head"><h2>📅 全部集會</h2><span class="mut">'+ms.length+' 場</span></div><div class="toc-list">'+rows+'</div></section>'
+    var f = App.planFilter || 'all';
+    var month = App.monthName();
+    var shown = ms.filter(function(m){
+      if (f === 'todo') return !done[m.tid];
+      if (f === 'done') return !!done[m.tid];
+      if (f === 'month') return String(m.month) === month;
+      return true;
+    });
+    var chips = [['all','全部'],['todo','未做'],['done','已完成'],['month','本月（' + month + '）']].map(function(c){
+      var on = (f === c[0]);
+      return '<button class="subtab' + (on ? ' cur' : '') + '" aria-pressed="' + (on ? 'true' : 'false') + '" onclick="App.setPlanFilter(\'' + c[0] + '\')">' + esc(c[1]) + '</button>';
+    }).join('');
+    var rows = shown.map(function(m){
+      var d=!!done[m.tid];
+      var i = ms.indexOf(m);
+      return '<div class="toc-row'+(m.tid===curTid()?' on':'')+'"><span class="toc-no">'+String(i+1).padStart(2,'0')+'</span>'
+        + '<a class="toc-mid" href="#prep?tid='+m.tid+'"><b>'+esc(m.n)+'</b><small>'+esc(m.month)+' · '+m.mins+'分鐘 · '+esc(m.badge)+'</small></a>'
+        + '<button class="pill '+(d?'on':'')+'" aria-pressed="'+(d?'true':'false')+'" aria-label="'+esc(m.n)+(d?'：已完成':'：未完成')+'" onclick="App.toggleDone(\''+m.tid+'\')">'+(d?'✓ 完成':'未做')+'</button></div>';
+    }).join('');
+    if (!rows) rows = '<p class="mut empty-note">呢個篩選暫時冇集會。撳「全部」睇返 27 場。</p>';
+    return '<section class="card catalog-hero"><span class="eyebrow">🐺 幼童軍 · 2026 綱要</span><h1>📅 集會目錄</h1><p>撳標題預備，撳狀態改完成。今場集會據幼童軍訓練綱要設計，唔使逐頁翻書。</p><div class="stat"><div class="s"><b>'+ms.length+'</b>場</div><div class="s"><b>'+count+'</b>完成</div></div><div class="btns"><a class="btn sm ghost" href="https://scout-circulars.vercel.app/" target="_blank" rel="noopener">📨 睇最新通告同活動</a><a class="btn sm ghost" href="'+OFFICIAL.schemePage+'" target="_blank" rel="noopener">📖 訓練綱要 2026</a><a class="btn sm ghost" href="'+OFFICIAL.packet+'" target="_blank" rel="noopener">📦 官方集會套包</a></div></section>'
+      + App.resumeCard()
+      + '<section class="card"><div class="catalog-head"><h2>📅 全部集會</h2><span class="mut">' + shown.length + ' / ' + ms.length + ' 場</span></div>'
+      + '<div class="subtabs plan-filter" role="group" aria-label="篩選集會">' + chips + '</div>'
+      + '<div class="toc-list">'+rows+'</div></section>';
   };
 
   App.vOfficial = function(){
@@ -147,10 +193,13 @@
       var toolTabs = tools.map(function (t, i) {
         return '<button class="subtab booktool' + (i === 0 ? ' cur' : '') + '" data-tool="' + t.id + '" onclick="App.showBookTool(this)">' + (t.icon ? t.icon + ' ' : '') + esc(t.label) + '</button>';
       }).join('');
+      /* 只有第一個分頁即刻 render；其餘等撳落去才生成，手冊頁因此由約 3,900 字降到約 900 字。 */
       var toolPanels = tools.map(function (t, i) {
         var panelHtml = '';
-        try { panelHtml = t.html(); } catch (e) { panelHtml = '<p class="mut">呢件教材暫時開唔到。</p>'; }
-        return '<div class="booktool-panel' + (i === 0 ? '' : ' hidden') + '" data-panel="' + t.id + '">' + panelHtml + '</div>';
+        if (i === 0) {
+          try { panelHtml = t.html(); } catch (e) { panelHtml = '<p class="mut">呢件教材暫時開唔到。</p>'; }
+        }
+        return '<div class="booktool-panel' + (i === 0 ? '' : ' hidden') + '" data-panel="' + t.id + '"' + (i === 0 ? '' : ' data-pending="1"') + '>' + panelHtml + '</div>';
       }).join('');
       toolsHtml = '<section class="card booktools"><h2>🧰 教材工具</h2><p class="mut">撳標籤直接開教材，唔使一路碌到落底。</p><div class="subtabs booktool-tabs">' + toolTabs + '</div>' + toolPanels + '</section>';
     }
@@ -168,7 +217,14 @@
     btn.classList.add('cur');
     var panels = root.querySelectorAll('.booktool-panel');
     for (var j = 0; j < panels.length; j++) {
-      panels[j].classList.toggle('hidden', panels[j].getAttribute('data-panel') !== id);
+      var on = panels[j].getAttribute('data-panel') === id;
+      if (on && panels[j].getAttribute('data-pending') === '1') {
+        var fn = null;
+        for (var k = 0; k < App.bookPanels.length; k++) if (App.bookPanels[k].id === id) fn = App.bookPanels[k].html;
+        try { panels[j].innerHTML = fn ? fn() : ''; } catch (e) { panels[j].innerHTML = '<p class="mut">呢件教材暫時開唔到。</p>'; }
+        panels[j].removeAttribute('data-pending');
+      }
+      panels[j].classList.toggle('hidden', !on);
     }
   };
 
@@ -205,7 +261,9 @@
      追蹤、遠足、紮作／工程、天氣等；活動＝遊戲、情境、分享、故事、手工等。
      每場只出三個核心節（第2–4個），集合／回顧係例行段，唔當活動／技能卡。 */
   App.skillTids = {c06:1,c07:1,c08:1,c09:1,c10:1,c12:1,c15:1,c17:1,c18:1,c20:1,c23:1};
-  App.libraryCards = function (kind) {
+  App.LIB_STEP = 12;
+  /* 一次過出 27 場 × 3 節會好重，所以分開：libraryList 出齊，頁面只畫前 12 張。 */
+  App.libraryList = function (kind) {
     var cards = [];
     DATA.meetings.forEach(function(m){
       var isSkill = !!App.skillTids[m.tid];
@@ -222,20 +280,56 @@
           ((typeof SkillArt!=='undefined' && SkillArt.print)?'<button class="btn sm ghost" onclick="SkillArt.print(\''+m.tid+'\','+i+')">🖨️ 只印呢張</button>':'')+'</div></div>');
       });
     });
-    return cards.join('');
+    return cards;
+  };
+  App.libraryCards = function (kind) { return App.libraryList(kind).join(''); };
+  App.librarySlice = function (kind, start, n) {
+    return App.libraryList(kind).slice(start || 0, (start || 0) + (n || App.LIB_STEP)).join('');
+  };
+  App.moreLibrary = function (btn, kind) {
+    if (!btn || !btn.dataset) return;
+    var sec = btn.closest ? btn.closest('section') : null;
+    var box = sec ? sec.querySelector('#lib-' + kind) : null;
+    var start = parseInt(btn.dataset.start, 10) || 0;
+    var total = App.libraryList(kind).length;
+    var next = Math.min(start + App.LIB_STEP, total);
+    if (box) box.insertAdjacentHTML('beforeend', App.librarySlice(kind, start, App.LIB_STEP));
+    btn.dataset.start = String(next);
+    var left = total - next;
+    if (left <= 0) { if (btn.parentElement) btn.parentElement.remove(); }
+    else btn.textContent = '睇多啲（仲有 ' + left + ' 張）';
+  };
+  App.libMore = function (kind) {
+    var total = App.libraryList(kind).length;
+    var left = total - App.LIB_STEP;
+    if (left <= 0) return '';
+    return '<div class="lib-more"><button class="btn ghost" data-start="' + App.LIB_STEP + '" onclick="App.moreLibrary(this,\'' + kind + '\')">睇多啲（仲有 ' + left + ' 張）</button></div>';
   };
   App.vLibrary = function (skills) {
     var title = '🎮 活動・技能帶領卡';
+    var actHtml = App.librarySlice('activity', 0);
+    var skillHtml = App.librarySlice('skill', 0);
     var jungleCard = '<section class="card"><h2>🌳 想加一段故事？</h2><a class="btn" href="#jungle">森林故事・角色卡 →</a></section>'
       + '<section class="card"><h2>🎲 集會中途要用嘅快鍵</h2><p class="mut">安靜訊號、集合哨、小隊計分、抽籤、倒數。</p><a class="btn" href="#tools">開快鍵 →</a>'
       + '<a class="btn ghost" href="https://prog.scouting.org.hk/cub/training-scheme/" target="_blank" rel="noopener">📖 訓練綱要 2026（官方）</a></section>';
-    return '<section class="card"><a class="back" href="#plan" style="text-decoration:none;color:var(--ord)">‹ 返回</a><h1>'+title+'</h1><p class="mut">先看圖，再跟住做。安全提醒必讀；可只印所選一張。</p><div class="subtabs"><button class="subtab'+(skills?'':' cur')+'" onclick="App.showLibraryTab(this,\'activity\')">🎮 活動</button><button class="subtab'+(skills?' cur':'')+'" onclick="App.showLibraryTab(this,\'skill\')">🛠️ 技能</button></div><div id="lib-activity" class="manual-grid lib-grid'+(skills?' hidden':'')+'" role="group" aria-label="活動帶領卡">'+App.libraryCards('activity')+'</div><div id="lib-skill" role="group" aria-label="技能帶領卡" class="manual-grid lib-grid'+(skills?'':' hidden')+'">'+App.libraryCards('skill')+'</div></section>'+jungleCard;
+    return '<section class="card"><a class="back" href="#plan" style="text-decoration:none;color:var(--ord)">‹ 返回</a><h1>' + title + '</h1><p class="mut">先看圖，再跟住做。安全提醒必讀；可只印所選一張。</p>'
+      + '<div class="subtabs"><button class="subtab' + (skills ? '' : ' cur') + '" onclick="App.showLibraryTab(this,\'activity\')">🎮 活動</button>'
+      + '<button class="subtab' + (skills ? ' cur' : '') + '" onclick="App.showLibraryTab(this,\'skill\')">🛠️ 技能</button></div>'
+      + '<div id="lib-activity" class="manual-grid lib-grid' + (skills ? ' hidden' : '') + '" role="group" aria-label="活動帶領卡">' + actHtml + '</div>'
+      + '<div class="lib-more' + (skills ? ' hidden' : '') + '" data-for="activity">' + App.libMore('activity') + '</div>'
+      + '<div id="lib-skill" role="group" aria-label="技能帶領卡" class="manual-grid lib-grid' + (skills ? '' : ' hidden') + '">' + skillHtml + '</div>'
+      + '<div class="lib-more' + (skills ? '' : ' hidden') + '" data-for="skill">' + App.libMore('skill') + '</div>'
+      + '</section>' + jungleCard;
   };
   App.showLibraryTab = function (btn, key) {
     var root = btn.closest('.card'); if (!root) return;
     root.querySelectorAll('.subtab').forEach(function(x){x.classList.remove('cur');}); btn.classList.add('cur');
     root.querySelector('#lib-activity').classList.toggle('hidden', key !== 'activity');
     root.querySelector('#lib-skill').classList.toggle('hidden', key !== 'skill');
+    var moreA = root.querySelector('.lib-more[data-for="activity"]');
+    var moreS = root.querySelector('.lib-more[data-for="skill"]');
+    if (moreA) moreA.classList.toggle('hidden', key !== 'activity');
+    if (moreS) moreS.classList.toggle('hidden', key !== 'skill');
   };
 
   App.vCraft = function(){
